@@ -1,0 +1,10 @@
+.home-content {
+  background-color: #fff;
+  padding: 40px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Тень блока */
+  color: #3498db; /* Голубой цвет текста */
+}

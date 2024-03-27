@@ -1,0 +1,46 @@
+.teachers-container {
+  max-width: 1000px; /* Увеличиваем максимальную ширину */
+  margin: 20px auto; /* Уменьшаем вертикальный отступ, если нужно */
+}
+.teachers-title {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.teachers-content {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+}
+
+.teachers-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.teachers-table th, .teachers-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.teachers-table th {
+  background-color: #f5f5f5;
+}
+
+.teachers-table tbody tr:hover {
+  background-color: #f0f0f0;
+}
+
+.teachers-table td ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.teachers-table td li {
+  margin-bottom: 5px;
+}
