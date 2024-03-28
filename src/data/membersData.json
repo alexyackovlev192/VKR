@@ -1,7 +1,7 @@
 [
-    { "id": 1, "name": "Иванов Иван Иванович", "position": "Старший преподаватель", "email": "ivanov@example.com" },
-    { "id": 2, "name": "Петров Петр Петрович", "position": "Профессор", "email": "petrov@example.com" },
-    { "id": 3, "name": "Сидоров Сидор Сидорович", "position": "Профессор", "email": "sidorov@example.com" },
-    { "id": 4, "name": "Алексеев Алексей Алексеевич", "position": "Старший преподаватель", "email": "alexeev@example.com" },
-    { "id": 5, "name": "Козлов Козел Козлович", "position": "Профессор", "email": "kozlov@example.com" }
+    { "id": 1, "fullName": "Иванов Иван Иванович", "position": "Старший преподаватель", "email": "ivanov@example.com" },
+    { "id": 2, "fullName": "Петров Петр Петрович", "position": "Профессор", "email": "petrov@example.com" },
+    { "id": 3, "fullName": "Сидоров Сидор Сидорович", "position": "Профессор", "email": "sidorov@example.com" },
+    { "id": 4, "fullName": "Алексеев Алексей Алексеевич", "position": "Старший преподаватель", "email": "alexeev@example.com" },
+    { "id": 5, "fullName": "Козлов Козел Козлович", "position": "Профессор", "email": "kozlov@example.com" }
   ]

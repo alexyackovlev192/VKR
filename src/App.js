@@ -2,15 +2,16 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import LoginForm from './components/LoginForm';
-import Navigation from './components/Navigation';
-import Footer from './components/Footer';
-
 import HomePage from './pages/HomePage';
 import MembersPage from './pages/MembersPage';
 import SchedulePage from './pages/SchedulePage';
 import GekPage from './pages/GekPage';
 import DefendersPage from './pages/DefendersPage';
+
+import LoginForm from './components/LoginForm';
+import Navigation from './components/Navigation';
+import Footer from './components/Footer';
+
 
 import './App.css';
 
