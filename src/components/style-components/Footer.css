@@ -1,6 +1,6 @@
 .footer {
-  background-color: #ffffff; /* Цвет фона */
-  color: #fff; /* Цвет текста */
+  background-color: #e0eef3; /* Цвет фона */
+  color: #000000; /* Цвет текста */
   padding: 20px; /* Поля внутри футера */
   text-align: center; /* Выравнивание текста по центру */
 }

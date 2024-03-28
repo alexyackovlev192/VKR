@@ -28,12 +28,12 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<LoginForm />} />
         <Route path="/" element={<PageLayout><HomePage /></PageLayout>} />
         <Route path="/members" element={<PageLayout><MembersPage /></PageLayout>} />
         <Route path="/schedule" element={<PageLayout><SchedulePage /></PageLayout>} />
         <Route path="/gek" element={<PageLayout><GekPage /></PageLayout>} />
         <Route path="/defenders" element={<PageLayout><DefendersPage /></PageLayout>} />
+        <Route path="/login" element={<LoginForm />} />
       </Routes>
     </Router>
   );
