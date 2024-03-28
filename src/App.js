@@ -7,11 +7,10 @@ import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 
 import HomePage from './pages/HomePage';
-import ProfilePage from './pages/ProfilePage';
-import NewsPage from './pages/NewsPage';
-import DocumentsPage from './pages/DocumentsPage';
-import TeachersPage from './pages/TeachersPage';
-import TopicsPage from './pages/TopicsPage';
+import MembersPage from './pages/MembersPage';
+import SchedulePage from './pages/SchedulePage';
+import GekPage from './pages/GekPage';
+import DefendersPage from './pages/DefendersPage';
 
 import './App.css';
 
@@ -28,13 +27,12 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<PageLayout><HomePage /></PageLayout>} />
         <Route path="/login" element={<LoginForm />} />
-        <Route path="/profile" element={<PageLayout><ProfilePage /></PageLayout>} />
-        <Route path="/news" element={<PageLayout><NewsPage /></PageLayout>} />
-        <Route path="/documents" element={<PageLayout><DocumentsPage /></PageLayout>} />
-        <Route path="/teachers" element={<PageLayout><TeachersPage /></PageLayout>} />
-        <Route path="/topics" element={<PageLayout><TopicsPage /></PageLayout>} />
+        <Route path="/" element={<PageLayout><HomePage /></PageLayout>} />
+        <Route path="/members" element={<PageLayout><MembersPage /></PageLayout>} />
+        <Route path="/schedule" element={<PageLayout><SchedulePage /></PageLayout>} />
+        <Route path="/gek" element={<PageLayout><GekPage /></PageLayout>} />
+        <Route path="/defenders" element={<PageLayout><DefendersPage /></PageLayout>} />
       </Routes>
     </Router>
   );

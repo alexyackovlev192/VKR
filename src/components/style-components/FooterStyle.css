@@ -1,25 +1,21 @@
 .footer {
-    background-color: #333;
-    color: white;
-    padding: 20px;
-    text-align: center;
-    position: relative; /* Фиксированная позиция */
-    bottom: 0;
-    width: calc(100%-16px);
-    margin-top: 30px;
-  }
-  
-  .social-links {
-    font-size: 24px;
-    margin-top: 10px;
-  }
-  
-  .social-links a {
-    color: white;
-    margin: 0 10px;
-    text-decoration: none;
-  }
-  
-  .social-links a:hover {
-    text-decoration: underline;
-  }
+  background-color: #ffffff; /* Цвет фона */
+  color: #fff; /* Цвет текста */
+  padding: 20px; /* Поля внутри футера */
+  text-align: center; /* Выравнивание текста по центру */
+}
+
+.social-links {
+  margin-top: 10px; /* Отступ сверху для социальных ссылок */
+}
+
+.social-links a {
+  color: #fff; /* Цвет иконок */
+  font-size: 24px; /* Размер иконок */
+  margin: 0 10px; /* Отступ между ссылками */
+  text-decoration: none; /* Убираем подчеркивание */
+}
+
+.social-links a:hover {
+  color: #ccc; /* Цвет иконок при наведении */
+}
