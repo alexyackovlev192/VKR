@@ -89,7 +89,7 @@ const UpdateDefender = ({
       <Modal.Footer>
         {isEditing && (
           <>
-            <Button variant="primary" size="sm" onClick={handleDeleteDefender}>Удалить</Button>
+            <Button variant="secondary" size="sm" onClick={handleDeleteDefender}>Удалить</Button>
             <Button variant="primary" size="sm" onClick={handleSaveChanges}>Сохранить</Button>
           </>
         )}

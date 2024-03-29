@@ -39,11 +39,11 @@ const MembersPage = () => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value, checked, type } = e.target;
-    setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
+    const { fullName, value, checked, type } = e.target;
+    setFormData({ ...formData, [fullName]: type === 'checkbox' ? checked : value });
   };
   return (
-    <>
+    <div className="my-5 px-5">
       <Table striped bordered hover size="sm">
       <thead>
         <tr>
@@ -57,7 +57,7 @@ const MembersPage = () => {
         {membersData.map((member, index) => (
           <tr key={member.id} onDoubleClick={() => handleRowDoubleClick(member)}>
             <td>{index + 1}</td>
-            <td>{member.name}</td>
+            <td>{member.fullName}</td>
             <td>{member.position}</td>
             <td>{member.email}</td>
           </tr>
@@ -74,7 +74,7 @@ const MembersPage = () => {
         handleDeleteMember={handleDeleteMember}
         handleSaveChanges={handleSaveChanges}
       />
-    </>
+    </div>
   );
 };
 
