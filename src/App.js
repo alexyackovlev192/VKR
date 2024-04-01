@@ -1,42 +1,40 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-
-import HomePage from './pages/HomePage';
-import MembersPage from './pages/MembersPage';
-import SchedulePage from './pages/SchedulePage';
-import GekPage from './pages/GekPage';
-import DefendersPage from './pages/DefendersPage';
-
-import LoginForm from './components/LoginForm';
-import Navigation from './components/Navigation';
-import Footer from './components/Footer';
-
-
+import React, { useEffect, useState } from 'react';
 import './App.css';
 
-// Общий компонент для всех страниц
-const PageLayout = ({ children }) => (
-  <div>
-    <Navigation />
-    {children}
-    <Footer />
-  </div>
-);
+function App() {
+  
+  const [state, setState] = useState(null);
 
-const App = () => {
+  const callBackendAPI = async () => {
+    const response = await fetch('/api/data');
+    const body = await response.json();
+
+    if (response.status !== 200) {
+      throw Error(body.message)
+    }
+    return body;
+  };
+  
+  // получение GET маршрута с сервера Express, который соответствует GET из server.js 
+  useEffect(() => {
+    callBackendAPI()
+    .then(res => setState(res.express))
+    .catch(err => console.log(err));
+  }, [])
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<PageLayout><HomePage /></PageLayout>} />
-        <Route path="/members" element={<PageLayout><MembersPage /></PageLayout>} />
-        <Route path="/schedule" element={<PageLayout><SchedulePage /></PageLayout>} />
-        <Route path="/gek" element={<PageLayout><GekPage /></PageLayout>} />
-        <Route path="/defenders" element={<PageLayout><DefendersPage /></PageLayout>} />
-        <Route path="/login" element={<LoginForm />} />
-      </Routes>
-    </Router>
+    <div className="App">
+      <header className="App-header">
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+      </header>
+
+      <p>
+          {state}
+      </p>
+    </div>
   );
-};
+}
 
 export default App;
