@@ -1,26 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import './App.css';
 
 function App() {
   
   const [state, setState] = useState(null);
 
-  const callBackendAPI = async () => {
-    const response = await fetch('/api/data');
-    const body = await response.json();
-
-    if (response.status !== 200) {
-      throw Error(body.message)
-    }
-    return body;
-  };
-  
-  // получение GET маршрута с сервера Express, который соответствует GET из server.js 
-  useEffect(() => {
-    callBackendAPI()
-    .then(res => setState(res.express))
-    .catch(err => console.log(err));
-  }, [])
+  axios.get('/api/data') // замените '/api/data' на путь к вашему API на сервере
+  .then(response => {
+    // Обработка полученных данных
+    console.log(response.data);
+  })
+  .catch(error => {
+    console.error('There was a problem with the fetch operation:', error);
+  });
 
   return (
     <div className="App">
