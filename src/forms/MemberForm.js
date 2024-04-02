@@ -8,13 +8,18 @@ const MemberForm = ({ formData, handleInputChange, isEditing }) => {
     <Form>
       <Form.Group controlId="formFullName">
         <Form.Label>ФИО</Form.Label>
-        <Form.Control
+        <Form.Select
           type="text"
           name="fullName"
           value={fullName}
           onChange={handleInputChange}
           readOnly={isEditing}
-        />
+        >
+          <option value={fullName}>{fullName}</option>
+          <option value="Петров Петр Петрович">Петров Петр Петрович</option>
+          <option value="Сидоров Сидор Сидорович">Сидоров Сидор Сидорович</option>
+          <option value="Алексеев Алексей Алексеевич">Алексеев Алексей Алексеевич</option>
+      </Form.Select>
       </Form.Group>
       <Form.Group controlId="formPosition">
         <Form.Label>Должность</Form.Label>
