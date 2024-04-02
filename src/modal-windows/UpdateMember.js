@@ -1,9 +1,9 @@
 import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
-import DefenderForm from '../forms/DefenderForm';
+import MemberForm from '../forms/MemberForm';
 
-const UpdateDefender = ({
+const UpdateMember = ({
   showModal,
   handleCloseModal,
   formData,
@@ -18,7 +18,7 @@ const UpdateDefender = ({
 
       <Modal.Body>
         {formData && (
-          <DefenderForm formData={formData} handleInputChange={handleInputChange}/>
+          <MemberForm formData={formData} handleInputChange={handleInputChange}/>
         )}
       </Modal.Body>
 
@@ -29,4 +29,4 @@ const UpdateDefender = ({
   );
 };
 
-export default UpdateDefender;
+export default UpdateMember;
