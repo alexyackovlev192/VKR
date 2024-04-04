@@ -1,5 +1,5 @@
 import React from 'react';
-import Form from 'react-bootstrap/Form';
+import { Form } from 'react-bootstrap';
 
 const MemberForm = ({ formData, handleInputChange, isEditing }) => {
   const { fullName, position, email } = formData || {};

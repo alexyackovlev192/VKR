@@ -1,5 +1,5 @@
 import React from 'react';
-import Form from 'react-bootstrap/Form';
+import { Form } from 'react-bootstrap';
 
 const DefenderForm = ({ formData, handleInputChange, isEditing }) => {
     const { fullName, group, topic, supervisor, averageGrade, hasHonors } = formData || {};

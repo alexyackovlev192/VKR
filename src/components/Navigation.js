@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom'; // Импортируем NavLink и useLocation
 import './style-components/Navigation.css';
-import Nav from 'react-bootstrap/Nav';
+import { Nav } from 'react-bootstrap';
 
 const navigationItems = [
   { href: "/", text: "Главная" },

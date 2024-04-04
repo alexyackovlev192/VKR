@@ -1,0 +1,88 @@
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { Button, Card, ListGroup } from 'react-bootstrap';
+import geksData from '../data/geksData.json';
+import membersData from '../data/membersData.json';
+
+const EditGekPage = () => {
+    const { gekId } = useParams(); // Получаем параметр маршрута
+    const [membersGek, setMembersGek] = useState([]);
+    const [allMembersGek, setAllMembersGek] = useState([]);
+    
+    useEffect(() => {
+        // Находим данные выбранной ГЭК по идентификатору из параметра маршрута
+        const gek = geksData.find(gek => gek.id === parseInt(gekId));
+        if (gek) {
+            setMembersGek(gek.members || []);
+        }
+        const filteredMembersData = membersData.filter(member => {
+            return !gek || !gek.members.find(gekMember => gekMember.id === member.id);
+        });
+    
+        // Устанавливаем отфильтрованные данные в setAllMembersGek
+        setAllMembersGek(filteredMembersData);
+    }, [gekId]);
+    
+    const handleMemberAdd = (member) => {
+        // Добавить участника в список текущих участников
+        setMembersGek([...membersGek, member]);
+        
+        // Удалить участника из списка доступных участников
+        const updatedMembers = allMembersGek.filter(m => m.id !== member.id);
+        setAllMembersGek(updatedMembers);
+    };
+        
+    const handleMemberRemove = (member) => {
+        // Добавить участника обратно в список доступных участников
+        setAllMembersGek([...allMembersGek, member]);
+        
+        // Удалить участника из списка текущих участников
+        const updatedMembers = membersGek.filter(m => m.id !== member.id);
+        setMembersGek(updatedMembers);
+    };
+
+  return (
+    <div className="container-fluid text-center my-3">
+      <div className="row justify-content-evenly">
+        <Card style={{ minWidth: '500px', width: '40%' }} className="my-2 text-center bg-light">
+            <Card.Body>
+                <Card.Title className="text-center fs-5">Текущие члены ГЭК</Card.Title>
+                <ListGroup className="container">
+                    {membersGek.map((member, index) => (
+                    <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center py-2">
+                        <span className="mx-3">{member.id}: {member.name}</span>
+                        <Button 
+                            variant="danger" 
+                            onClick={() => handleMemberRemove(member)}
+                            className="mx-3"
+                        >Удалить</Button>
+                    </ListGroup.Item>
+                ))}
+                </ListGroup>
+            </Card.Body>
+        </Card>
+
+
+        <Card style={{ minWidth: '500px', width: '40%' }} className="my-2 text-center bg-light">
+            <Card.Body>
+                <Card.Title className="text-center fs-5">Члены ГЭК</Card.Title>
+                <ListGroup className="container">
+                    {allMembersGek.map((member, index) => (
+                    <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center py-2">
+                        <span className="mx-3">{member.id}: {member.name}</span>
+                        <Button 
+                            variant="primary" 
+                            onClick={() => handleMemberAdd(member)}
+                            className="mx-3"
+                        >Добавить</Button>
+                    </ListGroup.Item>
+                ))}
+                </ListGroup>
+            </Card.Body>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default EditGekPage;
