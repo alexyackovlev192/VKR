@@ -120,4 +120,6 @@ const EditGekPage = () => {
   );
 };
 
+
+
 export default EditGekPage;
