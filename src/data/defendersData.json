@@ -1,6 +1,0 @@
-[
-    { "id": 1, "fullName": "Иванов Иван Иванович", "group": "Группа 1", "topic": "Тема 1", "supervisor": "Петров Петр Петрович", "averageGrade": 4.5, "hasHonors": true },
-    { "id": 2, "fullName": "Петров Петр Петрович", "group": "Группа 2", "topic": "Тема 2", "supervisor": "Сидоров Сидор Сидорович", "averageGrade": 4.7, "hasHonors": false },
-    { "id": 3, "fullName": "Сидоров Сидор Сидорович", "group": "Группа 3", "topic": "Тема 3", "supervisor": "Иванов Иван Иванович", "averageGrade": 4.2, "hasHonors": true },
-    { "id": 4, "fullName": "Алексеев Алексей Алексеевич", "group": "Группа 4", "topic": "Тема 4", "supervisor": "Козлов Козел Козлович", "averageGrade": 4.9, "hasHonors": true }
-]
