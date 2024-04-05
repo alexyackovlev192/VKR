@@ -7,6 +7,7 @@ import membersData from '../data/membersData.json';
 const EditGekPage = () => {
     const { gekId } = useParams(); // Получаем параметр маршрута
     const [membersGek, setMembersGek] = useState([]);
+    const [secretariesGek, setSecretariesGek] = useState([]);
     const [allMembersGek, setAllMembersGek] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('Состав'); // Добавляем состояние для выбранной категории
 
@@ -29,9 +30,7 @@ const EditGekPage = () => {
         if (selectedCategory === 'Состав') {
             setMembersGek([...membersGek, member]);
         } else if (selectedCategory === 'Секретари') {
-            // Добавить участника в список секретарей
-            // Здесь предполагается, что у вас есть отдельный массив для секретарей в объекте gek или другой логике
-            // Например, gek.secretaries.push(member)
+            setSecretariesGek([...secretariesGek, member]);
         }
         
         // Удалить участника из списка доступных участников
@@ -48,14 +47,23 @@ const EditGekPage = () => {
         setMembersGek(updatedMembers);
     };
 
+    const handleSecretarieRemove = (member) => {
+        // Добавить участника обратно в список доступных участников
+        setAllMembersGek([...allMembersGek, member]);
+        
+        // Удалить участника из списка текущих участников
+        const updatedSecretaries = secretariesGek.filter(m => m.id !== member.id);
+        setSecretariesGek(updatedSecretaries);
+    };
+
     const handleCategoryChange = (category) => {
         setSelectedCategory(category);
     };
 
     // Сортировка по алфавиту ФИО
     const sortedMembersGek = membersGek.slice().sort((a, b) => a.name.localeCompare(b.name));
+    const sortedSecretariesGek = secretariesGek.slice().sort((a, b) => a.name.localeCompare(b.name));
     const sortedAllMembersGek = allMembersGek.slice().sort((a, b) => a.name.localeCompare(b.name));
-
   return (
     <div className="container-fluid text-center my-3">
       <div className="row justify-content-evenly">
@@ -68,7 +76,7 @@ const EditGekPage = () => {
                     className="mx-3 my-2"
                 >Состав</Button>
                 <ListGroup className="container text-center">
-                    {selectedCategory === 'Состав' && sortedMembersGek.map((member, index) => (
+                    {sortedMembersGek.map((member, index) => (
                     <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center py-2">
                         <span className="mx-3">{member.id}: {member.name}</span>
                         <Button 
@@ -85,12 +93,12 @@ const EditGekPage = () => {
                     className="mx-3 my-2"
                 >Секретари</Button>
                 <ListGroup className="container text-center">
-                    {selectedCategory === 'Секретари' && sortedMembersGek.map((member, index) => (
+                    {sortedSecretariesGek.map((member, index) => (
                     <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center py-2">
                         <span className="mx-3">{member.id}: {member.name}</span>
                         <Button 
                             variant="danger" 
-                            onClick={() => handleMemberRemove(member)}
+                            onClick={() => handleSecretarieRemove(member)}
                             className="mx-3"
                         >Удалить</Button>
                     </ListGroup.Item>
