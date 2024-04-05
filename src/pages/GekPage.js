@@ -6,7 +6,9 @@ import geksData from '../data/geksData.json';
 const GekPage = () => {
   return (
     <div className="container-fluid text-center my-3">
-      <Button variant="primary" className="col-2 my-2 p-3">Создать новую ГЭК</Button>
+      <Link to={`/create-gek`}>
+        <Button variant="primary" className="col-2 my-2 p-3">Создать новую ГЭК</Button>
+      </Link>
       <div className="row justify-content-evenly">
         {geksData.map(gekData => (
           <Card key={gekData.id} style={{ minWidth: '400px', width: '30%' }}  className="col-4 my-4 text-center bg-light">

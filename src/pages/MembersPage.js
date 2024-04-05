@@ -91,34 +91,36 @@ const MembersPage = () => {
   // Возвращаем JSX компонента
   return (
     <div className="my-5 px-5" ref={tableRef}>
-      <>
+      <div>
         <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>Редактировать</Button>
         <Button variant="primary" className="mx-3" onClick={handleAddMember}>Добавить</Button>
         <Button variant="danger" className="mx-3" onClick={handleDeleteMember} disabled={!activeRow}>Удалить</Button>
-      </>
-      <table className="table table-light table-hover">
-        <thead>
-          <tr>
-            <th>№</th>
-            <th>ФИО</th>
-            <th>Должность</th>
-            <th>Почта</th>
-          </tr>
-        </thead>
-        <tbody>
-          {membersData.map((member, index) => (
-            <tr 
-              key={member.id}
-              className={activeRow === member ? 'table-info' : 'table-light'}
-              onClick={() => handleRowClick(member)}>
-              <td>{index + 1}</td>
-              <td>{member.fullName}</td>
-              <td>{member.position}</td>
-              <td>{member.email}</td>
+      </div>
+      <div className="my-4" style={{ height: '70vh', overflowY: 'auto' }}>
+        <table className="table table-light table-hover">
+          <thead>
+            <tr>
+              <th>№</th>
+              <th>ФИО</th>
+              <th>Должность</th>
+              <th>Почта</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {membersData.map((member, index) => (
+              <tr 
+                key={member.id}
+                className={activeRow === member ? 'table-info' : 'table-light'}
+                onClick={() => handleRowClick(member)}>
+                <td>{index + 1}</td>
+                <td>{member.fullName}</td>
+                <td>{member.position}</td>
+                <td>{member.email}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <UpdateMember
         showModal={showUpdateModal}
         handleCloseModal={handleCloseModal}
