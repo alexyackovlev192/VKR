@@ -1,0 +1,7 @@
+[
+    { "id": "ivt", "name": "ИВТ" },
+    { "id": "pi", "name": "ПИ" },
+    { "id": "prinj", "name": "ПриИнж" },
+    { "id": "ist", "name": "ИСТ" },
+    { "id": "fiit", "name": "ФИИТ" }
+  ]
