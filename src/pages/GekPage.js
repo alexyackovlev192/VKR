@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Card, ListGroup } from 'react-bootstrap';
 import geksData from '../data/geksData.json';
 
 const GekPage = () => {
+  const [geks, setGeks] = useState(geksData); // Хранение данных ГЭК в состоянии
+
+  // Функция для удаления ГЭК по идентификатору
+  const handleDeleteGek = (id) => {
+    // Фильтрация массива ГЭК, оставляя только те, у которых id не совпадает с удаляемым id
+    const updatedGeks = geks.filter(gek => gek.id !== id);
+    setGeks(updatedGeks); // Обновление состояния
+  };
+
   return (
     <div className="container-fluid text-center my-3">
-      <Button variant="primary" className="col-2 my-2 p-3">Создать новую ГЭК</Button>
+      <Link to={`/create-gek`}>
+        <Button variant="primary" className="col-2 py-2">Создать новую ГЭК</Button>
+      </Link>
       <div className="row justify-content-evenly">
-        {geksData.map(gekData => (
+        {geks.map(gekData => (
           <Card key={gekData.id} style={{ minWidth: '400px', width: '30%' }}  className="col-4 my-4 text-center bg-light">
             <Card.Header className="fs-4 bg-light" >ГЭК №{gekData.number}</Card.Header>
             <Card.Body> 
@@ -29,7 +40,7 @@ const GekPage = () => {
               <Link to={`/edit-gek/${gekData.id}`}>
                 <Button variant="primary" className="mx-3">Редактировать</Button>
               </Link>
-              <Button variant="danger" className="mx-3">Удалить</Button>
+              <Button variant="danger" className="mx-3" onClick={() => handleDeleteGek(gekData.id)}>Удалить</Button>
             </Card.Footer>
           </Card>
         ))}

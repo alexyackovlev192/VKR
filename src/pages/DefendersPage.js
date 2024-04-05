@@ -97,35 +97,37 @@ const DefendersPage = () => {
         <Button variant="primary" className="mx-3" onClick={handleAddDefender}>Добавить</Button>
         <Button variant="danger" className="mx-3" onClick={handleDeleteDefender} disabled={!activeRow}>Удалить</Button>
       </>
-      <table className="table table-light table-hover">
-        <thead>
-          <tr>
-            <th>№</th>
-            <th>ФИО</th>
-            <th>Группа</th>
-            <th>Тема</th>
-            <th>Научрук</th>
-            <th>Средний балл</th>
-            <th>Красный диплом</th>
-          </tr>
-        </thead>
-        <tbody>
-          {defendersData.map((defender, index) => (
-            <tr 
-              key={defender.id} 
-              className={activeRow === defender ? 'table-info' : 'table-light'}
-              onClick={() => handleRowClick(defender)}>
-              <td>{index + 1}</td>
-              <td>{defender.fullName}</td>
-              <td>{defender.group}</td>
-              <td>{defender.topic}</td>
-              <td>{defender.supervisor}</td>
-              <td>{defender.averageGrade}</td>
-              <td>{defender.hasHonors ? 'Да' : 'Нет'}</td>
+      <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+        <table className="table table-light table-hover">
+          <thead>
+            <tr>
+              <th>№</th>
+              <th>ФИО</th>
+              <th>Группа</th>
+              <th>Тема</th>
+              <th>Научрук</th>
+              <th>Средний балл</th>
+              <th>Красный диплом</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {defendersData.map((defender, index) => (
+              <tr 
+                key={defender.id} 
+                className={activeRow === defender ? 'table-info' : 'table-light'}
+                onClick={() => handleRowClick(defender)}>
+                <td>{index + 1}</td>
+                <td>{defender.fullName}</td>
+                <td>{defender.group}</td>
+                <td>{defender.topic}</td>
+                <td>{defender.supervisor}</td>
+                <td>{defender.averageGrade}</td>
+                <td>{defender.hasHonors ? 'Да' : 'Нет'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
       <UpdateDefender
         showModal={showUpdateModal}
         handleCloseModal={handleCloseModal}

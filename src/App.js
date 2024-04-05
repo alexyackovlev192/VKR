@@ -5,6 +5,7 @@ import MembersPage from './pages/MembersPage';
 import SchedulePage from './pages/SchedulePage';
 import GekPage from './pages/GekPage';
 import EditGekPage from './pages/EditGekPage';
+import CreateGekPage from './pages/CreateGekPage'
 import DefendersPage from './pages/DefendersPage';
 import LoginForm from './components/LoginForm';
 import Navigation from './components/Navigation';
@@ -40,6 +41,7 @@ const App = () => {
           <Route path="/members" element={<PageLayout><MembersPage /></PageLayout>} />
           <Route path="/schedule" element={<PageLayout><SchedulePage /></PageLayout>} />
           <Route path="/gek" element={<PageLayout><GekPage /></PageLayout>} />
+          <Route path="/create-gek" element={<PageLayout><CreateGekPage /></PageLayout>} />
           <Route path="/edit-gek/:gekId" element={<PageLayout><EditGekPage /></PageLayout>} />
           <Route path="/defenders" element={<PageLayout><DefendersPage /></PageLayout>} />
           <Route path="/login" element={<LoginForm />} />

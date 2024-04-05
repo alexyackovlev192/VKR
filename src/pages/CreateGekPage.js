@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, Card, ListGroup } from 'react-bootstrap';
-import geksData from '../data/geksData.json';
 import membersData from '../data/membersData.json';
 
 const EditGekPage = () => {
@@ -12,18 +11,8 @@ const EditGekPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('Состав'); // Добавляем состояние для выбранной категории
 
     useEffect(() => {
-        // Находим данные выбранной ГЭК по идентификатору из параметра маршрута
-        const gek = geksData.find(gek => gek.id === parseInt(gekId));
-        if (gek) {
-            setMembersGek(gek.members || []);
-            setSecretariesGek(gek.secretaries || []);
-        }
-        const filteredMembersData = membersData.filter(member => {
-            return !gek || !gek.members.find(gekMember => gekMember.id === member.id);
-        });
-    
         // Устанавливаем отфильтрованные данные в setAllMembersGek
-        setAllMembersGek(filteredMembersData);
+        setAllMembersGek(membersData);
     }, [gekId]);
     
     const handleMemberAdd = (member) => {
@@ -65,11 +54,12 @@ const EditGekPage = () => {
     const sortedMembersGek = membersGek.slice().sort((a, b) => a.name.localeCompare(b.name));
     const sortedSecretariesGek = secretariesGek.slice().sort((a, b) => a.name.localeCompare(b.name));
     const sortedAllMembersGek = allMembersGek.slice().sort((a, b) => a.name.localeCompare(b.name));
+
   return (
     <div className="container-fluid text-center my-3">
       <div className="row justify-content-evenly">
         <Card style={{ minWidth: '500px', width: '40%', height: '80vh', overflowY: 'auto' }} className="my-2 text-center bg-light">
-            <Card.Header className="fs-4 bg-light">Текущие члены ГЭК №{gekId}</Card.Header>
+            <Card.Header className="fs-4 bg-light">Новая ГЭК</Card.Header>
             <Card.Body> 
                 <Button 
                     variant={selectedCategory === 'Состав' ? 'primary' : 'secondary'} 

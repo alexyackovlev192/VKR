@@ -2,7 +2,7 @@ import React from 'react';
 import { Form } from 'react-bootstrap';
 
 const MemberForm = ({ formData, handleInputChange, isEditing }) => {
-  const { fullName, position, email } = formData || {};
+  const { name, position, email } = formData || {};
 
   return (
     <Form>
@@ -11,11 +11,11 @@ const MemberForm = ({ formData, handleInputChange, isEditing }) => {
         <Form.Select
           type="text"
           name="fullName"
-          value={fullName}
+          value={name}
           onChange={handleInputChange}
           readOnly={isEditing}
         >
-          <option value={fullName}>{fullName}</option>
+          <option value={name}>{name}</option>
           <option value="Петров Петр Петрович">Петров Петр Петрович</option>
           <option value="Сидоров Сидор Сидорович">Сидоров Сидор Сидорович</option>
           <option value="Алексеев Алексей Алексеевич">Алексеев Алексей Алексеевич</option>
