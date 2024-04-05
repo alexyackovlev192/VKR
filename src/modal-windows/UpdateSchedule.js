@@ -6,7 +6,7 @@ const UpdateSchelude = ({
     showModal,
     handleCloseModal,
     formData,
-    handleInputChange,
+    handleInputChange, // Передаем эту функцию в компонент ScheludeForm
     handleSaveChanges
   }) => {
     return (
@@ -16,7 +16,7 @@ const UpdateSchelude = ({
         </Modal.Header>
   
         <Modal.Body>
-          <ScheludeForm formData={formData} handleInputChange={handleInputChange} />
+          <ScheludeForm formData={formData} handleInputChange={handleInputChange} /> 
         </Modal.Body>
   
         <Modal.Footer>

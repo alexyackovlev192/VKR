@@ -22,6 +22,13 @@ const SchedulePage = () => {
     setEditingData(null);
   };
 
+  const handleInputChange = event => {
+    const { name, value } = event.target;
+    // Создаем копию объекта editingData, чтобы не изменять состояние напрямую
+    const updatedData = { ...editingData, [name]: value };
+    setEditingData(updatedData);
+  };
+
   // Возвращаемый JSX компонента
   return (
     <div className="schedule my-5 px-5">
@@ -50,9 +57,9 @@ const SchedulePage = () => {
       <UpdateSchelude
         showModal={showModal}
         handleCloseModal={handleCloseModal}
-        formData={editingData || {}} // Используем короткий синтаксис для передачи пустого объекта
-        handleInputChange={() => {}} // Можно удалить, если не нужен
-        handleSaveChanges={() => {}} // Можно удалить, если не нужен
+        formData={editingData || {}}
+        handleInputChange={handleInputChange} // Передаем функцию handleInputChange
+        handleSaveChanges={() => {}} // Эту функцию нужно реализовать для сохранения изменений
       />
     </div>
   );
