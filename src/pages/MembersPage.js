@@ -79,7 +79,7 @@ const MembersPage = () => {
   // Удаление участника
   const handleDeleteMember = () => {
     console.log('Удаление члена ГЭК:', activeRow);
-    setActiveRow(null);
+    setActiveRow(null); 
   };
 
   // Обработчик изменения ввода формы
@@ -114,7 +114,7 @@ const MembersPage = () => {
                 className={activeRow === member ? 'table-info' : 'table-light'}
                 onClick={() => handleRowClick(member)}>
                 <td>{index + 1}</td>
-                <td>{member.fullName}</td>
+                <td>{member.name}</td>
                 <td>{member.position}</td>
                 <td>{member.email}</td>
               </tr>
