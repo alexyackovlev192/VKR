@@ -91,14 +91,14 @@ const DefendersPage = () => {
 
   // Возвращаем JSX компонента
   return (
-    <div className="my-5 px-5" ref={tableRef}>
+    <div className="my-5 px-5">
       <>
         <Button variant="primary" className="mx-3" onClick={handleEditDefender} disabled={!activeRow}>Редактировать</Button>
         <Button variant="primary" className="mx-3" onClick={handleAddDefender}>Добавить</Button>
         <Button variant="danger" className="mx-3" onClick={handleDeleteDefender} disabled={!activeRow}>Удалить</Button>
       </>
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-        <table className="table table-light table-hover">
+        <table className="table table-light table-hover" ref={tableRef}>
           <thead>
             <tr>
               <th>№</th>
