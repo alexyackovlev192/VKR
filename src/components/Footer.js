@@ -3,9 +3,9 @@ import './style-components/Footer.css';
 
 const Footer = () => {
   return (
-    <footer className="footer">
-      <div className="social-links">
-        <p>Это футер</p>
+    <footer className="footer mx-0">
+      <div className="text-center fs-1">
+        <div className="col-12">Footer</div>
       </div>
     </footer>
   );

@@ -71,7 +71,7 @@ const SchedulePage = () => {
             <Button variant="primary" className="mx-3" onClick={() => openEditModal(activeCell)} disabled={!activeCell || activeCell.event == null}>Редактировать</Button>
           ) : ("")}
           <Button variant="primary" className="mx-3" onClick={handleAddMember}>Добавить</Button>
-          <Button variant="primary" className="mx-3" onClick={toggleView}>{isTableView ? 'Показать карточки' : 'Показать таблицу'}</Button>
+          <Button variant="primary" className="mx-3" onClick={toggleView}>{isTableView ? 'Карточки' : 'Таблица'}</Button>
         </div>
         {isTableView ? (
         <>
@@ -121,10 +121,10 @@ const SchedulePage = () => {
           </div>  
         </>
         ) : (
-          <div className="col-12">
-            <div className="card-group">
+          <div className="container-fluid text-center my-3">
+            <div className="row justify-content-evenly">
               {schedulesData.map((item, index) => (
-                <Card key={index} className="col-md-4 my-3">
+                <Card key={index} className="col-2 mx-2 my-4 text-center bg-light">
                   <Card.Body>
                     <Card.Title>{item.date}</Card.Title>
                     <Card.Text>
@@ -132,7 +132,7 @@ const SchedulePage = () => {
                         item[direction.id] ? <p key={idx}>{item[direction.id]}</p> : ""
                       ))}
                     </Card.Text>
-                    <Button variant="primary" onClick={() => openEditModal({ date: schedulesData.date  })}>Редактировать</Button>
+                    <Button variant="primary" onClick={() => openEditModal({ date: item.date, direction: directionData.direction, event: item })}>Редактировать</Button>
                   </Card.Body>
                 </Card>
               ))}
