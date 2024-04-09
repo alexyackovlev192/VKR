@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Form } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-const ScheludeForm = ({ formData, handleInputChange }) => {
-  const { date, direction, time, gec, room } = formData || {};
-  const [selectedDate, setSelectedDate] = useState();
+const ScheduleForm = ({ formData, handleInputChange }) => {
+  const { date, direction, time, room } = formData || {};
+  const [selectedDate, setSelectedDate] = useState(new Date(date)); // Инициализация даты из formData
+
   return (
     <Form>
       <Form.Group controlId="formDate">
@@ -38,15 +39,6 @@ const ScheludeForm = ({ formData, handleInputChange }) => {
           onChange={handleInputChange}
         />
       </Form.Group>
-      <Form.Group controlId="formGec">
-        <Form.Label>Номер ГЭК</Form.Label>
-        <Form.Control
-          type="text"
-          name="gec"
-          value={gec}
-          onChange={handleInputChange}
-        />
-      </Form.Group>
       <Form.Group controlId="formRoom">
         <Form.Label>Аудитория</Form.Label>
         <Form.Control
@@ -60,4 +52,4 @@ const ScheludeForm = ({ formData, handleInputChange }) => {
   );
 };
 
-export default ScheludeForm;
+export default ScheduleForm;
