@@ -7,7 +7,6 @@ import UpdateSchedule from '../modal-windows/UpdateSchedule';
 import './style-pages/SchedulePage.css';
 
 const SchedulePage = () => {
-  const [editingData, setEditingData] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [activeCell, setActiveCell] = useState(null);
   const [isTableView, setIsTableView] = useState(true);
@@ -34,20 +33,14 @@ const SchedulePage = () => {
   }, []); // Пустой массив зависимостей означает, что эффект сработает только при монтировании и размонтировании компонента
 
   const openEditModal = (data) => {
-    setEditingData(data);
     setShowModal(true);
+    setActiveCell(data);
     console.log(data);
   };
 
   const handleCloseModal = () => {
     setShowModal(false);
-    setEditingData(null);
     setActiveCell(null);
-  };
-
-  const handleInputChange = event => {
-    const updatedData = { ...editingData };
-    setEditingData(updatedData);
   };
 
   const handleUpdateClick = (item) => {
@@ -65,8 +58,6 @@ const SchedulePage = () => {
     setActiveCell(null);
   };
 
-
-
   const groupedSchedules = schedulesData.reduce((acc, curr) => {
     if (acc[curr.date]) {
       acc[curr.date].push(curr);
@@ -75,7 +66,6 @@ const SchedulePage = () => {
     }
     return acc;
   }, {});
-
 
   return (
     <div className="schedule-container my-5 px-5">
@@ -127,7 +117,11 @@ const SchedulePage = () => {
                         activeCell.event.date === schedules[0].date && 
                         activeCell.event.direction === direction 
                         ? 'table-info' : 'table-light'}
-                      onClick={() => handleUpdateClick({ date: schedules[0].date, direction: direction, event: schedules.find(schedule => schedule.direction === direction) })}
+                      onClick={() => handleUpdateClick({ date: schedules[0].date, 
+                                                    direction: direction,
+                                                         time: schedules[0].time,
+                                                         room: schedules[0].room,
+                                                        event: schedules.find(schedule => schedule.direction === direction)})}
                     >
                       {schedules.find(schedule => schedule.direction === direction)?.id || ''}
                     </td>
@@ -158,13 +152,13 @@ const SchedulePage = () => {
           </div>
         )}
       </div>
-      {/* <UpdateSchedule
+      <UpdateSchedule
         showModal={showModal}
         handleCloseModal={handleCloseModal}
-        formData={editingData || {}}
-        handleInputChange={handleInputChange}
-        handleSaveChanges={() => {}} 
-      /> */}
+        formData={activeCell || {}}
+        handleInputChange={() => {}}
+        handleSaveChanges={() => {}}
+      />
     </div>
   );
 };

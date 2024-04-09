@@ -5,8 +5,11 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 const ScheduleForm = ({ formData, handleInputChange }) => {
   const { date, direction, time, room } = formData || {};
-  const [selectedDate, setSelectedDate] = useState(new Date(date)); // Инициализация даты из formData
+  const [selectedDate, setSelectedDate] = useState(null); 
 
+  const handleDateChange = date => {
+    setSelectedDate(date);
+  };
   return (
     <Form>
       <Form.Group controlId="formDate">
@@ -14,8 +17,8 @@ const ScheduleForm = ({ formData, handleInputChange }) => {
         <div>
           <DatePicker
             selected={selectedDate}
-            onChange={(newDate) => setSelectedDate(newDate)}
-            dateFormat="dd.MM"
+            onChange={handleDateChange}
+            dateFormat="dd.MM" 
             placeholderText={date}
             className="form-control"
           />
