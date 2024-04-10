@@ -87,13 +87,13 @@ const SchedulePage = () => {
                 </tr>
               </thead>
               <tbody className=''>
-                {uniqueDates.map((date, index) => (
-                  <tr key={index}>
-                    <td>
-                      {date}
-                    </td>
-                  </tr>
-                ))}
+              {uniqueDates.map((date, index) => (
+                <tr key={index}>
+                  <td>
+                    {new Date(date).toLocaleDateString('ru-GB', { day: '2-digit', month: '2-digit' })}
+                  </td>
+                </tr>
+              ))}
               </tbody>
             </table>
           </div>
