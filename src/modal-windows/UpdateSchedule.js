@@ -7,7 +7,8 @@ const UpdateSchedule = ({
     handleCloseModal,
     formData,
     handleInputChange,
-    handleSaveChanges
+    handleSaveChanges,
+    handleDeleteSchedule
   }) => {
     
     return (
@@ -26,6 +27,9 @@ const UpdateSchedule = ({
           </Button>
           <Button variant="secondary" onClick={handleCloseModal}>
             Отмена
+          </Button>
+          <Button variant="danger" onClick={() => handleDeleteSchedule(formData)}>
+            Удалить
           </Button>
         </Modal.Footer>
       </Modal>

@@ -50,10 +50,10 @@ const SchedulePage = () => {
     setFormData(null);
   };
 
-  const handleEditSchedule = () => {
-    setActiveCell(activeCell);
-    setFormData(activeCell);
-    setShowUpdateModal(true);
+  const handleEditSchedule = (selectedItem) => {
+    setActiveCell(selectedItem);
+    setFormData(selectedItem); 
+    setShowUpdateModal(true); 
   };
 
   const handleAddSchedule = () => {
@@ -78,6 +78,11 @@ const SchedulePage = () => {
     setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
   };
 
+  const handleDeleteSchedule = (item) => {
+    console.log('Удаление защиты:', item);
+    setActiveCell(null); 
+  };
+
   const toggleView = () => {
     setIsTableView(prevState => !prevState);
     setActiveCell(null);
@@ -97,7 +102,7 @@ const SchedulePage = () => {
       <div className="row">
         <div className="">
           { isTableView ? (
-            <Button variant="primary" className="mx-3" onClick={() => handleEditSchedule()} disabled={!activeCell || activeCell.event == null}>Редактировать</Button>
+            <Button variant="primary" className="mx-3" onClick={() => handleEditSchedule(activeCell)} disabled={!activeCell || activeCell.event == null}>Редактировать</Button>
           ) : ("")}
           <Button variant="primary" className="mx-3" onClick={handleAddSchedule}>Добавить</Button>
           <Button variant="primary" className="mx-3" onClick={toggleView}>{isTableView ? 'Карточки' : 'Таблица'}</Button>
@@ -142,7 +147,9 @@ const SchedulePage = () => {
                         activeCell.event.date === schedules[0].date && 
                         activeCell.event.direction === direction 
                         ? 'table-info' : 'table-light'}
-                      onClick={() => handleSelectedClick({ date: schedules[0].date, 
+                      onClick={() => handleSelectedClick({ 
+                                                           id: schedules[0].id, 
+                                                         date: schedules[0].date, 
                                                     direction: direction,
                                                          time: schedules[0].time,
                                                          room: schedules[0].room,
@@ -159,21 +166,24 @@ const SchedulePage = () => {
         </>
         ) : (
           <div className="container-fluid text-center my-3">
-            {/* <div className="row justify-content-evenly">
+            <div className="row justify-content-evenly">
               {schedulesData.map((item, index) => (
                 <Card key={index} className="col-2 mx-2 my-4 text-center bg-light">
                   <Card.Body>
-                    <Card.Title>{item.date}</Card.Title>
+                    <Card.Title>{new Date(item.date).toLocaleDateString('ru', { day: '2-digit', month: '2-digit' })}</Card.Title>
                     <Card.Text>
-                      { schedulesData.map((direction, idx) => (
-                        item.id ? <p key={idx}>{item.id}</p> : ""
-                      ))}
+                      <div>
+                        <p>ГЭК №{item.id}</p>
+                        <p>Время: {item.time}</p>
+                        <p>Направление: {item.direction}</p>
+                        <p>Аудитория:{item.room}</p>
+                      </div>
                     </Card.Text>
-                    <Button variant="primary" onClick={() => openEditModal({ date: item.date, direction: directionData.direction, event: item })}>Редактировать</Button>
+                    <Button variant="primary" onClick={() => handleEditSchedule(item)}>Редактировать</Button>
                   </Card.Body>
                 </Card>
               ))}
-            </div> */}
+            </div>
           </div>
         )}
       </div>
@@ -183,6 +193,7 @@ const SchedulePage = () => {
         formData={formData}
         handleInputChange={handleInputChange}
         handleSaveChanges={handleSaveChangesUpdate}
+        handleDeleteSchedule={handleDeleteSchedule}
       />
       <AddSchedule
         showModal={showAddModal}

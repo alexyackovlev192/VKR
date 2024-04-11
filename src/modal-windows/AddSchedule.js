@@ -20,7 +20,7 @@ const AddSchedule = ({
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="primary" onClick={handleSaveChanges}>
+        <Button variant="primary" onClick={() => handleSaveChanges(formData)}>
           Сохранить изменения
         </Button>
         <Button variant="secondary" onClick={handleCloseModal}>

@@ -3,12 +3,11 @@ import { Form } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import 'react-time-picker/dist/TimePicker.css';
-import 'react-clock/dist/Clock.css';
+
 
 const ScheduleForm = ({ formData, handleInputChange }) => {
   const { date, direction, time, room } = formData || {};
-  const [startDate, setStartDate] = useState(date); // Устанавливаем новую дату как начальное значение для DatePicker
+  const [startDate, setStartDate] = useState(date); 
 
   
   return (
