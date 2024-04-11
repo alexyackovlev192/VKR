@@ -22,7 +22,7 @@ class authController {
          if (!errors.isEmpty()) {
             return res.status(400).json({message:"Ошибка при регистрации", errors})
          }
-         const {Fullname, Login, Password, Mail, Post, NameRole} = req.body 
+         const {Fullname, Login, Password, Mail, Post, Roles} = req.body 
          const candidate = await User.findOne({ where: {
             Login: Login
           }})
@@ -36,14 +36,16 @@ class authController {
             Login: Login
           }})
          const userId = this_user.id_U;
-         const role = await Role.findOne({where: {
-            Name_role: NameRole
-          }})
-         const roleId = role.id_R
-         console.log("UserId",userId)
-         console.log("RoleId",roleId)
-         const userRole = new UserRole({id_U: userId, id_R: roleId})
-         await userRole.save()
+         for (const roleName of Roles) {
+            const role = await Role.findOne({ where: { Name_role: roleName } });
+            if (!role) {
+                console.log(`Роль "${roleName}" не найдена`);
+                continue;
+            }
+            const roleId = role.id_R;
+            const userRole = new UserRole({ id_U: userId, id_R: roleId });
+            await userRole.save();
+        }
 
          
          return res.json({message: "Пользователь успешно зарегистрирован"})
