@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
 
-const DefenderForm = ({ formData, handleInputChange, isEditing }) => {
+const DefenderForm = ({ formData, handleInputChange }) => {
     const { fullName, group, topic, supervisor, averageGrade, hasHonors } = formData || {};
 
     return (
@@ -13,7 +13,6 @@ const DefenderForm = ({ formData, handleInputChange, isEditing }) => {
             name="fullName"
             value={fullName}
             onChange={handleInputChange}
-            readOnly={isEditing}
             />
         </Form.Group>
         <Form.Group controlId="formGroup">
@@ -23,7 +22,6 @@ const DefenderForm = ({ formData, handleInputChange, isEditing }) => {
             name="group"
             value={group}
             onChange={handleInputChange}
-            readOnly={isEditing}
             />
         </Form.Group>
         <Form.Group controlId="formTopic">
@@ -33,7 +31,6 @@ const DefenderForm = ({ formData, handleInputChange, isEditing }) => {
             name="topic"
             value={topic}
             onChange={handleInputChange}
-            readOnly={isEditing}
             />
         </Form.Group>
         <Form.Group controlId="formSupervisor">
@@ -43,7 +40,6 @@ const DefenderForm = ({ formData, handleInputChange, isEditing }) => {
             name="supervisor"
             value={supervisor}
             onChange={handleInputChange}
-            readOnly={isEditing}
             />
         </Form.Group>
         <Form.Group controlId="formAverageGrade">
@@ -53,7 +49,6 @@ const DefenderForm = ({ formData, handleInputChange, isEditing }) => {
             name="averageGrade"
             value={averageGrade}
             onChange={handleInputChange}
-            readOnly={isEditing}
             />
         </Form.Group>
         <Form.Group controlId="formHasHonors">
@@ -63,7 +58,6 @@ const DefenderForm = ({ formData, handleInputChange, isEditing }) => {
             name="hasHonors"
             checked={hasHonors}
             onChange={handleInputChange}
-            disabled={isEditing}
             />
         </Form.Group>
         </Form>

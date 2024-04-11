@@ -11,9 +11,9 @@ const DefendersPage = () => {
   // Состояния компонента
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false); // Показать модальное окно
-  const [isEditing, setIsEditing] = useState(false); // Редактирование
   const [formData, setFormData] = useState(null); // Данные участника
   const [activeRow, setActiveRow] = useState(null); // Состояние для активной строки
+  
   const tableRef = useRef(null); // Создаем ссылку на элемент таблицы
 
   // Обработчик клика в любое место кроме таблицы
@@ -22,7 +22,6 @@ const DefendersPage = () => {
     if (tableRef.current && !tableRef.current.contains(event.target)) {
       setActiveRow(null); // Сбрасываем активную строку
     }
-    setIsEditing(false)
   };
 
   useEffect(() => {
@@ -38,7 +37,7 @@ const DefendersPage = () => {
   // Обработчик клика по строке таблицы
   const handleRowClick = (defender) => {
     setActiveRow(defender);
-    console.log('Выбран ГЭК:', defender.id);
+    console.log('Выбран студент:', defender.id);
   };
 
   // Закрытие модального окна
@@ -46,12 +45,11 @@ const DefendersPage = () => {
     setShowUpdateModal(false);
     setShowAddModal(false);
     setFormData(null);
-    setIsEditing(false);
   };
   
   // Обработчик клика по кнопке редактировать
   const handleEditDefender = () => {
-    setIsEditing(true);
+    setActiveRow(activeRow);
     setFormData(activeRow); // Передаем данные активной строки в форму редактирования
     setShowUpdateModal(true);
   };
@@ -59,7 +57,6 @@ const DefendersPage = () => {
   // Обработчик клика по кнопке добавить
   const handleAddDefender = () => {
     setShowAddModal(true);
-    setIsEditing(false);
     setFormData(null); // Очищаем форму
   };
 
@@ -77,8 +74,8 @@ const DefendersPage = () => {
   };
 
   // Удаление участника
-  const handleDeleteDefender = () => {
-    console.log('Удаление члена ГЭК:', activeRow);
+  const handleDeleteDefender = (item) => {
+    console.log('Удаление участника:', item);
     setActiveRow(null);
   };
 
@@ -95,7 +92,6 @@ const DefendersPage = () => {
       <>
         <Button variant="primary" className="mx-3" onClick={handleEditDefender} disabled={!activeRow}>Редактировать</Button>
         <Button variant="primary" className="mx-3" onClick={handleAddDefender}>Добавить</Button>
-        <Button variant="danger" className="mx-3" onClick={handleDeleteDefender} disabled={!activeRow}>Удалить</Button>
       </>
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         <table className="table table-light table-hover" ref={tableRef}>
@@ -134,6 +130,7 @@ const DefendersPage = () => {
         formData={formData}
         handleInputChange={handleInputChange}
         handleSaveChanges={handleSaveChangesUpdate}
+        handleDeleteDefender={handleDeleteDefender}
       />
       <AddDefender
         showModal={showAddModal}

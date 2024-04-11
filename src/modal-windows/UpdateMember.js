@@ -7,7 +7,8 @@ const UpdateMember = ({
   handleCloseModal,
   formData,
   handleInputChange,
-  handleSaveChanges
+  handleSaveChanges,
+  handleDeleteMember
 }) => {
   return (
     <Modal show={showModal} onHide={handleCloseModal}>
@@ -22,11 +23,14 @@ const UpdateMember = ({
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="primary" onClick={handleSaveChanges}>
+        <Button variant="primary" onClick={() => handleSaveChanges(formData)}>
           Сохранить изменения
         </Button>
         <Button variant="secondary" onClick={handleCloseModal}>
           Отмена
+        </Button>
+        <Button variant="danger" onClick={() => handleDeleteMember(formData)}>
+          Удалить
         </Button>
       </Modal.Footer>
     </Modal>

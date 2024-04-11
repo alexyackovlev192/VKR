@@ -7,7 +7,8 @@ const UpdateDefender = ({
   handleCloseModal,
   formData,
   handleInputChange,
-  handleSaveChanges
+  handleSaveChanges,
+  handleDeleteDefender
 }) => {
   return (
     <Modal show={showModal} onHide={handleCloseModal}>
@@ -22,10 +23,13 @@ const UpdateDefender = ({
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="primary" onClick={handleSaveChanges}>
+        <Button variant="primary" onClick={() => handleSaveChanges(formData)}>
           Сохранить изменения
         </Button>
         <Button variant="secondary" onClick={handleCloseModal}>
+          Отмена
+        </Button>
+        <Button variant="danger" onClick={() => handleDeleteDefender(formData)}>
           Отмена
         </Button>
       </Modal.Footer>

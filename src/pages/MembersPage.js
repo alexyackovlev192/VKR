@@ -75,8 +75,8 @@ const MembersPage = () => {
   };
 
   // Удаление участника
-  const handleDeleteMember = () => {
-    console.log('Удаление члена ГЭК:', activeRow);
+  const handleDeleteMember = (item) => {
+    console.log('Удаление члена ГЭК:', item);
     setActiveRow(null); 
   };
 
@@ -92,7 +92,6 @@ const MembersPage = () => {
       <>
       <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>Редактировать</Button>
         <Button variant="primary" className="mx-3" onClick={handleAddMember}>Добавить</Button>
-        <Button variant="danger" className="mx-3" onClick={handleDeleteMember} disabled={!activeRow}>Удалить</Button>
       </>
 
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
@@ -126,6 +125,7 @@ const MembersPage = () => {
         formData={formData}
         handleInputChange={handleInputChange}
         handleSaveChanges={handleSaveChangesUpdate}
+        handleDeleteMember={handleDeleteMember}
       />
       <AddMember
         showModal={showAddModal}

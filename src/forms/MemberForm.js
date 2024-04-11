@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
 
-const MemberForm = ({ formData, handleInputChange, isEditing }) => {
+const MemberForm = ({ formData, handleInputChange  }) => {
   const { name, position, email } = formData || {};
 
   return (
@@ -13,7 +13,6 @@ const MemberForm = ({ formData, handleInputChange, isEditing }) => {
           name="fullName"
           value={name}
           onChange={handleInputChange}
-          readOnly={isEditing}
         >
           <option value={name}>{name}</option>
           <option value="Петров Петр Петрович">Петров Петр Петрович</option>
@@ -28,7 +27,6 @@ const MemberForm = ({ formData, handleInputChange, isEditing }) => {
           name="position"
           value={position}
           onChange={handleInputChange}
-          readOnly={isEditing}
         />
       </Form.Group>
       <Form.Group controlId="formEmail">
@@ -38,7 +36,6 @@ const MemberForm = ({ formData, handleInputChange, isEditing }) => {
           name="email"
           value={email}
           onChange={handleInputChange}
-          readOnly={isEditing}
         />
       </Form.Group>
     </Form>
