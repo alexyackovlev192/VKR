@@ -11,9 +11,9 @@ const MembersPage = () => {
   // Состояния компонента
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false); // Показать модальное окно
-  const [isEditing, setIsEditing] = useState(false); // Редактирование
   const [formData, setFormData] = useState(null); // Данные участника
   const [activeRow, setActiveRow] = useState(null); // Состояние для активной строки
+  
   const tableRef = useRef(null); // Создаем ссылку на элемент таблицы
 
   // Обработчик клика в любое место кроме таблицы
@@ -22,7 +22,6 @@ const MembersPage = () => {
     if (tableRef.current && !tableRef.current.contains(event.target)) {
       setActiveRow(null); // Сбрасываем активную строку
     }
-    setIsEditing(false)
   };
 
   useEffect(() => {
@@ -46,12 +45,12 @@ const MembersPage = () => {
     setShowUpdateModal(false);
     setShowAddModal(false);
     setFormData(null);
-    setIsEditing(false);
   };
   
   // Обработчик клика по кнопке редактировать
   const handleEditMember = () => {
-    setIsEditing(true);
+    // Устанавливаем активную строку для редактирования
+    setActiveRow(activeRow);
     setFormData(activeRow); // Передаем данные активной строки в форму редактирования
     setShowUpdateModal(true);
   };
@@ -59,7 +58,6 @@ const MembersPage = () => {
   // Обработчик клика по кнопке добавить
   const handleAddMember = () => {
     setShowAddModal(true);
-    setIsEditing(false);
     setFormData(null); // Очищаем форму
   };
 
@@ -92,7 +90,7 @@ const MembersPage = () => {
   return (
     <div className="my-5 px-5">
       <>
-        <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>Редактировать</Button>
+      <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>Редактировать</Button>
         <Button variant="primary" className="mx-3" onClick={handleAddMember}>Добавить</Button>
         <Button variant="danger" className="mx-3" onClick={handleDeleteMember} disabled={!activeRow}>Удалить</Button>
       </>

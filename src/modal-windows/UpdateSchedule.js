@@ -1,14 +1,15 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import ScheduleForm from '../forms/ScheduleForm'; // Импортируем компонент ScheduleForm
+import ScheduleForm from '../forms/ScheduleForm';
 
 const UpdateSchedule = ({
     showModal,
     handleCloseModal,
     formData,
     handleInputChange,
-    handleSaveChanges
+    handleSaveSchedule
   }) => {
+    
     return (
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
@@ -20,7 +21,7 @@ const UpdateSchedule = ({
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="primary" onClick={handleSaveChanges}>
+          <Button variant="primary" onClick={() => handleSaveSchedule(formData)}>
             Сохранить изменения
           </Button>
           <Button variant="secondary" onClick={handleCloseModal}>

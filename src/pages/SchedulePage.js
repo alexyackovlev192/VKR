@@ -7,8 +7,11 @@ import UpdateSchedule from '../modal-windows/UpdateSchedule';
 import './style-pages/SchedulePage.css';
 
 const SchedulePage = () => {
-  const [showModal, setShowModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false); // Показать модальное окно
+  const [formData, setFormData] = useState(null); // Данные участника
   const [activeCell, setActiveCell] = useState(null);
+
   const [isTableView, setIsTableView] = useState(true);
   const tableRef = useRef(null); 
 
@@ -22,7 +25,7 @@ const SchedulePage = () => {
       setActiveCell(null); // Сбрасываем активную строку
     }
   };
-
+  
   useEffect(() => {
     // Добавляем обработчик события клика при монтировании компонента
     document.addEventListener('click', handleClickOutsideTable);
@@ -31,26 +34,43 @@ const SchedulePage = () => {
       document.removeEventListener('click', handleClickOutsideTable);
     };
   }, []); // Пустой массив зависимостей означает, что эффект сработает только при монтировании и размонтировании компонента
-
-  const openEditModal = (data) => {
-    setShowModal(true);
-    setActiveCell(data);
-    console.log(data);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setActiveCell(null);
-  };
-
-  const handleUpdateClick = (item) => {
+  
+  const handleSelectedClick = (item) => {
     if (item.event != null) {
       setActiveCell(item);
     }
+    console.log('Выбран защита:', item.id);
   };
 
-  const handleAddMember = () => {
+  const handleCloseModal = () => {
+    setShowUpdateModal(false);
+    setShowAddModal(false);
+    setFormData(null);
+  };
+
+  const handleEditSchedule = () => {
+    setShowAddModal(true);
+    setFormData(null);
+  };
+
+  const handleAddSchedule = () => {
+    setShowAddModal(true);
+    setFormData(null); 
+  };
+
+  const handleSaveChangesUpdate= () => {
+    setShowUpdateModal(false);
+    setFormData(null);
+    console.log('Сохранение изменений:', formData);
+  };
+
+  const handleSaveChangesAdd = () => {
     
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value, checked, type } = e.target;
+    setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
   };
 
   const toggleView = () => {
@@ -74,7 +94,7 @@ const SchedulePage = () => {
           { isTableView ? (
             <Button variant="primary" className="mx-3" onClick={() => openEditModal(activeCell)} disabled={!activeCell || activeCell.event == null}>Редактировать</Button>
           ) : ("")}
-          <Button variant="primary" className="mx-3" onClick={handleAddMember}>Добавить</Button>
+          <Button variant="primary" className="mx-3" onClick={handleAddSchedule}>Добавить</Button>
           <Button variant="primary" className="mx-3" onClick={toggleView}>{isTableView ? 'Карточки' : 'Таблица'}</Button>
         </div>
         {isTableView ? (
@@ -117,7 +137,7 @@ const SchedulePage = () => {
                         activeCell.event.date === schedules[0].date && 
                         activeCell.event.direction === direction 
                         ? 'table-info' : 'table-light'}
-                      onClick={() => handleUpdateClick({ date: schedules[0].date, 
+                      onClick={() => handleSelectedClick({ date: schedules[0].date, 
                                                     direction: direction,
                                                          time: schedules[0].time,
                                                          room: schedules[0].room,
@@ -152,12 +172,19 @@ const SchedulePage = () => {
           </div>
         )}
       </div>
-      <UpdateSchedule
-        showModal={showModal}
+      <UpdateMember
+        showModal={showUpdateModal}
         handleCloseModal={handleCloseModal}
-        formData={activeCell || {}}
-        handleInputChange={() => {}}
-        handleSaveChanges={() => {}}
+        formData={formData}
+        handleInputChange={handleInputChange}
+        handleSaveChanges={handleSaveChangesUpdate}
+      />
+      <AddMember
+        showModal={showAddModal}
+        handleCloseModal={handleCloseModal}
+        handleInputChange={handleInputChange}
+        handleSaveChanges={handleSaveChangesAdd}
+        formData={formData}
       />
     </div>
   );

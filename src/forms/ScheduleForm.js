@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Form } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 
-import TimePicker from 'react-time-picker';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'react-time-picker/dist/TimePicker.css';
 import 'react-clock/dist/Clock.css';
@@ -10,9 +9,8 @@ import 'react-clock/dist/Clock.css';
 const ScheduleForm = ({ formData, handleInputChange }) => {
   const { date, direction, time, room } = formData || {};
   const [startDate, setStartDate] = useState(date); // Устанавливаем новую дату как начальное значение для DatePicker
-  const [value, onChange] = useState('10:00');;
 
-
+  
   return (
     <Form>
       <Form.Group controlId="formDate">
@@ -38,12 +36,14 @@ const ScheduleForm = ({ formData, handleInputChange }) => {
       </Form.Group>
       <Form.Group controlId="formTime">
         <Form.Label>Время</Form.Label>
-        <Form.Control
-          type="time"
-          name="time"
-          value={time}
-          onChange={handleInputChange}
-        />
+        <div>
+          <Form.Control
+            type="time"
+            name="time"
+            value={time}
+            onChange={handleInputChange}
+          />
+        </div>
       </Form.Group>
       <Form.Group controlId="formRoom">
         <Form.Label>Аудитория</Form.Label>
