@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
+
 import schedulesData from '../data/schedulesData.json';
 import UpdateSchedule from '../modal-windows/UpdateSchedule';
+import AddSchedule from '../modal-windows/AddSchedule';
 
 import './style-pages/SchedulePage.css';
 
@@ -39,7 +41,7 @@ const SchedulePage = () => {
     if (item.event != null) {
       setActiveCell(item);
     }
-    console.log('Выбран защита:', item.id);
+    console.log('Выбрана защита:', item.date);
   };
 
   const handleCloseModal = () => {
@@ -49,8 +51,9 @@ const SchedulePage = () => {
   };
 
   const handleEditSchedule = () => {
-    setShowAddModal(true);
-    setFormData(null);
+    setActiveCell(activeCell);
+    setFormData(activeCell);
+    setShowUpdateModal(true);
   };
 
   const handleAddSchedule = () => {
@@ -65,7 +68,9 @@ const SchedulePage = () => {
   };
 
   const handleSaveChangesAdd = () => {
-    
+    setShowAddModal(false);
+    setFormData(null);
+    console.log('Добавление нового участника:', formData);
   };
 
   const handleInputChange = (e) => {
@@ -92,7 +97,7 @@ const SchedulePage = () => {
       <div className="row">
         <div className="">
           { isTableView ? (
-            <Button variant="primary" className="mx-3" onClick={() => openEditModal(activeCell)} disabled={!activeCell || activeCell.event == null}>Редактировать</Button>
+            <Button variant="primary" className="mx-3" onClick={() => handleEditSchedule()} disabled={!activeCell || activeCell.event == null}>Редактировать</Button>
           ) : ("")}
           <Button variant="primary" className="mx-3" onClick={handleAddSchedule}>Добавить</Button>
           <Button variant="primary" className="mx-3" onClick={toggleView}>{isTableView ? 'Карточки' : 'Таблица'}</Button>
@@ -172,14 +177,14 @@ const SchedulePage = () => {
           </div>
         )}
       </div>
-      <UpdateMember
+      <UpdateSchedule
         showModal={showUpdateModal}
         handleCloseModal={handleCloseModal}
         formData={formData}
         handleInputChange={handleInputChange}
         handleSaveChanges={handleSaveChangesUpdate}
       />
-      <AddMember
+      <AddSchedule
         showModal={showAddModal}
         handleCloseModal={handleCloseModal}
         handleInputChange={handleInputChange}

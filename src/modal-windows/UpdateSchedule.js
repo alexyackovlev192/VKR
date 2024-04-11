@@ -7,7 +7,7 @@ const UpdateSchedule = ({
     handleCloseModal,
     formData,
     handleInputChange,
-    handleSaveSchedule
+    handleSaveChanges
   }) => {
     
     return (
@@ -21,7 +21,7 @@ const UpdateSchedule = ({
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="primary" onClick={() => handleSaveSchedule(formData)}>
+          <Button variant="primary" onClick={() => handleSaveChanges(formData)}>
             Сохранить изменения
           </Button>
           <Button variant="secondary" onClick={handleCloseModal}>
