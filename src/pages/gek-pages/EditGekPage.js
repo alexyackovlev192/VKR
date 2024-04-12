@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import { Button, Card, ListGroup } from 'react-bootstrap';
-import membersData from '../data/membersData.json';
+import geksData from '../../data/geksData.json';
+import membersData from '../../data/membersData.json';
 
 const EditGekPage = () => {
     const { gekId } = useParams(); // Получаем параметр маршрута
@@ -11,8 +13,18 @@ const EditGekPage = () => {
     const [selectedCategory, setSelectedCategory] = useState('Состав'); // Добавляем состояние для выбранной категории
 
     useEffect(() => {
+        // Находим данные выбранной ГЭК по идентификатору из параметра маршрута
+        const gek = geksData.find(gek => gek.id === parseInt(gekId));
+        if (gek) {
+            setMembersGek(gek.members || []);
+            setSecretariesGek(gek.secretaries || []);
+        }
+        const filteredMembersData = membersData.filter(member => {
+            return !gek || !gek.members.find(gekMember => gekMember.id === member.id);
+        });
+    
         // Устанавливаем отфильтрованные данные в setAllMembersGek
-        setAllMembersGek(membersData);
+        setAllMembersGek(filteredMembersData);
     }, [gekId]);
     
     const handleMemberAdd = (member) => {
@@ -54,12 +66,17 @@ const EditGekPage = () => {
     const sortedMembersGek = membersGek.slice().sort((a, b) => a.name.localeCompare(b.name));
     const sortedSecretariesGek = secretariesGek.slice().sort((a, b) => a.name.localeCompare(b.name));
     const sortedAllMembersGek = allMembersGek.slice().sort((a, b) => a.name.localeCompare(b.name));
-
   return (
     <div className="container-fluid text-center my-3">
+        <div className="row my-3">
+            <Link to={`/gek`} className="col-1">
+                <Button variant="primary" className="">Назад</Button>
+            </Link>
+            <h4 className="col-10">Редактирование ГЭК</h4>
+        </div>
       <div className="row justify-content-evenly">
         <Card style={{ minWidth: '500px', width: '40%', height: '80vh', overflowY: 'auto' }} className="my-2 text-center bg-light">
-            <Card.Header className="fs-4 bg-light">Новая ГЭК</Card.Header>
+            <Card.Header className="fs-4 bg-light">Текущие члены ГЭК №{gekId}</Card.Header>
             <Card.Body> 
                 <Button 
                     variant={selectedCategory === 'Состав' ? 'primary' : 'secondary'} 
@@ -81,7 +98,7 @@ const EditGekPage = () => {
                 <Button 
                     variant={selectedCategory === 'Секретари' ? 'primary' : 'secondary'} 
                     onClick={() => handleCategoryChange('Секретари')}
-                    className="mx-3 my-2"
+                    className="mx-2 my-2"
                 >Секретари</Button>
                 <ListGroup className="container text-center">
                     {sortedSecretariesGek.map((member, index) => (
@@ -119,7 +136,5 @@ const EditGekPage = () => {
     </div>
   );
 };
-
-
 
 export default EditGekPage;

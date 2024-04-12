@@ -77,6 +77,7 @@ const DefendersPage = () => {
   const handleDeleteDefender = (item) => {
     console.log('Удаление участника:', item);
     setActiveRow(null);
+    handleCloseModal();
   };
 
   // Обработчик изменения ввода формы

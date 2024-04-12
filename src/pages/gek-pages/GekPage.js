@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Card, ListGroup } from 'react-bootstrap';
-import geksData from '../data/geksData.json';
+import geksData from '../../data/geksData.json';
 
 const GekPage = () => {
   const [geks, setGeks] = useState(geksData); // Хранение данных ГЭК в состоянии

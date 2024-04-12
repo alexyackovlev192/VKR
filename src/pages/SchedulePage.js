@@ -81,6 +81,7 @@ const SchedulePage = () => {
   const handleDeleteSchedule = (item) => {
     console.log('Удаление защиты:', item);
     setActiveCell(null); 
+    handleCloseModal();
   };
 
   const toggleView = () => {

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+//import axios from 'axios';
 import HomePage from './pages/HomePage';
 import MembersPage from './pages/MembersPage';
 import SchedulePage from './pages/SchedulePage';
-import GekPage from './pages/GekPage';
-import EditGekPage from './pages/EditGekPage';
-import CreateGekPage from './pages/CreateGekPage'
+import GekPage from './pages/gek-pages/GekPage';
+import EditGekPage from './pages/gek-pages/EditGekPage';
+import CreateGekPage from './pages/gek-pages/CreateGekPage'
 import DefendersPage from './pages/DefendersPage';
 import LoginForm from './components/LoginForm';
 import Navigation from './components/Navigation';

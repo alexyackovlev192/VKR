@@ -30,7 +30,7 @@ const UpdateDefender = ({
           Отмена
         </Button>
         <Button variant="danger" onClick={() => handleDeleteDefender(formData)}>
-          Отмена
+          Удалить
         </Button>
       </Modal.Footer>
     </Modal>

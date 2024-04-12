@@ -11,7 +11,7 @@ const DefenderForm = ({ formData, handleInputChange }) => {
             <Form.Control
             type="text"
             name="fullName"
-            value={fullName}
+            value={fullName || ""}
             onChange={handleInputChange}
             />
         </Form.Group>
@@ -20,7 +20,7 @@ const DefenderForm = ({ formData, handleInputChange }) => {
             <Form.Control
             type="text"
             name="group"
-            value={group}
+            value={group || ""}
             onChange={handleInputChange}
             />
         </Form.Group>
@@ -29,7 +29,7 @@ const DefenderForm = ({ formData, handleInputChange }) => {
             <Form.Control
             type="text"
             name="topic"
-            value={topic}
+            value={topic || ""}
             onChange={handleInputChange}
             />
         </Form.Group>
@@ -38,7 +38,7 @@ const DefenderForm = ({ formData, handleInputChange }) => {
             <Form.Control
             type="text"
             name="supervisor"
-            value={supervisor}
+            value={supervisor || ""}
             onChange={handleInputChange}
             />
         </Form.Group>
@@ -47,7 +47,7 @@ const DefenderForm = ({ formData, handleInputChange }) => {
             <Form.Control
             type="text"
             name="averageGrade"
-            value={averageGrade}
+            value={averageGrade || ""}
             onChange={handleInputChange}
             />
         </Form.Group>
@@ -56,7 +56,7 @@ const DefenderForm = ({ formData, handleInputChange }) => {
             type="checkbox"
             label="Красный диплом"
             name="hasHonors"
-            checked={hasHonors}
+            checked={hasHonors || ""}
             onChange={handleInputChange}
             />
         </Form.Group>

@@ -20,7 +20,7 @@ const AddDefender = ({
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="primary" onClick={handleCloseModal}>
+        <Button variant="primary" onClick={() => handleSaveChanges(formData)}>
           Сохранить изменения
         </Button>
         <Button variant="secondary" onClick={handleCloseModal}>

@@ -78,6 +78,7 @@ const MembersPage = () => {
   const handleDeleteMember = (item) => {
     console.log('Удаление члена ГЭК:', item);
     setActiveRow(null); 
+    handleCloseModal();
   };
 
   // Обработчик изменения ввода формы

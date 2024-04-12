@@ -29,7 +29,7 @@ const ScheduleForm = ({ formData, handleInputChange }) => {
         <Form.Control
           type="text"
           name="direction"
-          value={direction}
+          value={direction || ""}
           onChange={handleInputChange}
         />
       </Form.Group>
@@ -39,7 +39,7 @@ const ScheduleForm = ({ formData, handleInputChange }) => {
           <Form.Control
             type="time"
             name="time"
-            value={time}
+            value={time || ""}
             onChange={handleInputChange}
           />
         </div>
@@ -49,7 +49,7 @@ const ScheduleForm = ({ formData, handleInputChange }) => {
         <Form.Control
           type="text"
           name="room"
-          value={room}
+          value={room || ""}
           onChange={handleInputChange}
         />
       </Form.Group>

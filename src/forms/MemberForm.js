@@ -6,26 +6,27 @@ const MemberForm = ({ formData, handleInputChange  }) => {
 
   return (
     <Form>
-      <Form.Group controlId="formFullName">
+      <Form.Group controlId="formName">
         <Form.Label>ФИО</Form.Label>
         <Form.Select
+          aria-label="Default select example"
           type="text"
-          name="fullName"
-          value={name}
-          onChange={handleInputChange}
+          name="name"
+          defaultValue={name || ""}
+          onChange={(e) => handleInputChange(e)}
         >
           <option value={name}>{name}</option>
           <option value="Петров Петр Петрович">Петров Петр Петрович</option>
           <option value="Сидоров Сидор Сидорович">Сидоров Сидор Сидорович</option>
           <option value="Алексеев Алексей Алексеевич">Алексеев Алексей Алексеевич</option>
-      </Form.Select>
+        </Form.Select>
       </Form.Group>
       <Form.Group controlId="formPosition">
         <Form.Label>Должность</Form.Label>
         <Form.Control
           type="text"
           name="position"
-          value={position}
+          value={position || ""}
           onChange={handleInputChange}
         />
       </Form.Group>
@@ -34,7 +35,7 @@ const MemberForm = ({ formData, handleInputChange  }) => {
         <Form.Control
           type="text"
           name="email"
-          value={email}
+          value={email || ""}
           onChange={handleInputChange}
         />
       </Form.Group>
