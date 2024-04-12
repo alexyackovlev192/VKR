@@ -34,6 +34,8 @@ const MembersPage = () => {
   }, []); // Пустой массив зависимостей означает, что эффект сработает только при монтировании и размонтировании компонента
 
 
+  const sortedMembers = membersData.slice().sort((a, b) => a.name.localeCompare(b.name));
+
   // Обработчик клика по строке таблицы
   const handleRowClick = (member) => {
     setActiveRow(member);
@@ -106,7 +108,7 @@ const MembersPage = () => {
             </tr>
           </thead>
           <tbody>
-            {membersData.map((member, index) => (
+            {sortedMembers.map((member, index) => (
               <tr 
                 key={member.id}
                 className={activeRow === member ? 'table-info' : 'table-light'}

@@ -33,6 +33,7 @@ const DefendersPage = () => {
     };
   }, []); // Пустой массив зависимостей означает, что эффект сработает только при монтировании и размонтировании компонента
 
+  const sortedDefenders = defendersData.slice().sort((a, b) => a.name.localeCompare(b.name));
 
   // Обработчик клика по строке таблицы
   const handleRowClick = (defender) => {
@@ -108,13 +109,13 @@ const DefendersPage = () => {
             </tr>
           </thead>
           <tbody>
-            {defendersData.map((defender, index) => (
+            {sortedDefenders.map((defender, index) => (
               <tr 
                 key={defender.id} 
                 className={activeRow === defender ? 'table-info' : 'table-light'}
                 onClick={() => handleRowClick(defender)}>
                 <td>{index + 1}</td>
-                <td>{defender.fullName}</td>
+                <td>{defender.name}</td>
                 <td>{defender.group}</td>
                 <td>{defender.topic}</td>
                 <td>{defender.supervisor}</td>

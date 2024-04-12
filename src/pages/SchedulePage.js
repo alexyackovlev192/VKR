@@ -112,7 +112,7 @@ const SchedulePage = () => {
         <>
           <div className="col-1 px-0 my-4">
             <table className="table table-light table-hover text-center">
-              <thead>
+              <thead className="table-dark">
                 <tr>
                   <th className="px-5">Дата</th>
                 </tr>
@@ -120,7 +120,9 @@ const SchedulePage = () => {
               <tbody className=''>
               {uniqueDates.map((date, index) => (
                 <tr key={index}>
-                  <td>
+                  <td
+                    className="py-5"
+                  >
                     {new Date(date).toLocaleDateString('ru-GB', { day: '2-digit', month: '2-digit' })}
                   </td>
                 </tr>
@@ -128,9 +130,9 @@ const SchedulePage = () => {
               </tbody>
             </table>
           </div>
-          <div className="col-11 px-0 my-4" style={{ overflowX: 'auto' }}>
+          <div className="col-11 px-0 my-4" >
             <table className="table table-light table-hover text-center" ref={tableRef}>
-              <thead>
+              <thead className="table-dark">
                 <tr>
                   {uniqueDirections.map((direction, index) => (
                     <th className="px-5" key={index}>{direction}</th>
@@ -147,7 +149,7 @@ const SchedulePage = () => {
                         activeCell.event != null && 
                         activeCell.event.date === schedules[0].date && 
                         activeCell.event.direction === direction 
-                        ? 'table-info' : 'table-light'}
+                        ? 'px-5 py-0 table-info' : 'px-5 py-0 table-light'}
                       onClick={() => handleSelectedClick({ 
                                                            id: schedules[0].id, 
                                                          date: schedules[0].date, 
@@ -156,7 +158,14 @@ const SchedulePage = () => {
                                                          room: schedules[0].room,
                                                         event: schedules.find(schedule => schedule.direction === direction)})}
                     >
-                      {schedules.find(schedule => schedule.direction === direction)?.id || ''}
+                      {schedules.find(schedule => schedule.direction === direction) ? (
+                      <div>
+                        <p>ГЭК №{schedules[0].id}</p>
+                        <p>Время:{schedules[0].time}</p>
+                        
+                        <p>Аудитория:{schedules[0].room}</p>
+                      </div>
+                      ) : ("")}
                     </td>
                   ))}
                 </tr>
@@ -177,7 +186,7 @@ const SchedulePage = () => {
                         <p>ГЭК №{item.id}</p>
                         <p>Время: {item.time}</p>
                         <p>Направление: {item.direction}</p>
-                        <p>Аудитория:{item.room}</p>
+                        <p>Аудитория: {item.room}</p>
                       </div>
                     </Card.Text>
                     <Button variant="primary" onClick={() => handleEditSchedule(item)}>Редактировать</Button>
