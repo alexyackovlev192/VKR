@@ -6,5 +6,8 @@ const authMiddleware = require('../middleware/authMiddleware')
 const roleMiddleware = require('../middleware/roleMiddleware')
 
 router.get('/', authMiddleware, roleMiddleware([3]), controller.getAllMembersOfGec)
-router.put('/:id', authMiddleware, roleMiddleware([3]), controller.updateMemberOfGec)
+router.put('/:id', [
+    check('Fullname').optional().notEmpty().withMessage('ФИО пользователя не может быть пустым'),
+    check('Mail').optional().isEmail().withMessage('Почта пользователя не может быть пустой') 
+], authMiddleware, roleMiddleware([3]), controller.updateMemberOfGec)
 module.exports = router
