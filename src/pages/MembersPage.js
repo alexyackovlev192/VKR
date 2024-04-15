@@ -98,8 +98,8 @@ const MembersPage = () => {
       </>
 
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-        <table className="table table-light table-hover" ref={tableRef}>
-          <thead>
+        <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
+          <thead className="table-dark">
             <tr>
               <th>№</th>
               <th>ФИО</th>

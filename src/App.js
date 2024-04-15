@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 //import axios from 'axios';
 import HomePage from './pages/HomePage';
 import MembersPage from './pages/MembersPage';
-import SchedulePage from './pages/SchedulePage';
+import SchedulePage from './pages/schedule-pages/SchedulePage';
+import MySchedulePage from './pages/schedule-pages/MySchedulePage';
+import OpenMySchedulePage from './pages/schedule-pages/OpenMySchedulePage';
 import GekPage from './pages/gek-pages/GekPage';
+import MyGekPage from './pages/gek-pages/MyGekPage';
 import EditGekPage from './pages/gek-pages/EditGekPage';
 import CreateGekPage from './pages/gek-pages/CreateGekPage'
 import DefendersPage from './pages/DefendersPage';
 import LoginForm from './components/LoginForm';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
@@ -40,7 +43,10 @@ const App = () => {
           <Route path="/" element={<PageLayout><HomePage /></PageLayout>} />
           <Route path="/members" element={<PageLayout><MembersPage /></PageLayout>} />
           <Route path="/schedule" element={<PageLayout><SchedulePage /></PageLayout>} />
+          <Route path="/my-schedule" element={<PageLayout><MySchedulePage /></PageLayout>} />
+          <Route path="/my-schedule/:scheduleId" element={<PageLayout><OpenMySchedulePage /></PageLayout>} />
           <Route path="/gek" element={<PageLayout><GekPage /></PageLayout>} />
+          <Route path="/my-gek" element={<PageLayout><MyGekPage /></PageLayout>} />
           <Route path="/create-gek" element={<PageLayout><CreateGekPage /></PageLayout>} />
           <Route path="/edit-gek/:gekId" element={<PageLayout><EditGekPage /></PageLayout>} />
           <Route path="/defenders" element={<PageLayout><DefendersPage /></PageLayout>} />

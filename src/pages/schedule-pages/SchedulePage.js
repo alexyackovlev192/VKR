@@ -2,11 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 
-import schedulesData from '../data/schedulesData.json';
-import UpdateSchedule from '../modal-windows/UpdateSchedule';
-import AddSchedule from '../modal-windows/AddSchedule';
+import schedulesData from '../../data/schedulesData.json';
+import UpdateSchedule from '../../modal-windows/UpdateSchedule';
+import AddSchedule from '../../modal-windows/AddSchedule';
 
-import './style-pages/SchedulePage.css';
+import '../style-pages/SchedulePage.css';
 
 const SchedulePage = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -111,10 +111,10 @@ const SchedulePage = () => {
         {isTableView ? (
         <>
           <div className="col-1 px-0 my-4">
-            <table className="table table-light table-hover text-center">
+            <table className="table table-primary table-bordered table-hover text-center">
               <thead className="table-dark">
                 <tr>
-                  <th className="px-5">Дата</th>
+                  <th className="px-5 py-3">Дата</th>
                 </tr>
               </thead>
               <tbody className=''>
@@ -123,19 +123,22 @@ const SchedulePage = () => {
                   <td
                     className="py-5"
                   >
+                    <br></br>
                     {new Date(date).toLocaleDateString('ru-GB', { day: '2-digit', month: '2-digit' })}
+                    <br></br>
+                    <br></br>
                   </td>
                 </tr>
               ))}
               </tbody>
             </table>
           </div>
-          <div className="col-11 px-0 my-4" >
-            <table className="table table-light table-hover text-center" ref={tableRef}>
+          <div className="col-11 px-0 my-4" style={{overflowX: 'auto' }}>
+            <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
               <thead className="table-dark">
                 <tr>
                   {uniqueDirections.map((direction, index) => (
-                    <th className="px-5" key={index}>{direction}</th>
+                    <th className="px-5 py-3" key={index}>{direction}</th>
                   ))}
                 </tr>
               </thead>
@@ -149,7 +152,7 @@ const SchedulePage = () => {
                         activeCell.event != null && 
                         activeCell.event.date === schedules[0].date && 
                         activeCell.event.direction === direction 
-                        ? 'px-5 py-0 table-info' : 'px-5 py-0 table-light'}
+                        ? 'px-5 py-4 table-info' : 'px-5 py-4 table-light'}
                       onClick={() => handleSelectedClick({ 
                                                            id: schedules[0].id, 
                                                          date: schedules[0].date, 
