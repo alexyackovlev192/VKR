@@ -20,7 +20,7 @@ const OpenMySchedulePage = () => {
   return (
     <div className="container-fluid text-center my-3">
         <h4 className="col-12">Мои защиты</h4>
-        <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>                
+        <div className="my-4 mx-5" style={{ maxHeight: '70vh', overflowY: 'auto' }}>                
             <table className="table table-striped table-bordered table-light table-hover text-center">
                 <thead className="table-dark">
                     <tr>
@@ -31,6 +31,10 @@ const OpenMySchedulePage = () => {
                     <th>Научрук</th>
                     <th>Средний балл</th>
                     <th>Красный диплом</th>
+                    <th>Рекомендация в магистратуру</th>
+                    <th>Рекомендация к публикации</th>
+                    <th>Оценка</th>
+                    <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -45,6 +49,15 @@ const OpenMySchedulePage = () => {
                         <td>{defender.supervisor}</td>
                         <td>{defender.averageGrade}</td>
                         <td>{defender.hasHonors ? 'Да' : 'Нет'}</td>
+                        <td>{defender.magRec ? 'Да' : ''}</td>
+                        <td>{defender.publRec ? 'Да' : ''}</td>
+                        <td>{defender.result}</td>
+                        <td>
+                            <Link to={`/defender-schedule/${defender.id}`} className="col-1">
+                                <Button variant="primary" className="">Начать</Button>
+                                {console.log(defender.id)}  
+                            </Link>
+                        </td>
                     </tr>
                     ))}
                 </tbody>

@@ -6,6 +6,7 @@ import MembersPage from './pages/MembersPage';
 import SchedulePage from './pages/schedule-pages/SchedulePage';
 import MySchedulePage from './pages/schedule-pages/MySchedulePage';
 import OpenMySchedulePage from './pages/schedule-pages/OpenMySchedulePage';
+import DefenderSchedulePage from './pages/schedule-pages/DefenderSchedulePage'
 import GekPage from './pages/gek-pages/GekPage';
 import MyGekPage from './pages/gek-pages/MyGekPage';
 import EditGekPage from './pages/gek-pages/EditGekPage';
@@ -45,8 +46,9 @@ const App = () => {
           <Route path="/schedule" element={<PageLayout><SchedulePage /></PageLayout>} />
           <Route path="/my-schedule" element={<PageLayout><MySchedulePage /></PageLayout>} />
           <Route path="/my-schedule/:scheduleId" element={<PageLayout><OpenMySchedulePage /></PageLayout>} />
-          <Route path="/gek" element={<PageLayout><GekPage /></PageLayout>} />
+          <Route path="/defender-schedule/:defId" element={<PageLayout><DefenderSchedulePage /></PageLayout>} />
           <Route path="/my-gek" element={<PageLayout><MyGekPage /></PageLayout>} />
+          <Route path="/gek" element={<PageLayout><GekPage /></PageLayout>} />
           <Route path="/create-gek" element={<PageLayout><CreateGekPage /></PageLayout>} />
           <Route path="/edit-gek/:gekId" element={<PageLayout><EditGekPage /></PageLayout>} />
           <Route path="/defenders" element={<PageLayout><DefendersPage /></PageLayout>} />
