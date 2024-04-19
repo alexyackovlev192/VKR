@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect }from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Button from 'react-bootstrap/Button';
 import UpdateMember from '../modal-windows/UpdateMember';
 import AddMember from '../modal-windows/AddMember';
@@ -6,113 +6,138 @@ import AddMember from '../modal-windows/AddMember';
 import membersData from '../data/membersData.json';
 import './style-pages/MembersPage.css';
 
-// Основной компонент страницы участников
 const MembersPage = () => {
-  // Состояния компонента
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false); // Показать модальное окно
-  const [formData, setFormData] = useState(null); // Данные участника
-  const [activeRow, setActiveRow] = useState(null); // Состояние для активной строки
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [formData, setFormData] = useState(null);
+  const [activeRow, setActiveRow] = useState(null);
   
-  const tableRef = useRef(null); // Создаем ссылку на элемент таблицы
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [searchText, setSearchText] = useState('');
+  const [sortedMembers, setSortedMembers] = useState(membersData);
 
-  // Обработчик клика в любое место кроме таблицы
-  const handleClickOutsideTable = (event) => {
-    // Проверяем, был ли клик сделан вне таблицы
-    if (tableRef.current && !tableRef.current.contains(event.target)) {
-      setActiveRow(null); // Сбрасываем активную строку
-    }
-  };
+  const tableRef = useRef(null);
 
   useEffect(() => {
-    // Добавляем обработчик события клика при монтировании компонента
+    const handleClickOutsideTable = (event) => {
+      if (tableRef.current && !tableRef.current.contains(event.target)) {
+        setActiveRow(null);
+      }
+    };
+
     document.addEventListener('click', handleClickOutsideTable);
-    // Удаляем обработчик события клика при размонтировании компонента
     return () => {
       document.removeEventListener('click', handleClickOutsideTable);
     };
-  }, []); // Пустой массив зависимостей означает, что эффект сработает только при монтировании и размонтировании компонента
+  }, []);
 
+  const sortData = useCallback((column) => {
+    if (sortColumn === column) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortOrder('asc');
+    }
 
-  const sortedMembers = membersData.slice().sort((a, b) => a.name.localeCompare(b.name));
+    const sortedData = sortedMembers.slice().sort((a, b) => {
+      if (column === 'name' || column === 'position' || column === 'email') {
+        return sortOrder === 'asc' ? a[column].localeCompare(b[column]) : b[column].localeCompare(a[column]);
+      } else {
+        return 0;
+      }
+    });
 
-  // Обработчик клика по строке таблицы
-  const handleRowClick = (member) => {
+    setSortedMembers(sortedData);
+  }, [sortColumn, sortOrder, sortedMembers]);
+
+  const handleRowClick = useCallback((member) => {
     setActiveRow(member);
     console.log('Выбран ГЭК:', member.id);
-  };
+  }, []);
 
-  // Закрытие модального окна
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setShowUpdateModal(false);
     setShowAddModal(false);
     setFormData(null);
-  };
-  
-  // Обработчик клика по кнопке редактировать
-  const handleEditMember = () => {
-    // Устанавливаем активную строку для редактирования
+  }, []);
+
+  const handleEditMember = useCallback(() => {
     setActiveRow(activeRow);
-    setFormData(activeRow); // Передаем данные активной строки в форму редактирования
+    setFormData(activeRow);
     setShowUpdateModal(true);
-  };
+  }, [activeRow]);
 
-  // Обработчик клика по кнопке добавить
-  const handleAddMember = () => {
+  const handleAddMember = useCallback(() => {
     setShowAddModal(true);
-    setFormData(null); // Очищаем форму
-  };
-
-  // Сохранение изменений
-  const handleSaveChangesUpdate = () => {
-    console.log('Сохранение изменений:', formData);
-    setShowUpdateModal(false);
     setFormData(null);
-  };
+  }, []);
 
-  const handleSaveChangesAdd = () => {
-    console.log('Добавление нового участника:', formData);
-    setShowAddModal(false);
-    setFormData(null);
-  };
-
-  // Удаление участника
-  const handleDeleteMember = (item) => {
-    console.log('Удаление члена ГЭК:', item);
-    setActiveRow(null); 
+  const handleSaveChanges = useCallback((formData) => {
+    if (showUpdateModal) {
+      console.log('Сохранение изменений:', formData);
+    } else if (showAddModal) {
+      console.log('Добавление нового участника:', formData);
+    }
     handleCloseModal();
-  };
+  }, [showUpdateModal, showAddModal, handleCloseModal]);
 
-  // Обработчик изменения ввода формы
-  const handleInputChange = (e) => {
+  const handleDeleteMember = useCallback((item) => {
+    console.log('Удаление члена ГЭК:', item);
+    setActiveRow(null);
+    handleCloseModal();
+  }, []);
+
+  const handleInputChange = useCallback((e) => {
     const { name, value, checked, type } = e.target;
     setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
-  };
+  }, [formData]);
 
-  // Возвращаем JSX компонента
+  const handleSearch = useCallback((e) => {
+    setSearchText(e.target.value);
+    const filteredData = membersData.filter((member) => {
+      const { name, position, email } = member;
+      const searchRegExp = new RegExp(e.target.value.trim(), 'i');
+      return searchRegExp.test(name) || searchRegExp.test(position) || searchRegExp.test(email);
+    });
+    setSortedMembers(filteredData);
+  }, []);
+
   return (
     <div className="my-5 px-5">
       <>
-      <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>Редактировать</Button>
-        <Button variant="primary" className="mx-3" onClick={handleAddMember}>Добавить</Button>
+        <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>
+          Редактировать
+        </Button>
+        <Button variant="primary" className="mx-3" onClick={handleAddMember}>
+          Добавить
+        </Button>
       </>
 
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+        <input
+          type="text"
+          className="form-control mb-3"
+          placeholder="Поиск..."
+          value={searchText}
+          onChange={handleSearch}
+        />
         <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
           <thead className="table-dark">
             <tr>
               <th>№</th>
-              <th>ФИО</th>
-              <th>Должность</th>
-              <th>Почта</th>
+              <th onClick={() => sortData('name')}>ФИО</th>
+              <th onClick={() => sortData('position')}>Должность</th>
+              <th onClick={() => sortData('email')}>Почта</th>
             </tr>
           </thead>
           <tbody>
             {sortedMembers.map((member, index) => (
-              <tr 
+              <tr
                 key={member.id}
                 className={activeRow === member ? 'table-info' : 'table-light'}
-                onClick={() => handleRowClick(member)}>
+                onClick={() => handleRowClick(member)}
+              >
                 <td>{index + 1}</td>
                 <td>{member.name}</td>
                 <td>{member.position}</td>
@@ -127,14 +152,14 @@ const MembersPage = () => {
         handleCloseModal={handleCloseModal}
         formData={formData}
         handleInputChange={handleInputChange}
-        handleSaveChanges={handleSaveChangesUpdate}
+        handleSaveChanges={() => handleSaveChanges(formData)}
         handleDeleteMember={handleDeleteMember}
       />
       <AddMember
         showModal={showAddModal}
         handleCloseModal={handleCloseModal}
         handleInputChange={handleInputChange}
-        handleSaveChanges={handleSaveChangesAdd}
+        handleSaveChanges={() => handleSaveChanges(formData)}
         formData={formData}
       />
     </div>

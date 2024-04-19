@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect }from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Button from 'react-bootstrap/Button';
 import UpdateDefender from '../modal-windows/UpdateDefender';
 import AddDefender from '../modal-windows/AddDefender';
@@ -6,114 +6,153 @@ import AddDefender from '../modal-windows/AddDefender';
 import defendersData from '../data/defendersData.json';
 import './style-pages/DefendersPage.css';
 
-// Основной компонент страницы участников
 const DefendersPage = () => {
-  // Состояния компонента
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false); // Показать модальное окно
-  const [formData, setFormData] = useState(null); // Данные участника
-  const [activeRow, setActiveRow] = useState(null); // Состояние для активной строки
-  
-  const tableRef = useRef(null); // Создаем ссылку на элемент таблицы
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [formData, setFormData] = useState(null);
+  const [activeRow, setActiveRow] = useState(null);
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortOrder, setSortOrder] = useState('asc');
+  const [searchText, setSearchText] = useState('');
+  const [sortedDefenders, setSortedDefenders] = useState(defendersData);
 
-  // Обработчик клика в любое место кроме таблицы
-  const handleClickOutsideTable = (event) => {
-    // Проверяем, был ли клик сделан вне таблицы
-    if (tableRef.current && !tableRef.current.contains(event.target)) {
-      setActiveRow(null); // Сбрасываем активную строку
-    }
-  };
+  const tableRef = useRef(null);
 
   useEffect(() => {
-    // Добавляем обработчик события клика при монтировании компонента
+    const handleClickOutsideTable = (event) => {
+      if (tableRef.current && !tableRef.current.contains(event.target)) {
+        setActiveRow(null);
+      }
+    };
+
     document.addEventListener('click', handleClickOutsideTable);
-    // Удаляем обработчик события клика при размонтировании компонента
     return () => {
       document.removeEventListener('click', handleClickOutsideTable);
     };
-  }, []); // Пустой массив зависимостей означает, что эффект сработает только при монтировании и размонтировании компонента
+  }, []);
 
-  const sortedDefenders = defendersData.slice().sort((a, b) => a.name.localeCompare(b.name));
+  const sortData = useCallback((column) => {
+    if (sortColumn === column) {
+        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+        setSortColumn(column);
+        setSortOrder('asc');
+    }
 
-  // Обработчик клика по строке таблицы
-  const handleRowClick = (defender) => {
+    const sortedData = sortedDefenders.slice().sort((a, b) => {
+      if (column === 'averageGrade') {
+        return sortOrder === 'asc' ? a[column] - b[column] : b[column] - a[column];
+      } else if (column === 'hasHonors') {
+        const aValue = a[column] ? 'Да' : 'Нет';
+        const bValue = b[column] ? 'Да' : 'Нет';
+        return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+      } else {
+        return sortOrder === 'asc' ? a[column].localeCompare(b[column]) : b[column].localeCompare(a[column]);
+      }
+    });
+
+    setSortedDefenders(sortedData);
+  }, [sortOrder, sortedDefenders]);
+
+  const renderSortArrow = (column) => {
+      if (sortColumn === column) {
+          return sortOrder === 'asc' ? ' ↑' : ' ↓';
+      }
+      return null;
+  };
+
+  const handleRowClick = useCallback((defender) => {
     setActiveRow(defender);
     console.log('Выбран студент:', defender.id);
-  };
+  }, []);
 
-  // Закрытие модального окна
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setShowUpdateModal(false);
     setShowAddModal(false);
     setFormData(null);
-  };
-  
-  // Обработчик клика по кнопке редактировать
-  const handleEditDefender = () => {
-    setActiveRow(activeRow);
-    setFormData(activeRow); // Передаем данные активной строки в форму редактирования
+  }, []);
+
+  const handleEditDefender = useCallback(() => {
+    setFormData(activeRow);
     setShowUpdateModal(true);
-  };
+  }, [activeRow]);
 
-  // Обработчик клика по кнопке добавить
-  const handleAddDefender = () => {
+  const handleAddDefender = useCallback(() => {
     setShowAddModal(true);
-    setFormData(null); // Очищаем форму
-  };
-
-  // Сохранение изменений
-  const handleSaveChangesUpdate = () => {
-    console.log('Сохранение изменений:', formData);
-    setShowUpdateModal(false);
     setFormData(null);
-  };
+  }, []);
 
-  const handleSaveChangesAdd = () => {
-    console.log('Добавление нового участника:', formData);
-    setShowAddModal(false);
-    setFormData(null);
-  };
+  const handleSaveChanges = useCallback((formData) => {
+    console.log(showUpdateModal ? 'Сохранение изменений:' : 'Добавление нового участника:', formData);
+    handleCloseModal();
+  }, [showUpdateModal, handleCloseModal]);
 
-  // Удаление участника
-  const handleDeleteDefender = (item) => {
+  const handleDeleteDefender = useCallback((item) => {
     console.log('Удаление участника:', item);
     setActiveRow(null);
     handleCloseModal();
-  };
+  }, []);
 
-  // Обработчик изменения ввода формы
-  const handleInputChange = (e) => {
+  const handleInputChange = useCallback((e) => {
     const { name, value, checked, type } = e.target;
-    setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
-  };
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: type === 'checkbox' ? checked : value }));
+  }, []);
 
+  const handleSearch = useCallback((e) => {
+    setSearchText(e.target.value);
+    const filteredData = defendersData.filter((defender) => {
+      const { name, group, topic, supervisor, averageGrade, hasHonors } = defender;
+      const searchRegExp = new RegExp(e.target.value.trim(), 'i');
+      return (
+        searchRegExp.test(name) ||
+        searchRegExp.test(group) ||
+        searchRegExp.test(topic) ||
+        searchRegExp.test(supervisor) ||
+        searchRegExp.test(averageGrade.toString()) ||
+        searchRegExp.test(hasHonors ? 'Да' : 'Нет')
+      );
+    });
+    setSortedDefenders(filteredData);
+  }, []);
 
-  // Возвращаем JSX компонента
   return (
     <div className="my-5 px-5">
       <>
-        <Button variant="primary" className="mx-3" onClick={handleEditDefender} disabled={!activeRow}>Редактировать</Button>
-        <Button variant="primary" className="mx-3" onClick={handleAddDefender}>Добавить</Button>
+        <Button variant="primary" className="mx-3" onClick={handleEditDefender} disabled={!activeRow}>
+          Редактировать
+        </Button>
+        <Button variant="primary" className="mx-3" onClick={handleAddDefender}>
+          Добавить
+        </Button>
       </>
+
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+        <input
+          type="text"
+          className="form-control mb-3"
+          placeholder="Поиск..."
+          value={searchText}
+          onChange={handleSearch}
+        />
         <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
           <thead className="table-dark">
             <tr>
               <th>№</th>
-              <th>ФИО</th>
-              <th>Группа</th>
-              <th>Тема</th>
-              <th>Научрук</th>
-              <th>Средний балл</th>
-              <th>Красный диплом</th>
+              <th onClick={() => sortData('name')}>ФИО{renderSortArrow('name')}</th>
+              <th onClick={() => sortData('group')}>Группа{renderSortArrow('group')}</th>
+              <th onClick={() => sortData('topic')}>Тема{renderSortArrow('topic')}</th>
+              <th onClick={() => sortData('supervisor')}>Научрук{renderSortArrow('supervisor')}</th>
+              <th onClick={() => sortData('averageGrade')}>Средний балл{renderSortArrow('averageGrade')}</th>
+              <th onClick={() => sortData('hasHonors')}>Красный диплом{renderSortArrow('hasHonors')}</th>
             </tr>
           </thead>
           <tbody>
             {sortedDefenders.map((defender, index) => (
-              <tr 
-                key={defender.id} 
+              <tr
+                key={defender.id}
                 className={activeRow === defender ? 'table-info' : 'table-light'}
-                onClick={() => handleRowClick(defender)}>
+                onClick={() => handleRowClick(defender)}
+              >
                 <td>{index + 1}</td>
                 <td>{defender.name}</td>
                 <td>{defender.group}</td>
@@ -131,14 +170,14 @@ const DefendersPage = () => {
         handleCloseModal={handleCloseModal}
         formData={formData}
         handleInputChange={handleInputChange}
-        handleSaveChanges={handleSaveChangesUpdate}
+        handleSaveChanges={() => handleSaveChanges(formData)}
         handleDeleteDefender={handleDeleteDefender}
       />
       <AddDefender
         showModal={showAddModal}
         handleCloseModal={handleCloseModal}
         handleInputChange={handleInputChange}
-        handleSaveChanges={handleSaveChangesAdd}
+        handleSaveChanges={() => handleSaveChanges(formData)}
         formData={formData}
       />
     </div>
