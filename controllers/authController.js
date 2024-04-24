@@ -36,14 +36,13 @@ class authController {
             Login: Login
           }})
          const userId = this_user.id_U;
-         for (const roleName of Roles) {
-            const role = await Role.findOne({ where: { Name_role: roleName } });
+         for (const roleId of Roles) {
+            const role = await Role.findOne({ where: { id_R: roleId } });
             if (!role) {
-                console.log(`Роль "${roleName}" не найдена`);
+                console.log(`Роль с id "${role}" не найдена`);
                 continue;
             }
-            const roleId = role.id_R;
-            const userRole = new UserRole({ id_U: userId, id_R: roleId });
+            const userRole = new UserRole({ id_U: userId, id_R: role.id_R });
             await userRole.save();
         }
 
