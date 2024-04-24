@@ -1,6 +1,8 @@
 const User = require('../models/User')
 const UserRole = require('../models/UserRole')
+const Role = require('../models/Role')
 const {validationResult} = require('express-validator')
+const { Op } = require('sequelize');
 
 class userController {
 
@@ -78,6 +80,72 @@ class userController {
 
         } catch(e) {
             res.status(500).json({ message: 'Ошибка при обновлении данных секретаря гэк', e})
+        }
+    }
+    async getUsersWithRoles(req, res) {
+        try {
+            const users = await User.findAll({ 
+                where: {
+                    Fullname: {
+                        [Op.not]: null
+                    }
+                } 
+            });
+            
+            const usersWithRoles = [];
+    
+            for (const user of users) {
+                const userRoles = await UserRole.findAll({ 
+                    where: {
+                        id_U: user.id_U 
+                    },
+                    attributes: ['id_R'] 
+                });
+    
+                const roles = userRoles.map(userRole => userRole.id_R);
+    
+                usersWithRoles.push({
+                    id_U: user.id_U,
+                    Fullname: user.Fullname,
+                    roles: roles
+                });
+            }
+    
+            return res.json(usersWithRoles);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: 'Ошибка при получении пользователей с ролями' });
+        }
+    }
+    async updateUsersRoles(req, res) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ message: "Ошибка при обновлении ролей пользователя", errors });
+            }
+    
+            const id = req.params.id;
+            if (!id) {
+                return res.status(400).json({ message: "Не указан ID пользователя" });
+            }
+    
+            // Удаление текущих ролей пользователя
+            await UserRole.destroy({ where: { id_U: id } });
+    
+            const { Roles } = req.body;
+            for (const roleId of Roles) {
+                const role = await Role.findOne({ where: { id_R: roleId } });
+                if (!role) {
+                    return res.status(404).json({ message: `Роль с ID ${roleId} не найдена` });
+                }
+                const userRole = new UserRole({ id_U: id, id_R: role.id_R });
+                await userRole.save();
+            }
+    
+            return res.status(200).json({ message: "Роли пользователя успешно обновлены" });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: "Ошибка при обновлении ролей пользователя" });
         }
     }
 }
