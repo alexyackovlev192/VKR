@@ -1,5 +1,6 @@
 const Router = require('express')
 const controller = require('../controllers/authController')
+const UserController = require('../controllers/userController')
 const {check} = require("express-validator")
 const router = new Router()
 const authMiddleware = require('../middleware/authMiddleware')
@@ -17,5 +18,14 @@ router.post('/registration', [
         return true;
     })
 ], authMiddleware, roleMiddleware([1]), controller.registartion)
+router.get('/users', authMiddleware, roleMiddleware([1]), UserController.getUsersWithRoles)
+router.put('/users/:id', [
+    check('Roles').custom(value => {
+        if (!Array.isArray(value) || value.length === 0) {
+            throw new Error('Роли пользователя не могут быть пустыми');
+        }
+        return true;
+    })
+], authMiddleware, roleMiddleware([1]), UserController.updateUsersRoles)
 
 module.exports = router
