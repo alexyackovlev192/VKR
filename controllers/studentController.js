@@ -62,6 +62,18 @@ class studentController {
             res.status(500).json({ message: 'Ошибка при обновлении данных студента', e})
         }
     }
+    async getStudentsDefThisYear(req, res) {
+        try {
+            const currentYear = new Date().getFullYear();
+            const studentsDefThisYear = await Student.findAll({where: { YearOfDefense: currentYear }})
+            if (!studentsDefThisYear) {
+                return res.status(404).json({ message: 'Студенты, защищающиеся в этом году не найдены!' });
+            }
+            return res.json(studentsDefThisYear)
+        } catch(e) {
+            return res.status(500).json(e)
+        }
+    }
 
 }
 module.exports = new studentController()

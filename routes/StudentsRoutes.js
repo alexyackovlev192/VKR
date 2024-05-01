@@ -23,5 +23,6 @@ router.put('/:id', [
     check('YearOfDefense').optional().notEmpty().withMessage('Год защиты студента не может быть пустым'),
     check('NameDirection').optional().notEmpty().withMessage('Направление студента не может быть пустым'),
 ], authMiddleware, roleMiddleware([3]), controller.updateStudent)
+router.get('/thisYear', authMiddleware, roleMiddleware([3]), controller.getStudentsDefThisYear)
 
 module.exports = router
