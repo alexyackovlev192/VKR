@@ -38,7 +38,7 @@ const OpenMySchedulePage = () => {
             } else {
                 return sortOrder === 'asc' ? a[column].localeCompare(b[column]) : b[column].localeCompare(a[column]);
             }
-        });
+        }); 
 
         setSortedMembers(sortedData);
     }, [sortColumn, sortOrder, sortedMembers]);

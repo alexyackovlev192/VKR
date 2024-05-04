@@ -32,25 +32,33 @@ const MembersPage = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const sortedData = sortedMembers.slice().sort((a, b) => {
+      if (!sortColumn) return 0;
+      if (sortColumn === 'name' || sortColumn === 'position' || sortColumn === 'email') {
+        return sortOrder === 'asc' ? a[sortColumn].localeCompare(b[sortColumn]) : b[sortColumn].localeCompare(a[sortColumn]);
+      }
+      return 0;
+    });
+    setSortedMembers(sortedData);
+  }, [sortColumn, sortOrder]);
+
   const sortData = useCallback((column) => {
     if (sortColumn === column) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(prevOrder => prevOrder === 'asc' ? 'desc' : 'asc');
     } else {
       setSortColumn(column);
       setSortOrder('asc');
     }
+  }, [sortColumn]);
 
-    const sortedData = sortedMembers.slice().sort((a, b) => {
-      if (column === 'name' || column === 'position' || column === 'email') {
-        return sortOrder === 'asc' ? a[column].localeCompare(b[column]) : b[column].localeCompare(a[column]);
-      } else {
-        return 0;
-      }
-    });
-
-    setSortedMembers(sortedData);
-  }, [sortColumn, sortOrder, sortedMembers]);
-
+  const renderSortArrow = (column) => {
+    if (sortColumn === column) {
+        return sortOrder === 'asc' ? ' ↑' : ' ↓';
+    }
+    return null;
+  };
+  
   const handleRowClick = useCallback((member) => {
     setActiveRow(member);
     console.log('Выбран ГЭК:', member.id);
@@ -113,22 +121,21 @@ const MembersPage = () => {
           Добавить
         </Button>
       </>
-
-      <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-        <input
+      <input
           type="text"
-          className="form-control mb-3"
+          className="form-control mb-3 my-4"
           placeholder="Поиск..."
           value={searchText}
           onChange={handleSearch}
         />
+      <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
           <thead className="table-dark">
             <tr>
               <th>№</th>
-              <th onClick={() => sortData('name')}>ФИО</th>
-              <th onClick={() => sortData('position')}>Должность</th>
-              <th onClick={() => sortData('email')}>Почта</th>
+              <th onClick={() => sortData('name')}>ФИО{renderSortArrow('name')}</th>
+              <th onClick={() => sortData('position')}>Должность{renderSortArrow('position')}</th>
+              <th onClick={() => sortData('email')}>Почта{renderSortArrow('email')}</th>
             </tr>
           </thead>
           <tbody>

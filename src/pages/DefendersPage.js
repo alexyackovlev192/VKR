@@ -11,6 +11,7 @@ const DefendersPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
+
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
   const [searchText, setSearchText] = useState('');
@@ -31,35 +32,37 @@ const DefendersPage = () => {
     };
   }, []);
 
-  const sortData = useCallback((column) => {
-    if (sortColumn === column) {
-        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-        setSortColumn(column);
-        setSortOrder('asc');
-    }
-
-    const sortedData = sortedDefenders.slice().sort((a, b) => {
-      if (column === 'averageGrade') {
-        return sortOrder === 'asc' ? a[column] - b[column] : b[column] - a[column];
-      } else if (column === 'hasHonors') {
-        const aValue = a[column] ? 'Да' : 'Нет';
-        const bValue = b[column] ? 'Да' : 'Нет';
-        return sortOrder === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+  useEffect(() => {
+    const sortedData = defendersData.slice().sort((a, b) => {
+      if (!sortColumn) return 0;
+      if (sortColumn === 'averageGrade') {
+        return sortOrder === 'asc' ? a[sortColumn] - b[sortColumn] : b[sortColumn] - a[sortColumn];
+      } else if (sortColumn === 'hasHonors') {
+        let valA = a[sortColumn] ? 'Да' : 'Нет';
+        let valB = b[sortColumn] ? 'Да' : 'Нет';
+        return sortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
       } else {
-        return sortOrder === 'asc' ? a[column].localeCompare(b[column]) : b[column].localeCompare(a[column]);
+        return sortOrder === 'asc' ? a[sortColumn].localeCompare(b[sortColumn]) : b[sortColumn].localeCompare(a[sortColumn]);
       }
     });
-
     setSortedDefenders(sortedData);
-  }, [sortOrder, sortedDefenders]);
+  }, [sortOrder, sortColumn]);
 
-  const renderSortArrow = (column) => {
-      if (sortColumn === column) {
-          return sortOrder === 'asc' ? ' ↑' : ' ↓';
-      }
-      return null;
-  };
+  const sortData = useCallback((column) => {
+    if (sortColumn === column) {
+      setSortOrder(prevOrder => prevOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortOrder('asc');
+    }
+  }, [sortColumn, sortOrder]);
+
+  const renderSortArrow = useCallback((column) => {
+    if (sortColumn === column) {
+      return sortOrder === 'asc' ? ' ↑' : ' ↓';
+    }
+    return null;
+  }, [sortColumn, sortOrder]);
 
   const handleRowClick = useCallback((defender) => {
     setActiveRow(defender);
@@ -125,15 +128,14 @@ const DefendersPage = () => {
           Добавить
         </Button>
       </>
-
-      <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-        <input
+      <input
           type="text"
-          className="form-control mb-3"
+          className="form-control mb-3 my-3"
           placeholder="Поиск..."
           value={searchText}
           onChange={handleSearch}
         />
+      <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
           <thead className="table-dark">
             <tr>
