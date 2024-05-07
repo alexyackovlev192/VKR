@@ -52,7 +52,7 @@ const App = () => {
           <Route path="/create-gek" element={<PageLayout><CreateGekPage /></PageLayout>} />
           <Route path="/edit-gek/:gekId" element={<PageLayout><EditGekPage /></PageLayout>} />
           <Route path="/defenders" element={<PageLayout><DefendersPage /></PageLayout>} />
-          <Route path="/login" element={<LoginForm />} />
+          <Route path="/auth" element={<LoginForm />} />
         </Routes>
       </Router>
   );
