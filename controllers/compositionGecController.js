@@ -60,7 +60,7 @@ class compositionGecController {
             return res.status(500).json(e)
         }
     }
-    async getGecIdsByUserId(req, res) {
+    /*async getGecIdsByUserId(req, res) {
         try {
             const id = req.params.id;
             if (!id) {
@@ -70,10 +70,49 @@ class compositionGecController {
                 where: { id_U: id },
                 attributes: ['id_G'] 
             });
+            const gecIds = await CompositionGec.findAll({
+                where: { 
+                    id_U: id 
+                },
+                include: [{
+                    model: Gec,
+                    required: true, 
+                    where: {
+                        status: null 
+                    }
+                }],
+                attributes: ['id_G']
+            });
             res.status(200).json(gecIds);
         }
         catch (e) {
             res.status(500).json({ message: 'Ошибка при получении id_G по id_U', e });
+        }
+    }*/
+    async getGecIdsByUserId(req, res) {
+        try {
+            const id = req.params.id;
+            if (!id) {
+                return res.status(400).json({ message: "Id не указан" });
+            }
+    
+            const gecIds = await CompositionGec.findAll({
+                where: { id_U: id },
+                attributes: ['id_G'] 
+            });
+    
+            const filteredGecIds = [];
+            for (const gecIdObj of gecIds) {
+                const gecId = gecIdObj.id_G;
+                const gec = await Gec.findOne({ where: { id_G: gecId, status: null } });
+                if (gec) {
+                    filteredGecIds.push({ id_G: gecId });
+                }
+            }
+    
+            return res.status(200).json(filteredGecIds);
+        } catch (e) {
+            return res.status(500).json({ message: 'Ошибка при получении id_G по id_U', e });
         }
     }
 }
