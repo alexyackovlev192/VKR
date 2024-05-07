@@ -24,5 +24,6 @@ router.put('/:id', [
     check('NameDirection').optional().notEmpty().withMessage('Направление студента не может быть пустым'),
 ], authMiddleware, roleMiddleware([3]), controller.updateStudent)
 router.get('/thisYear', authMiddleware, roleMiddleware([3]), controller.getStudentsDefThisYear)
+router.get('/:id', authMiddleware, roleMiddleware([3,2,4]), controller.getStudentById)
 
 module.exports = router

@@ -74,6 +74,21 @@ class studentController {
             return res.status(500).json(e)
         }
     }
+    async getStudentById(req, res) {
+        try {
+            const { id } = req.params;
+            if (!id) {
+                res.status(400).json({message: "Id не указан"})
+            }
+            const student = await Student.findOne({where: { id_S: id }})
+            if (!student) {
+                return res.status(404).json({ message: 'Студент не найден!' });
+            }
+            return res.json(student)
+        } catch(e) {
+            return res.status(500).json(e)
+        }
+    }
 
 }
 module.exports = new studentController()
