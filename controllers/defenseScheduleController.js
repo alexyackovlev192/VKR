@@ -97,19 +97,20 @@ class defenseScheduleController {
             return res.status(500).json(e)
         }
     }
-    async getDefenseById(req, res) {
+    async getDefensesByGecId(req, res) {
         try {
             const { id } = req.params;
             if (!id) {
                 res.status(400).json({message: "Id не указан"})
             }
-            const defenseSchedule = await DefenseSchedule.findOne({
+            const defenseSchedule = await DefenseSchedule.findAll({
                 where: {
-                    id_DS: id
-                }
+                    id_G: id
+                },
+                order: [['date', 'ASC']]
             });
             if (!defenseSchedule) {
-                return res.status(404).json({ message: 'Защита не найдена' });
+                return res.status(404).json({ message: 'Защиты не найдены' });
             }
             return res.json(defenseSchedule)
         } catch(e) {
