@@ -80,7 +80,6 @@ class defenseScheduleController {
     async getDefenseForThisYear(req, res) {
         try {
             const currentYear = new Date().getFullYear();
-            console.log("-------------------------------------")
             const defenseScheduleThisYear = await DefenseSchedule.findAll({
                 where: {
                     date: {
@@ -94,6 +93,25 @@ class defenseScheduleController {
                 return res.status(404).json({ message: 'Защиты этого года не найдены' });
             }
             return res.json(defenseScheduleThisYear)
+        } catch(e) {
+            return res.status(500).json(e)
+        }
+    }
+    async getDefenseById(req, res) {
+        try {
+            const { id } = req.params;
+            if (!id) {
+                res.status(400).json({message: "Id не указан"})
+            }
+            const defenseSchedule = await DefenseSchedule.findOne({
+                where: {
+                    id_DS: id
+                }
+            });
+            if (!defenseSchedule) {
+                return res.status(404).json({ message: 'Защита не найдена' });
+            }
+            return res.json(defenseSchedule)
         } catch(e) {
             return res.status(500).json(e)
         }
