@@ -11,5 +11,6 @@ router.post('/create', [
     check('Year', "Год защит у комиссии не может быть пустым").notEmpty()
 ], authMiddleware, roleMiddleware([3]), controller.create)
 router.get('/', authMiddleware, roleMiddleware([3]), controller.getAllGecs)
+router.get('/UserGecs/:id', authMiddleware, roleMiddleware([4]), controller.getGecIdsByUserId)
 
 module.exports = router
