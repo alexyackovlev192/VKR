@@ -1,6 +1,7 @@
 const DefenseSchedule = require('../models/DefenseSchedule')
 const Direction = require('../models/Direction')
 const Gec = require('../models/Gec')
+const { Op } = require('sequelize');
 const {validationResult} = require('express-validator')
 
 class defenseScheduleController {
@@ -74,6 +75,27 @@ class defenseScheduleController {
 
         } catch(e) {
             res.status(500).json({ message: 'Ошибка при обновлении данных защиты', e})
+        }
+    }
+    async getDefenseForThisYear(req, res) {
+        try {
+            const currentYear = new Date().getFullYear();
+            console.log("-------------------------------------")
+            const defenseScheduleThisYear = await DefenseSchedule.findAll({
+                where: {
+                    date: {
+                        [Op.gte]: new Date(`${currentYear}-01-01`), 
+                        [Op.lt]: new Date(`${currentYear + 1}-01-01`) 
+                    }
+                },
+                order: [['date', 'ASC']]
+            });
+            if (!defenseScheduleThisYear) {
+                return res.status(404).json({ message: 'Защиты этого года не найдены' });
+            }
+            return res.json(defenseScheduleThisYear)
+        } catch(e) {
+            return res.status(500).json(e)
         }
     }
 }
