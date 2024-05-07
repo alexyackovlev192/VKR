@@ -38,5 +38,30 @@ class gecController {
             return res.status(500).json(e)
         }
     }
+    async getGecIdsByUserId(req, res) {
+        try {
+            const id = req.params.id;
+            if (!id) {
+                return res.status(400).json({ message: "Id не указан" });
+            }
+    
+            const gecs = await Gec.findAll({
+                where: { 
+                    status: null,
+                    id_U: id
+                },
+                attributes: ['id_G'] 
+            });
+    
+            if (!gecs || gecs.length === 0) {
+                return res.status(404).json({ message: 'ГЭКи не найдены' });
+            }
+    
+            return res.json(gecs);
+        } catch (e) {
+            return res.status(500).json(e);
+        }
+    }
+
 }
 module.exports = new gecController()
