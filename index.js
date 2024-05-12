@@ -11,6 +11,7 @@ const DefenseScheduleRouter = require('./routes/DefenseScheduleRoutes')
 const DefenseScheduleStudentRouter = require('./routes/DefenseScheduleStudentRoutes')
 const DirectionsRouter = require('./routes/directionsRoutes')
 const RolesRouter = require('./routes/rolesRoutes')
+const CriteriaRouter = require('./routes/criteriaRoutes')
 const PORT = process.env.PORT || 5000
 
 const app = express()
@@ -26,6 +27,7 @@ app.use("/defenseSchedule", DefenseScheduleRouter)
 app.use("/defenseScheduleStudents", DefenseScheduleStudentRouter)
 app.use("/directions", DirectionsRouter)
 app.use("/roles", RolesRouter)
+app.use("/criteria", CriteriaRouter)
 
 const start = () => { 
     try {
