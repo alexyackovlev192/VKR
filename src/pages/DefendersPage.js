@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Button from 'react-bootstrap/Button';
+import axios from 'axios';
 import UpdateDefender from '../modal-windows/UpdateDefender';
 import AddDefender from '../modal-windows/AddDefender';
-
-import defendersData from '../data/defendersData.json';
 import './style-pages/DefendersPage.css';
 
 const DefendersPage = () => {
+  const [defenders, setDefenders] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState(null);
@@ -15,9 +15,24 @@ const DefendersPage = () => {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
   const [searchText, setSearchText] = useState('');
-  const [sortedDefenders, setSortedDefenders] = useState(defendersData);
+  const [sortedDefenders, setSortedDefenders] = useState([]);
 
   const tableRef = useRef(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    axios.get('http://localhost:5000/students/thisYear', {
+      headers: {
+        Authorization: `Bearer ${token}` // Добавляем токен в заголовок запроса
+      }
+    })
+      .then(response => {
+        setDefenders(response.data);
+        setSortedDefenders(response.data);
+        console.log(response.data);
+      })
+      .catch(error => console.error('Ошибка при получении данных:', error));
+  }, []);
 
   useEffect(() => {
     const handleClickOutsideTable = (event) => {
@@ -33,11 +48,11 @@ const DefendersPage = () => {
   }, []);
 
   useEffect(() => {
-    const sortedData = defendersData.slice().sort((a, b) => {
+    const sortedData = defenders.slice().sort((a, b) => {
       if (!sortColumn) return 0;
-      if (sortColumn === 'averageGrade') {
+      if (sortColumn === 'Avg_Mark') {
         return sortOrder === 'asc' ? a[sortColumn] - b[sortColumn] : b[sortColumn] - a[sortColumn];
-      } else if (sortColumn === 'hasHonors') {
+      } else if (sortColumn === 'Red_Diplom') {
         let valA = a[sortColumn] ? 'Да' : 'Нет';
         let valB = b[sortColumn] ? 'Да' : 'Нет';
         return sortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
@@ -46,7 +61,7 @@ const DefendersPage = () => {
       }
     });
     setSortedDefenders(sortedData);
-  }, [sortOrder, sortColumn]);
+  }, [sortOrder, sortColumn, defenders]);
 
   const sortData = useCallback((column) => {
     if (sortColumn === column) {
@@ -55,7 +70,7 @@ const DefendersPage = () => {
       setSortColumn(column);
       setSortOrder('asc');
     }
-  }, [sortColumn, sortOrder]);
+  }, [sortColumn]);
 
   const renderSortArrow = useCallback((column) => {
     if (sortColumn === column) {
@@ -66,7 +81,7 @@ const DefendersPage = () => {
 
   const handleRowClick = useCallback((defender) => {
     setActiveRow(defender);
-    console.log('Выбран студент:', defender.id);
+    console.log('Выбран студент:', defender.id_S);
   }, []);
 
   const handleCloseModal = useCallback(() => {
@@ -94,7 +109,7 @@ const DefendersPage = () => {
     console.log('Удаление участника:', item);
     setActiveRow(null);
     handleCloseModal();
-  }, []);
+  }, [handleCloseModal]);
 
   const handleInputChange = useCallback((e) => {
     const { name, value, checked, type } = e.target;
@@ -103,20 +118,20 @@ const DefendersPage = () => {
 
   const handleSearch = useCallback((e) => {
     setSearchText(e.target.value);
-    const filteredData = defendersData.filter((defender) => {
-      const { name, group, topic, supervisor, averageGrade, hasHonors } = defender;
+    const filteredData = defenders.filter((defender) => {
+      const { Fullname, Group, Topic, ScientificAdviser, Avg_Mark, Red_Diplom } = defender;
       const searchRegExp = new RegExp(e.target.value.trim(), 'i');
       return (
-        searchRegExp.test(name) ||
-        searchRegExp.test(group) ||
-        searchRegExp.test(topic) ||
-        searchRegExp.test(supervisor) ||
-        searchRegExp.test(averageGrade.toString()) ||
-        searchRegExp.test(hasHonors ? 'Да' : 'Нет')
+        searchRegExp.test(Fullname) ||
+        searchRegExp.test(Group) ||
+        searchRegExp.test(Topic) ||
+        searchRegExp.test(ScientificAdviser) ||
+        searchRegExp.test(Avg_Mark.toString()) ||
+        searchRegExp.test(Red_Diplom ? 'Да' : 'Нет')
       );
     });
     setSortedDefenders(filteredData);
-  }, []);
+  }, [defenders]);
 
   return (
     <div className="my-5 px-5">
@@ -129,59 +144,62 @@ const DefendersPage = () => {
         </Button>
       </>
       <input
-          type="text"
-          className="form-control mb-3 my-3"
-          placeholder="Поиск..."
-          value={searchText}
-          onChange={handleSearch}
-        />
+        type="text"
+        className="form-control mb-3 my-3"
+        placeholder="Поиск..."
+        value={searchText}
+        onChange={handleSearch}
+      />
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
           <thead className="table-dark">
             <tr>
               <th>№</th>
-              <th onClick={() => sortData('name')}>ФИО{renderSortArrow('name')}</th>
-              <th onClick={() => sortData('group')}>Группа{renderSortArrow('group')}</th>
-              <th onClick={() => sortData('topic')}>Тема{renderSortArrow('topic')}</th>
-              <th onClick={() => sortData('supervisor')}>Научрук{renderSortArrow('supervisor')}</th>
-              <th onClick={() => sortData('averageGrade')}>Средний балл{renderSortArrow('averageGrade')}</th>
-              <th onClick={() => sortData('hasHonors')}>Красный диплом{renderSortArrow('hasHonors')}</th>
+              <th onClick={() => sortData('Fullname')}>ФИО{renderSortArrow('Fullname')}</th>
+              <th onClick={() => sortData('Group')}>Группа{renderSortArrow('Group')}</th>
+              <th onClick={() => sortData('Topic')}>Тема{renderSortArrow('Topic')}</th>
+              <th onClick={() => sortData('ScientificAdviser')}>Руководитель{renderSortArrow('ScientificAdviser')}</th>
+              <th onClick={() => sortData('Avg_Mark')}>Средний балл{renderSortArrow('Avg_Mark')}</th>
+              <th onClick={() => sortData('Red_Diplom')}>С отличием{renderSortArrow('Red_Diplom')}</th>
             </tr>
           </thead>
           <tbody>
             {sortedDefenders.map((defender, index) => (
               <tr
-                key={defender.id}
-                className={activeRow === defender ? 'table-info' : 'table-light'}
+                key={defender.id_S}
+                className={activeRow && activeRow.id_S === defender.id_S ? 'table-primary' : ''}
                 onClick={() => handleRowClick(defender)}
               >
                 <td>{index + 1}</td>
-                <td>{defender.name}</td>
-                <td>{defender.group}</td>
-                <td>{defender.topic}</td>
-                <td>{defender.supervisor}</td>
-                <td>{defender.averageGrade}</td>
-                <td>{defender.hasHonors ? 'Да' : 'Нет'}</td>
+                <td>{defender.Fullname}</td>
+                <td>{defender.Group}</td>
+                <td>{defender.Topic}</td>
+                <td>{defender.ScientificAdviser}</td>
+                <td>{defender.Avg_Mark}</td>
+                <td>{defender.Red_Diplom ? 'Да' : 'Нет'}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <UpdateDefender
-        showModal={showUpdateModal}
-        handleCloseModal={handleCloseModal}
-        formData={formData}
-        handleInputChange={handleInputChange}
-        handleSaveChanges={() => handleSaveChanges(formData)}
-        handleDeleteDefender={handleDeleteDefender}
-      />
-      <AddDefender
-        showModal={showAddModal}
-        handleCloseModal={handleCloseModal}
-        handleInputChange={handleInputChange}
-        handleSaveChanges={() => handleSaveChanges(formData)}
-        formData={formData}
-      />
+      {showUpdateModal && (
+        <UpdateDefender
+          show={showUpdateModal}
+          onClose={handleCloseModal}
+          onSave={handleSaveChanges}
+          formData={formData}
+          onInputChange={handleInputChange}
+        />
+      )}
+      {showAddModal && (
+        <AddDefender
+          show={showAddModal}
+          onClose={handleCloseModal}
+          onSave={handleSaveChanges}
+          formData={formData}
+          onInputChange={handleInputChange}
+        />
+      )}
     </div>
   );
 };

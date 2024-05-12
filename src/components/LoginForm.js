@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
-import axios from 'axios'; // импортируем axios
+import axios from 'axios';
 import './style-components/Login.css';
 
 const LoginPage = () => {
@@ -11,21 +11,16 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     try {
-      console.log(username, password);
-      const response = await axios.post('http://localhost:5000/auth/login', { // отправляем POST-запрос по пути /auth/login
+      const response = await axios.post('http://localhost:5000/auth/login', {
         Login: username,
         Password: password
       });
-      //  console.log(username, password);
-      // Если авторизация прошла успешно, получаем токен из ответа и сохраняем его
       const token = response.data.token;
-      // Здесь вы можете сохранить токен, например, в localStorage
-
+      // Сохраняем токен в localStorage
+      localStorage.setItem('token', token);
       // Переходим на главную страницу
       navigate('/');
     } catch (error) {
-      // Обработка ошибок авторизации
-      
       console.error('Ошибка при авторизации:', error);
     }
   };
