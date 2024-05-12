@@ -9,6 +9,7 @@ const gecCompositionRouter = require('./routes/gecCompositionRoutes')
 const StudentsRouter = require('./routes/StudentsRoutes')
 const DefenseScheduleRouter = require('./routes/DefenseScheduleRoutes')
 const DefenseScheduleStudentRouter = require('./routes/DefenseScheduleStudentRoutes')
+const DirectionsRouter = require('./routes/directionsRoutes')
 const PORT = process.env.PORT || 5000
 
 const app = express()
@@ -22,6 +23,7 @@ app.use("/gecComposition", gecCompositionRouter)
 app.use("/students", StudentsRouter)
 app.use("/defenseSchedule", DefenseScheduleRouter)
 app.use("/defenseScheduleStudents", DefenseScheduleStudentRouter)
+app.use("/directions", DirectionsRouter)
 
 const start = () => { 
     try {
