@@ -1,34 +1,51 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
+import axios from 'axios';
 
-import schedulesData from '../../data/schedulesData.json';
 import UpdateSchedule from '../../modal-windows/UpdateSchedule';
 import AddSchedule from '../../modal-windows/AddSchedule';
 
 import '../style-pages/SchedulePage.css';
 
 const SchedulePage = () => {
+  const [schedules, setSchedules] = useState([]);
+  const [uniqueDates, setUniqueDates] = useState([]);
+  const [uniqueDirections, setUniqueDirections] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false); // Показать модальное окно
   const [formData, setFormData] = useState(null); // Данные участника
   const [activeCell, setActiveCell] = useState(null);
 
   const [isTableView, setIsTableView] = useState(true);
+
   const tableRef = useRef(null); 
 
-  const uniqueDates = Array.from(new Set(schedulesData.map(item => item.date)));
-  const uniqueDirections = Array.from(new Set(schedulesData.map(item => item.direction)));
-
-  // Обработчик клика в любое место кроме таблицы
-  const handleClickOutsideTable = (event) => {
-    // Проверяем, был ли клик сделан вне таблицы
-    if (tableRef.current && !tableRef.current.contains(event.target)) {
-      setActiveCell(null); // Сбрасываем активную строку
-    }
-  };
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    axios.get('http://localhost:5000/defenseSchedule/thisYear', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      setSchedules(response.data); // Установить полученные данные в состояние schedules
+      // Также обновить состояния uniqueDates и uniqueDirections
+      setUniqueDates(Array.from(new Set(response.data.map(item => item.date))));
+      setUniqueDirections(Array.from(new Set(response.data.map(item => item.Name_direction))));
+    })
+    .catch(error => console.error('Ошибка при загрузке данных:', error));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   
   useEffect(() => {
+    // Обработчик клика в любое место кроме таблицы
+    const handleClickOutsideTable = (event) => {
+      // Проверяем, был ли клик сделан вне таблицы
+      if (tableRef.current && !tableRef.current.contains(event.target)) {
+        setActiveCell(null); // Сбрасываем активную строку
+      }
+    };
     // Добавляем обработчик события клика при монтировании компонента
     document.addEventListener('click', handleClickOutsideTable);
     // Удаляем обработчик события клика при размонтировании компонента
@@ -89,7 +106,7 @@ const SchedulePage = () => {
     setActiveCell(null);
   };
 
-  const groupedSchedules = schedulesData.reduce((acc, curr) => {
+  const groupedSchedules = schedules.reduce((acc, curr) => {
     if (acc[curr.date]) {
       acc[curr.date].push(curr);
     } else {
@@ -109,6 +126,7 @@ const SchedulePage = () => {
           <Button variant="primary" className="mx-3" onClick={toggleView}>{isTableView ? 'Карточки' : 'Таблица'}</Button>
         </div>
         {isTableView ? (
+        // таблица
         <>
           <div className="col-1 px-0 my-4">
             <table className="table table-primary table-bordered table-hover text-center">
@@ -121,12 +139,10 @@ const SchedulePage = () => {
               {uniqueDates.map((date, index) => (
                 <tr key={index}>
                   <td
-                    className="py-5"
+                    className=""
+                    style={{ height: '180px', verticalAlign: 'middle' }}
                   >
-                    <br></br>
                     {new Date(date).toLocaleDateString('ru-GB', { day: '2-digit', month: '2-digit' })}
-                    <br></br>
-                    <br></br>
                   </td>
                 </tr>
               ))}
@@ -143,53 +159,56 @@ const SchedulePage = () => {
                 </tr>
               </thead>
               <tbody>
-              {Object.values(groupedSchedules).map((schedules, dateIndex) => (
-                <tr key={dateIndex}>
-                  {uniqueDirections.map((direction, directionIndex) => (
-                    <td 
-                      key={directionIndex}
-                      className={activeCell && 
-                        activeCell.event != null && 
-                        activeCell.event.date === schedules[0].date && 
-                        activeCell.event.direction === direction 
-                        ? 'px-5 py-4 table-info' : 'px-5 py-4 table-light'}
-                      onClick={() => handleSelectedClick({ 
-                                                           id: schedules[0].id, 
-                                                         date: schedules[0].date, 
-                                                    direction: direction,
-                                                         time: schedules[0].time,
-                                                         room: schedules[0].room,
-                                                        event: schedules.find(schedule => schedule.direction === direction)})}
-                    >
-                      {schedules.find(schedule => schedule.direction === direction) ? (
+
+              {schedules.map((sched, dateIndex) => (
+              <tr key={dateIndex}>
+                {uniqueDirections.map((direction, directionIndex) => (
+                  <td 
+                    key={directionIndex}
+                    className={activeCell && 
+                      activeCell.event != null && 
+                      activeCell.event.date === sched.date && 
+                      activeCell.event.direction === direction 
+                      ? 'px-5 table-info' : 'px-5 table-light'}
+                    onClick={() => handleSelectedClick({ 
+                                                        id: sched.id, 
+                                                      date: sched.date, 
+                                                  direction: direction,
+                                                      time: sched.time,
+                                                      room: sched.room,
+                                                      event: sched})}
+                    style={{ height: '180px', verticalAlign: 'middle' }}
+                  >
+                    {sched.Name_direction === direction ? (
                       <div>
-                        <p>ГЭК №{schedules[0].id}</p>
-                        <p>Время:{schedules[0].time}</p>
-                        
-                        <p>Аудитория:{schedules[0].room}</p>
+                        <p>ГЭК №{sched.id_G}</p>
+                        <p>Время: {sched.time}</p>
+                        <p>Направление: {sched.Name_direction}</p>
+                        <p>Аудитория: {sched.classroom}</p>
                       </div>
-                      ) : ("")}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+                    ) : ("")}
+                  </td>
+                ))}
+              </tr>
+            ))}
               </tbody>
             </table>
           </div>  
         </>
         ) : (
+          // Карточки
           <div className="container-fluid text-center my-3">
             <div className="row justify-content-evenly">
-              {schedulesData.map((item, index) => (
+              {schedules.map((item, index) => (
                 <Card key={index} className="col-2 mx-2 my-4 text-center bg-light">
                   <Card.Body>
                     <Card.Title>{new Date(item.date).toLocaleDateString('ru', { day: '2-digit', month: '2-digit' })}</Card.Title>
                     <Card.Text>
                       <div>
-                        <p>ГЭК №{item.id}</p>
+                        <p>ГЭК №{item.id_G}</p>
                         <p>Время: {item.time}</p>
-                        <p>Направление: {item.direction}</p>
-                        <p>Аудитория: {item.room}</p>
+                        <p>Направление: {item.Name_direction}</p>
+                        <p>Аудитория: {item.classroom}</p>
                       </div>
                     </Card.Text>
                     <Button variant="primary" onClick={() => handleEditSchedule(item)}>Редактировать</Button>

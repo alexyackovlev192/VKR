@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import UpdateDefender from '../modal-windows/UpdateDefender';
@@ -23,17 +23,19 @@ const DefendersPage = () => {
     const token = localStorage.getItem('token');
     axios.get('http://localhost:5000/students/thisYear', {
       headers: {
-        Authorization: `Bearer ${token}` // Добавляем токен в заголовок запроса
+        'Authorization': `Bearer ${token}`
       }
     })
-      .then(response => {
-        setDefenders(response.data);
-        setSortedDefenders(response.data);
-        console.log(response.data);
-      })
-      .catch(error => console.error('Ошибка при получении данных:', error));
+    .then(response => {
+      setDefenders(response.data);
+    })
+    .catch(error => console.error('Ошибка при загрузке данных:', error));
   }, []);
 
+  useEffect(() => {
+    setSortedDefenders(defenders);
+  }, [defenders]);
+  
   useEffect(() => {
     const handleClickOutsideTable = (event) => {
       if (tableRef.current && !tableRef.current.contains(event.target)) {
@@ -63,60 +65,83 @@ const DefendersPage = () => {
     setSortedDefenders(sortedData);
   }, [sortOrder, sortColumn, defenders]);
 
-  const sortData = useCallback((column) => {
+  const sortData = (column) => {
     if (sortColumn === column) {
       setSortOrder(prevOrder => prevOrder === 'asc' ? 'desc' : 'asc');
     } else {
       setSortColumn(column);
       setSortOrder('asc');
     }
-  }, [sortColumn]);
+  };
 
-  const renderSortArrow = useCallback((column) => {
+  const renderSortArrow = (column) => {
     if (sortColumn === column) {
       return sortOrder === 'asc' ? ' ↑' : ' ↓';
     }
     return null;
-  }, [sortColumn, sortOrder]);
+  };
 
-  const handleRowClick = useCallback((defender) => {
+  const handleRowClick = (defender) => {
     setActiveRow(defender);
     console.log('Выбран студент:', defender.id_S);
-  }, []);
+  };
 
-  const handleCloseModal = useCallback(() => {
+  const handleCloseModal = () => {
     setShowUpdateModal(false);
     setShowAddModal(false);
     setFormData(null);
-  }, []);
+  };
 
-  const handleEditDefender = useCallback(() => {
+  const handleEditDefender = () => {
     setFormData(activeRow);
     setShowUpdateModal(true);
-  }, [activeRow]);
+  };
 
-  const handleAddDefender = useCallback(() => {
+  const handleAddDefender = () => {
     setShowAddModal(true);
     setFormData(null);
-  }, []);
+  };
 
-  const handleSaveChanges = useCallback((formData) => {
-    console.log(showUpdateModal ? 'Сохранение изменений:' : 'Добавление нового участника:', formData);
-    handleCloseModal();
-  }, [showUpdateModal, handleCloseModal]);
+  const handleSaveAddDefender = (formData) => {
+    const token = localStorage.getItem('token');
+    axios.post('http://localhost:5000/students/create', formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(response => {
+        console.log('Новый студент успешно добавлен:', response.data);
+        setDefenders(prevDefenders => [...prevDefenders, response.data]);
+        handleCloseModal();
+      })
+      .catch(error => console.error('Ошибка при добавлении студента:', error));
+  };
 
-  const handleDeleteDefender = useCallback((item) => {
-    console.log('Удаление участника:', item);
-    setActiveRow(null);
-    handleCloseModal();
-  }, [handleCloseModal]);
+  const handleSaveUpdateDefender = (formData) => {
+    const token = localStorage.getItem('token');
+    axios.put(`http://localhost:5000/students/${formData.id_S}`, formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(response => {
+        console.log('Изменения студента успешно сохранены:', response.data);
+        setDefenders(prevDefenders =>
+          prevDefenders.map(defender =>
+            defender.id_S === formData.id_S ? { ...defender, ...formData } : defender
+          )
+        );
+        handleCloseModal();
+      })
+      .catch(error => console.error('Ошибка при сохранении изменений студента:', error));
+  };
 
-  const handleInputChange = useCallback((e) => {
+  const handleInputChange = (e) => {
     const { name, value, checked, type } = e.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: type === 'checkbox' ? checked : value }));
-  }, []);
+  };
 
-  const handleSearch = useCallback((e) => {
+  const handleSearch = (e) => {
     setSearchText(e.target.value);
     const filteredData = defenders.filter((defender) => {
       const { Fullname, Group, Topic, ScientificAdviser, Avg_Mark, Red_Diplom } = defender;
@@ -131,7 +156,7 @@ const DefendersPage = () => {
       );
     });
     setSortedDefenders(filteredData);
-  }, [defenders]);
+  };
 
   return (
     <div className="my-5 px-5">
@@ -184,20 +209,20 @@ const DefendersPage = () => {
       </div>
       {showUpdateModal && (
         <UpdateDefender
-          show={showUpdateModal}
-          onClose={handleCloseModal}
-          onSave={handleSaveChanges}
+          showModal={showUpdateModal}
+          handleCloseModal={handleCloseModal}
+          handleSaveChanges={handleSaveUpdateDefender}
           formData={formData}
-          onInputChange={handleInputChange}
+          handleInputChange={handleInputChange}
         />
       )}
       {showAddModal && (
         <AddDefender
-          show={showAddModal}
-          onClose={handleCloseModal}
-          onSave={handleSaveChanges}
+          showModal={showAddModal}
+          handleCloseModal={handleCloseModal}
+          handleSaveChanges={handleSaveAddDefender}
           formData={formData}
-          onInputChange={handleInputChange}
+          handleInputChange={handleInputChange}
         />
       )}
     </div>

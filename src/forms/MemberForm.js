@@ -1,32 +1,32 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
 
-const MemberForm = ({ formData, handleInputChange  }) => {
-  const { name, position, email } = formData || {};
+const MemberForm = ({ formData, handleInputChange, members}) => {
+  const { Fullname, Post, Mail } = formData || {};
 
   return (
     <Form>
       <Form.Group controlId="formName">
         <Form.Label>ФИО</Form.Label>
-        <Form.Select
+        <Form.Control
           aria-label="Default select example"
           type="text"
-          name="name"
-          defaultValue={name || ""}
-          onChange={(e) => handleInputChange(e)}
+          name="Fullname"
+          value={Fullname || ""}
+          onChange={handleInputChange}
         >
-          <option value={name}>{name}</option>
-          <option value="Петров Петр Петрович">Петров Петр Петрович</option>
-          <option value="Сидоров Сидор Сидорович">Сидоров Сидор Сидорович</option>
-          <option value="Алексеев Алексей Алексеевич">Алексеев Алексей Алексеевич</option>
-        </Form.Select>
+          {/* <option value="Fullname">{Fullname}</option>
+          {members.map((member, index) => (
+            <option key={index} value={member.Fullname}>{member.Fullname}</option>
+          ))} */}
+        </Form.Control>
       </Form.Group>
       <Form.Group controlId="formPosition">
         <Form.Label>Должность</Form.Label>
         <Form.Control
           type="text"
-          name="position"
-          value={position || ""}
+          name="Post"
+          value={Post || ""}
           onChange={handleInputChange}
         />
       </Form.Group>
@@ -34,8 +34,8 @@ const MemberForm = ({ formData, handleInputChange  }) => {
         <Form.Label>Почта</Form.Label>
         <Form.Control
           type="text"
-          name="email"
-          value={email || ""}
+          name="Mail"
+          value={Mail || ""}
           onChange={handleInputChange}
         />
       </Form.Group>

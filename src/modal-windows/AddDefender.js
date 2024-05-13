@@ -5,9 +5,9 @@ import DefenderForm from '../forms/DefenderForm';
 const AddDefender = ({
   showModal,
   handleCloseModal,
+  formData,
   handleInputChange,
-  handleSaveChanges,
-  formData
+  handleSaveChanges
 }) => {
   return (
     <Modal show={showModal} onHide={handleCloseModal}>

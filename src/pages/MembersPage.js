@@ -1,23 +1,43 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Button from 'react-bootstrap/Button';
+import axios from 'axios';
 import UpdateMember from '../modal-windows/UpdateMember';
-import AddMember from '../modal-windows/AddMember';
+//import AddMember from '../modal-windows/AddMember';
 
-import membersData from '../data/membersData.json';
 import './style-pages/MembersPage.css';
 
 const MembersPage = () => {
+  const [members, setMembers] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false);
+  //const [showAddModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
   
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
   const [searchText, setSearchText] = useState('');
-  const [sortedMembers, setSortedMembers] = useState(membersData);
+  const [sortedMembers, setSortedMembers] = useState([]);
 
   const tableRef = useRef(null);
+
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    axios.get('http://localhost:5000/gecMembers', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      setMembers(response.data);
+    })
+    .catch(error => console.error('Ошибка при загрузке данных:', error));
+  }, []);
+
+  useEffect(() => {
+    setSortedMembers(members);
+  }, [members]);
+
 
   useEffect(() => {
     const handleClickOutsideTable = (event) => {
@@ -35,12 +55,13 @@ const MembersPage = () => {
   useEffect(() => {
     const sortedData = sortedMembers.slice().sort((a, b) => {
       if (!sortColumn) return 0;
-      if (sortColumn === 'name' || sortColumn === 'position' || sortColumn === 'email') {
+      if (sortColumn === 'Fullname' || sortColumn === 'Post' || sortColumn === 'Mail') {
         return sortOrder === 'asc' ? a[sortColumn].localeCompare(b[sortColumn]) : b[sortColumn].localeCompare(a[sortColumn]);
       }
       return 0;
     });
     setSortedMembers(sortedData);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortColumn, sortOrder]);
 
   const sortData = useCallback((column) => {
@@ -61,12 +82,12 @@ const MembersPage = () => {
   
   const handleRowClick = useCallback((member) => {
     setActiveRow(member);
-    console.log('Выбран ГЭК:', member.id);
+    console.log('Выбран ГЭК:', member.id_U);
   }, []);
 
   const handleCloseModal = useCallback(() => {
     setShowUpdateModal(false);
-    setShowAddModal(false);
+    //setShowAddModal(false);
     setFormData(null);
   }, []);
 
@@ -76,25 +97,51 @@ const MembersPage = () => {
     setShowUpdateModal(true);
   }, [activeRow]);
 
-  const handleAddMember = useCallback(() => {
-    setShowAddModal(true);
-    setFormData(null);
-  }, []);
+  const handleSaveUpdateMembers = (formData) => {
+    const token = localStorage.getItem('token');
+    axios.put(`http://localhost:5000/gecMembers/${formData.id_U}`, formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(response => {
+        console.log('Изменения информации о члене ГЭК успешно:', response.data);
+        setMembers(prevMembers =>
+          prevMembers.map(members =>
+            members.id_U === formData.id_U ? { ...members, ...formData } : members
+          )
+        );
+        handleCloseModal();
+      })
+      .catch(error => console.error('Ошибка при сохранении изменении информации о члене ГЭК:', error));
+  };
 
-  const handleSaveChanges = useCallback((formData) => {
-    if (showUpdateModal) {
-      console.log('Сохранение изменений:', formData);
-    } else if (showAddModal) {
-      console.log('Добавление нового участника:', formData);
-    }
-    handleCloseModal();
-  }, [showUpdateModal, showAddModal, handleCloseModal]);
+  // const handleAddMember = useCallback(() => {
+  //   setShowAddModal(true);
+  //   setFormData(null);
+  // }, []);
 
-  const handleDeleteMember = useCallback((item) => {
-    console.log('Удаление члена ГЭК:', item);
-    setActiveRow(null);
-    handleCloseModal();
-  }, []);
+  // const handleSaveAddMembers = (formData) => {
+  //   const token = localStorage.getItem('token');
+  //   axios.post('http://localhost:5000/gecMembers/create', formData, {
+  //     headers: {
+  //       'Authorization': `Bearer ${token}`
+  //     }
+  //   })
+  //     .then(response => {
+  //       console.log('Новый член ГЭК успешно добавлен:', response.data);
+  //       setMembers(prevMembers => [...prevMembers, response.data]);
+  //       handleCloseModal();
+  //     })
+  //     .catch(error => console.error('Ошибка при добавлении члена ГЭК:', error));
+  // };
+
+
+  // const handleDeleteMember = useCallback((item) => {
+  //   console.log('Удаление члена ГЭК:', item);
+  //   setActiveRow(null);
+  //   handleCloseModal();
+  // }, []);
 
   const handleInputChange = useCallback((e) => {
     const { name, value, checked, type } = e.target;
@@ -103,12 +150,13 @@ const MembersPage = () => {
 
   const handleSearch = useCallback((e) => {
     setSearchText(e.target.value);
-    const filteredData = membersData.filter((member) => {
-      const { name, position, email } = member;
+    const filteredData = members.filter((member) => {
+      const { Fullname, Post, Mail } = member;
       const searchRegExp = new RegExp(e.target.value.trim(), 'i');
-      return searchRegExp.test(name) || searchRegExp.test(position) || searchRegExp.test(email);
+      return searchRegExp.test(Fullname) || searchRegExp.test(Post) || searchRegExp.test(Mail);
     });
     setSortedMembers(filteredData);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -117,9 +165,9 @@ const MembersPage = () => {
         <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>
           Редактировать
         </Button>
-        <Button variant="primary" className="mx-3" onClick={handleAddMember}>
+        {/* <Button variant="primary" className="mx-3" onClick={handleAddMember}>
           Добавить
-        </Button>
+        </Button> */}
       </>
       <input
           type="text"
@@ -133,9 +181,9 @@ const MembersPage = () => {
           <thead className="table-dark">
             <tr>
               <th>№</th>
-              <th onClick={() => sortData('name')}>ФИО{renderSortArrow('name')}</th>
-              <th onClick={() => sortData('position')}>Должность{renderSortArrow('position')}</th>
-              <th onClick={() => sortData('email')}>Почта{renderSortArrow('email')}</th>
+              <th onClick={() => sortData('Fullname')}>ФИО{renderSortArrow('Fullname')}</th>
+              <th onClick={() => sortData('Post')}>Должность{renderSortArrow('Post')}</th>
+              <th onClick={() => sortData('Mail')}>Почта{renderSortArrow('Mail')}</th>
             </tr>
           </thead>
           <tbody>
@@ -146,29 +194,30 @@ const MembersPage = () => {
                 onClick={() => handleRowClick(member)}
               >
                 <td>{index + 1}</td>
-                <td>{member.name}</td>
-                <td>{member.position}</td>
-                <td>{member.email}</td>
+                <td>{member.Fullname}</td>
+                <td>{member.Post}</td>
+                <td>{member.Mail}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
       <UpdateMember
+        members={members}
         showModal={showUpdateModal}
         handleCloseModal={handleCloseModal}
         formData={formData}
         handleInputChange={handleInputChange}
-        handleSaveChanges={() => handleSaveChanges(formData)}
-        handleDeleteMember={handleDeleteMember}
+        handleSaveChanges={handleSaveUpdateMembers}
+        //handleDeleteMember={handleDeleteMember}
       />
-      <AddMember
+      {/* <AddMember
         showModal={showAddModal}
         handleCloseModal={handleCloseModal}
         handleInputChange={handleInputChange}
-        handleSaveChanges={() => handleSaveChanges(formData)}
+        handleSaveChanges={handleSaveAddMemberr}
         formData={formData}
-      />
+      /> */}
     </div>
   );
 };
