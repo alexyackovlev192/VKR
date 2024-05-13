@@ -6,12 +6,13 @@ class studentController {
     async create(req, res) {
         try {
             const errors = validationResult(req)
+            console.log(errors);
             if (!errors.isEmpty()) {
                 return res.status(400).json({message:"Ошибка при создании студента", errors})
             }
-            const {Fullname, Group, Topic, ScientificAdviser, Avg_Mark, Red_Diplom, YearOfDefense, NameDirection} = req.body
+            const {Fullname, Group, Topic, ScientificAdviser, Avg_Mark, Red_Diplom, YearOfDefense, Name_direction} = req.body
             const direction = await Direction.findOne({where: {
-                Name_direction: NameDirection
+                Name_direction: Name_direction
             }})
 
             if (!direction) {
@@ -33,14 +34,14 @@ class studentController {
                 return res.status(400).json({message:"Ошибка при обновлении информации о студенте", errors})
             }
             const { id } = req.params;
-            const {Fullname, Group, Topic, ScientificAdviser, Avg_Mark, Red_Diplom, YearOfDefense, NameDirection} = req.body 
+            const {Fullname, Group, Topic, ScientificAdviser, Avg_Mark, Red_Diplom, YearOfDefense, Name_direction} = req.body 
             if (!id) {
                 res.status(400).json({message: "Id не указан"})
             }
-            if (NameDirection) {
+            if (Name_direction) {
                 const direction = await Direction.findOne({
                     where: {
-                        Name_direction: NameDirection
+                        Name_direction: Name_direction
                     }
                 });
     
@@ -49,7 +50,7 @@ class studentController {
                 }
             }
             const updatedRowsCount = await Student.update(
-                { Fullname, Group, Topic, ScientificAdviser, Avg_Mark, Red_Diplom, YearOfDefense, Name_direction: NameDirection },
+                { Fullname, Group, Topic, ScientificAdviser, Avg_Mark, Red_Diplom, YearOfDefense, Name_direction: Name_direction },
                 { where: { id_S: id } }
             )
             if (updatedRowsCount[0] === 0) {

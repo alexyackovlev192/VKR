@@ -19,7 +19,7 @@ router.put('/:id', [
     check('Time').optional().notEmpty().withMessage('Время защиты не может быть пустым'),
     check('Classroom').optional().notEmpty().withMessage('Аудитория защиты не может быть пустой')
 ], authMiddleware, roleMiddleware([3]), controller.updateDefense)
-router.get('/thisYear', authMiddleware, roleMiddleware([3]), controller.getDefenseForThisYear)
+router.get('/thisYear', authMiddleware, roleMiddleware([1,3]), controller.getDefenseForThisYear)
 router.get('/:id', authMiddleware, roleMiddleware([3,2,4]), controller.getDefensesByGecId)
 
 module.exports = router
