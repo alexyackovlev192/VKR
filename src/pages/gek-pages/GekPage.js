@@ -1,10 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import { Button, Card, ListGroup } from 'react-bootstrap';
-import geksData from '../../data/geksData.json';
 
 const GekPage = () => {
-  const [geks, setGeks] = useState(geksData); // Хранение данных ГЭК в состоянии
+  const [geks, setGeks] = useState([]); // Хранение данных ГЭК в состоянии
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    axios.get('http://localhost:5000/gecs', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      setGeks(response.data);
+    })
+    .catch(error => console.error('Ошибка при загрузке данных:', error));
+  }, []);
 
   // Функция для удаления ГЭК по идентификатору
   const handleDeleteGek = (id) => {

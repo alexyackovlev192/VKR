@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 //import axios from 'axios';
 import HomePage from './pages/HomePage';
 import MembersPage from './pages/MembersPage';
@@ -41,7 +41,9 @@ const App = () => {
     return (
       <Router>
         <Routes>
-          <Route path="/" element={<PageLayout><HomePage /></PageLayout>} />
+          <Route path="/" element={<Navigate to="/auth" />}/>
+          <Route path="/main" element={<PageLayout><HomePage /></PageLayout>}/>
+          <Route path="/auth" element={<LoginForm />} />
           <Route path="/members" element={<PageLayout><MembersPage /></PageLayout>} />
           <Route path="/schedule" element={<PageLayout><SchedulePage /></PageLayout>} />
           <Route path="/my-schedule" element={<PageLayout><MySchedulePage /></PageLayout>} />
@@ -52,7 +54,6 @@ const App = () => {
           <Route path="/create-gek" element={<PageLayout><CreateGekPage /></PageLayout>} />
           <Route path="/edit-gek/:gekId" element={<PageLayout><EditGekPage /></PageLayout>} />
           <Route path="/defenders" element={<PageLayout><DefendersPage /></PageLayout>} />
-          <Route path="/auth" element={<LoginForm />} />
         </Routes>
       </Router>
   );
