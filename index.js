@@ -14,6 +14,7 @@ const DirectionsRouter = require('./routes/directionsRoutes')
 const RolesRouter = require('./routes/rolesRoutes')
 const CriteriaRouter = require('./routes/criteriaRoutes')
 const ResultComissionMemberRouter = require('./routes/resultComissionMemberRoutes')
+const ResultComissionSecretaryRouter = require('./routes/resultComissionSecretaryRoutes')
 const PORT = process.env.PORT || 5000
 
 const app = express()
@@ -32,6 +33,7 @@ app.use("/directions", DirectionsRouter)
 app.use("/roles", RolesRouter)
 app.use("/criteria", CriteriaRouter)
 app.use("/resultComissionMember", ResultComissionMemberRouter)
+app.use("/resultComissionSecretary", ResultComissionSecretaryRouter)
 
 const start = () => { 
     try {
