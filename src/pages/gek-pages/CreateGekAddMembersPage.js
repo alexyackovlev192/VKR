@@ -4,8 +4,13 @@ import axios from 'axios';
 import { Button, Card, ListGroup } from 'react-bootstrap';
 
 const CreateGekAddMemberPage = () => {
+    const [formData, setFormData] = useState(() => {
+        const savedFormData = localStorage.getItem('formData');
+        return savedFormData ? JSON.parse(savedFormData) : null;
+      });
     const [membersGek, setMembersGek] = useState([]);
     const [allMembersGek, setAllMembersGek] = useState([]);
+    var id_S;
 
     useEffect(() => {
         fetchData();
@@ -38,9 +43,49 @@ const CreateGekAddMemberPage = () => {
         setMembersGek(updatedMembersGek);
     };
 
-    // Сортировка списков
     const sortedMembersGek = membersGek.slice().sort((a, b) => a.Fullname.localeCompare(b.Fullname));
     const sortedAllMembersGek = allMembersGek.slice().sort((a, b) => a.Fullname.localeCompare(b.Fullname));
+
+
+    const handleSaveGek = (data) => {
+        const token = localStorage.getItem('token');
+        axios.post('http://localhost:5000/students/create', data, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+          .then(response => {
+            console.log('Новая гэк создана:', response.data);
+          })
+          .catch(error => console.error('Ошибка при создании гэк:', error));
+          
+
+        axios.get('http://localhost:5000/gecs', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => {
+            id_S = response.data.length - 1;
+        })
+        .catch(error => console.error('Ошибка при загрузке данных:', error));
+
+
+        axios.post(`http://localhost:5000/gecComposition/${id_S}`, membersGek.map(m => m.id_U), formData.Fullname, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+            .then(response => {
+              console.log('Новая гэк создана:', response.data);
+              localStorage.removeItem('formData');
+            })
+            .catch(error => console.error('Ошибка при создании гэк:', error));
+
+        localStorage.removeItem('formData');
+        setFormData(null);
+      };
+
 
     return (
         <div className="container-fluid text-center my-3">
@@ -51,7 +96,7 @@ const CreateGekAddMemberPage = () => {
                 <h4 className="col-10">Создание ГЭК</h4>
             </div>
             <div className="row justify-content-evenly">
-                <Card style={{ minWidth: '500px', width: '40%', height: '80vh', overflowY: 'auto' }} className="my-2 text-center bg-light">
+                <Card style={{ minWidth: '500px', width: '40%', height: '70vh', overflowY: 'auto' }} className="my-2 text-center bg-light">
                     <Card.Header className="fs-4 bg-light">Новая ГЭК</Card.Header>
                     <Card.Body> 
                         <h5 className="my-2">Состав</h5>
@@ -70,13 +115,13 @@ const CreateGekAddMemberPage = () => {
                         <h5 className="my-2">Секретарь ГЭК</h5>
                         <ListGroup className="container text-center">
                             <ListGroup.Item  className="d-flex justify-content-between align-items-center py-2">
-                                <span className="mx-3">fgdgsdgsd</span>
+                                <span className="mx-3">{formData.Fullname}</span>
                             </ListGroup.Item>
                         </ListGroup>
                     </Card.Body>
                 </Card>
 
-                <Card style={{ minWidth: '500px', width: '40%', height: '80vh', overflowY: 'auto' }} className="my-2 text-center bg-light">
+                <Card style={{ minWidth: '500px', width: '40%', height: '70vh', overflowY: 'auto' }} className="my-2 text-center bg-light">
                     <Card.Header className="fs-4 bg-light">Члены ГЭК</Card.Header>
                     <Card.Body>
                         <ListGroup className="container">
@@ -93,6 +138,9 @@ const CreateGekAddMemberPage = () => {
                         </ListGroup>
                     </Card.Body>
                 </Card>
+                <Link to={ `/gek` }>
+                    <Button variant="primary" className="col-2 my-4" onClick={handleSaveGek(formData)}>Создать ГЭК</Button>
+                </Link>
             </div>
         </div>
     );
