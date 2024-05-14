@@ -148,5 +148,26 @@ class userController {
             return res.status(500).json({ message: "Ошибка при обновлении ролей пользователя" });
         }
     }
+    async getUserById(req, res) {
+        try {
+            const { id } = req.params;
+            if (!id) {
+                res.status(400).json({message: "Id не указан"})
+            }
+            const user = await User.findOne({
+                where: {
+                    id_U: id
+                },
+                attributes: ['id_U', 'Fullname', 'Mail', 'Post']
+            });
+            if (!user) {
+                return res.status(404).json({ message: 'Пользователь не найден' });
+            }
+            return res.json(user)
+        } catch(e) {
+            return res.status(500).json(e)
+        }
+    }
 }
+
 module.exports = new userController()
