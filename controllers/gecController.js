@@ -62,6 +62,31 @@ class gecController {
             return res.status(500).json(e);
         }
     }
+    async getSecretaryIdByGecId(req, res) {
+        try {
+            const id = req.params.id;
+            if (!id) {
+                return res.status(400).json({ message: "Id не указан" });
+            }
+    
+            const secretaryId = await Gec.findOne({
+                where: { 
+                    status: null,
+                    id_G: id
+                },
+                attributes: ['id_U'] 
+            });
+    
+            if (!secretaryId) {
+                return res.status(404).json({ message: 'Id секретаря по id ГЭК не найден' });
+            }
+    
+            return res.json(secretaryId);
+        } catch (e) {
+            return res.status(500).json(e);
+        }
+    }
+
 
 }
 module.exports = new gecController()
