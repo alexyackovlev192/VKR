@@ -60,35 +60,7 @@ class compositionGecController {
             return res.status(500).json(e)
         }
     }
-    /*async getGecIdsByUserId(req, res) {
-        try {
-            const id = req.params.id;
-            if (!id) {
-                res.status(400).json({message: "Id не указан"})
-            }
-            const gecIds = await CompositionGec.findAll({
-                where: { id_U: id },
-                attributes: ['id_G'] 
-            });
-            const gecIds = await CompositionGec.findAll({
-                where: { 
-                    id_U: id 
-                },
-                include: [{
-                    model: Gec,
-                    required: true, 
-                    where: {
-                        status: null 
-                    }
-                }],
-                attributes: ['id_G']
-            });
-            res.status(200).json(gecIds);
-        }
-        catch (e) {
-            res.status(500).json({ message: 'Ошибка при получении id_G по id_U', e });
-        }
-    }*/
+    
     async getGecIdsByUserId(req, res) {
         try {
             const id = req.params.id;
