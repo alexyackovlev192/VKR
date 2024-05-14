@@ -106,14 +106,14 @@ const SchedulePage = () => {
     setActiveCell(null);
   };
 
-  const groupedSchedules = schedules.reduce((acc, curr) => {
-    if (acc[curr.date]) {
-      acc[curr.date].push(curr);
-    } else {
-      acc[curr.date] = [curr];
-    }
-    return acc;
-  }, {});
+  // const groupedSchedules = schedules.reduce((acc, curr) => {
+  //   if (acc[curr.date]) {
+  //     acc[curr.date].push(curr);
+  //   } else {
+  //     acc[curr.date] = [curr];
+  //   }
+  //   return acc;
+  // }, {});
 
   return (
     <div className="schedule-container my-5 px-5">

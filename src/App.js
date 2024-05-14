@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 //import axios from 'axios';
 import HomePage from './pages/HomePage';
@@ -11,6 +11,7 @@ import GekPage from './pages/gek-pages/GekPage';
 import MyGekPage from './pages/gek-pages/MyGekPage';
 import EditGekPage from './pages/gek-pages/EditGekPage';
 import CreateGekPage from './pages/gek-pages/CreateGekPage'
+import CreateGekAddMemberPage from './pages/gek-pages/CreateGekAddMembersPage';
 import DefendersPage from './pages/DefendersPage';
 import LoginForm from './components/LoginForm';
 import Navigation from './components/Navigation';
@@ -52,6 +53,7 @@ const App = () => {
           <Route path="/my-gek" element={<PageLayout><MyGekPage /></PageLayout>} />
           <Route path="/gek" element={<PageLayout><GekPage /></PageLayout>} />
           <Route path="/create-gek" element={<PageLayout><CreateGekPage /></PageLayout>} />
+          <Route path="/create-gek/add-member" element={<PageLayout><CreateGekAddMemberPage /></PageLayout>} />
           <Route path="/edit-gek/:gekId" element={<PageLayout><EditGekPage /></PageLayout>} />
           <Route path="/defenders" element={<PageLayout><DefendersPage /></PageLayout>} />
         </Routes>

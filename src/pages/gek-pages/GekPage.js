@@ -5,6 +5,7 @@ import { Button, Card, ListGroup } from 'react-bootstrap';
 
 const GekPage = () => {
   const [geks, setGeks] = useState([]); // Хранение данных ГЭК в состоянии
+  const [members, setMemberss] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -17,21 +18,31 @@ const GekPage = () => {
       setGeks(response.data);
     })
     .catch(error => console.error('Ошибка при загрузке данных:', error));
+    axios.get('http://localhost:5000/gecComposition/3', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      setMemberss(response.data);
+    })
+    .catch(error => console.error('Ошибка при загрузке данных:', error));
   }, []);
 
-  // Функция для удаления ГЭК по идентификатору
-  const handleDeleteGek = (id) => {
-    // Фильтрация массива ГЭК, оставляя только те, у которых id не совпадает с удаляемым id
-    const updatedGeks = geks.filter(gek => gek.id !== id);
-    setGeks(updatedGeks); // Обновление состояния
-  };
+  // // Функция для удаления ГЭК по идентификатору
+  // const handleDeleteGek = (id) => {
+  //   // Фильтрация массива ГЭК, оставляя только те, у которых id не совпадает с удаляемым id
+  //   const updatedGeks = geks.filter(gek => gek.id !== id);
+  //   setGeks(updatedGeks); // Обновление состояния
+  // };
 
   return (
     <div className="container-fluid text-center my-3">
       <Link to={`/create-gek`}>
         <Button variant="primary" className="col-2 py-2">Создать новую ГЭК</Button>
       </Link>
-      <div className="row justify-content-evenly">
+
+      {/* <div className="row justify-content-evenly">
         {geks.map(gekData => (
           <Card key={gekData.id} style={{ minWidth: '400px', width: '30%' }}  className="col-4 my-4 text-center bg-light">
             <Card.Header className="fs-4 bg-light" >ГЭК №{gekData.number}</Card.Header>
@@ -57,7 +68,7 @@ const GekPage = () => {
             </Card.Footer>
           </Card>
         ))}
-      </div>
+      </div> */}
     </div>
   );
 };

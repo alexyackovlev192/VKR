@@ -1,132 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
-import { Button, Card, ListGroup } from 'react-bootstrap';
-import membersData from '../../data/membersData.json';
+import axios from 'axios';
+import { Button } from 'react-bootstrap';
+import CreateGekForm from '../../forms/GekForm';
 
-const EditGekPage = () => {
-    const { gekId } = useParams(); // Получаем параметр маршрута
-    const [membersGek, setMembersGek] = useState([]);
-    const [secretariesGek, setSecretariesGek] = useState([]);
-    const [allMembersGek, setAllMembersGek] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('Состав'); // Добавляем состояние для выбранной категории
+const CreateGekPage = () => {
+  const [directories, setDirectories] = useState([]); // Директории
+  const [secretaries, setSecretaries] = useState([]); // Директории
+  const [formData, setFormData] = useState(null);
+  
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    axios.get('http://localhost:5000/directions', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      setDirectories(response.data);
+    })
+    .catch(error => console.error('Ошибка при загрузке данных:', error));
+    axios.get('http://localhost:5000/secretariesGec', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      setSecretaries(response.data);
+    })
+    .catch(error => console.error('Ошибка при загрузке данных:', error));
+  }, []);
 
-    useEffect(() => {
-        // Устанавливаем отфильтрованные данные в setAllMembersGek
-        setAllMembersGek(membersData);
-    }, [gekId]);
-    
-    const handleMemberAdd = (member) => {
-        // Добавить участника в выбранную категорию
-        if (selectedCategory === 'Состав') {
-            setMembersGek([...membersGek, member]);
-        } else if (selectedCategory === 'Секретари') {
-            setSecretariesGek([...secretariesGek, member]);
-        }
-        
-        // Удалить участника из списка доступных участников
-        const updatedMembers = allMembersGek.filter(m => m.id !== member.id);
-        setAllMembersGek(updatedMembers);
-    };
-        
-    const handleMemberRemove = (member) => {
-        // Добавить участника обратно в список доступных участников
-        setAllMembersGek([...allMembersGek, member]);
-        
-        // Удалить участника из списка текущих участников
-        const updatedMembers = membersGek.filter(m => m.id !== member.id);
-        setMembersGek(updatedMembers);
-    };
 
-    const handleSecretarieRemove = (member) => {
-        // Добавить участника обратно в список доступных участников
-        setAllMembersGek([...allMembersGek, member]);
-        
-        // Удалить участника из списка текущих участников
-        const updatedSecretaries = secretariesGek.filter(m => m.id !== member.id);
-        setSecretariesGek(updatedSecretaries);
-    };
+  const handleInputChange = useCallback((e) => {
+    const { name, value, checked, type } = e.target;
+    setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
+  }, [formData]);
 
-    const handleCategoryChange = (category) => {
-        setSelectedCategory(category);
-    };
-
-    // Сортировка по алфавиту ФИО
-    const sortedMembersGek = membersGek.slice().sort((a, b) => a.name.localeCompare(b.name));
-    const sortedSecretariesGek = secretariesGek.slice().sort((a, b) => a.name.localeCompare(b.name));
-    const sortedAllMembersGek = allMembersGek.slice().sort((a, b) => a.name.localeCompare(b.name));
+  console.log(directories);
 
   return (
     <div className="container-fluid text-center my-3">
-        <div className="row my-3">
-            <Link to={`/gek`} className="col-1">
-                <Button variant="primary" className="">Назад</Button>
-            </Link>
-            <h4 className="col-10">Создание ГЭК</h4>
+      <div className="row my-3">
+          <Link to={`/gek`} className="col-1">
+            <Button variant="primary" className="">Назад</Button>
+          </Link>
+          <h4 className="col-10">Создание ГЭК</h4>
+      </div>
+      <div className="d-flex justify-content-center">
+        <div className="row justify-content-evenly col-6">
+          <CreateGekForm formData={formData} handleInputChange={handleInputChange} directories={directories} secretaries={secretaries}/>
         </div>
-      <div className="row justify-content-evenly">
-        <Card style={{ minWidth: '500px', width: '40%', height: '80vh', overflowY: 'auto' }} className="my-2 text-center bg-light">
-            <Card.Header className="fs-4 bg-light">Новая ГЭК</Card.Header>
-            <Card.Body> 
-                <Button 
-                    variant={selectedCategory === 'Состав' ? 'primary' : 'secondary'} 
-                    onClick={() => handleCategoryChange('Состав')}
-                    className="mx-3 my-2"
-                >Состав</Button>
-                <ListGroup className="container text-center">
-                    {sortedMembersGek.map((member, index) => (
-                    <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center py-2">
-                        <span className="mx-3">{member.name}</span>
-                        <Button 
-                            variant="danger" 
-                            onClick={() => handleMemberRemove(member)}
-                            className="mx-3"
-                        >Удалить</Button>
-                    </ListGroup.Item>
-                    ))}    
-                </ListGroup>
-                <Button 
-                    variant={selectedCategory === 'Секретари' ? 'primary' : 'secondary'} 
-                    onClick={() => handleCategoryChange('Секретари')}
-                    className="mx-3 my-2"
-                >Секретари</Button>
-                <ListGroup className="container text-center">
-                    {sortedSecretariesGek.map((member, index) => (
-                    <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center py-2">
-                        <span className="mx-3">{member.name}</span>
-                        <Button 
-                            variant="danger" 
-                            onClick={() => handleSecretarieRemove(member)}
-                            className="mx-3"
-                        >Удалить</Button>
-                    </ListGroup.Item>
-                    ))}    
-                </ListGroup>
-            </Card.Body>
-        </Card>
-    
-        <Card style={{ minWidth: '500px', width: '40%', height: '80vh', overflowY: 'auto' }} className="my-2 text-center bg-light">
-            <Card.Body>
-                <Card.Title className="text-center fs-4">Члены ГЭК</Card.Title>
-                <ListGroup className="container">
-                    {sortedAllMembersGek.map((member, index) => (
-                    <ListGroup.Item key={index} className="d-flex justify-content-between align-items-center py-2">
-                        <span className="mx-3">{member.name}</span>
-                        <Button 
-                            variant="primary" 
-                            onClick={() => handleMemberAdd(member)}
-                            className="mx-3"
-                        >Добавить</Button>
-                    </ListGroup.Item>
-                ))}
-                </ListGroup>
-            </Card.Body>
-        </Card>
       </div>
     </div>
   );
 };
 
-
-
-export default EditGekPage;
+export default CreateGekPage;
