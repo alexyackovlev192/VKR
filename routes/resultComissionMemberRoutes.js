@@ -18,5 +18,6 @@ router.post('/create', [
         return true;
     })
 ], authMiddleware, roleMiddleware([2]), controller.create)
+router.get('/GecResult/:id', authMiddleware, roleMiddleware([4]), controller.getResultsByIdDSS)
 
 module.exports = router
