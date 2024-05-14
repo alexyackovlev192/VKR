@@ -33,5 +33,28 @@ class resultComissionSecretaryController {
             res.status(400).json({message: 'Ошибка добавления результата защиты студента, выставленного секретарем ГЭК'})
         }
     }
+    async getResultsByIdDSS(req, res) {
+        try {
+            const id = req.params.id;
+            if (!id) {
+                return res.status(400).json({ message: "Id не указан" });
+            }
+    
+            const result = await ResultComissionSecretary.findOne({
+                 where: { id_DSS: id },
+                 attributes: ['Result', 'RecMagistracy', 'RecPublication', 'NumberProtocol']
+                });
+            if (!result) {
+                return res.status(404).json({ message: 'Результаты от секретаря ГЭК для защиты не найдены' });
+            }
+
+            
+            
+            return res.json(result);
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: 'Ошибка при получении результата от секретаря ГЭК для защиты', error });
+        }
+    }
 }
 module.exports = new resultComissionSecretaryController()

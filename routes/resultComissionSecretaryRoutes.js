@@ -11,5 +11,6 @@ router.post('/create', [
     check('Result', "Результат защиты не может быть пустым").notEmpty(),
     check('NumberProtocol', "Номер протокола защиты не может быть пустым").notEmpty()
 ], authMiddleware, roleMiddleware([4]), controller.create)
+router.get('/:id', authMiddleware, roleMiddleware([4]), controller.getResultsByIdDSS)
 
 module.exports = router
