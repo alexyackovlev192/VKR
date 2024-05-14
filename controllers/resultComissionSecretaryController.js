@@ -1,6 +1,7 @@
 const DefenseScheduleStudent = require('../models/DefenseScheduleStudent')
 const User = require('../models/User')
 const ResultComissionSecretary = require('../models/ResultComissionSecretary')
+const Student = require('../models/Student')
 const {validationResult} = require('express-validator')
 
 class resultComissionSecretaryController {
@@ -10,7 +11,7 @@ class resultComissionSecretaryController {
             if (!errors.isEmpty()) {
                 return res.status(400).json({message:"Ошибка при создании результата защиты студента секретарем ГЭК", errors})
             }
-            const {id_DSS, id_U, Result, RecMagistracy, RecPublication, NumberProtocol} = req.body
+            const {id_DSS, id_U, Result, RecMagistracy, RecPublication, NumberProtocol, id_S, Red_Diplom} = req.body
             const defenseStudent = await DefenseScheduleStudent.findOne({where: {
                 id_DSS: id_DSS
             }})
@@ -27,6 +28,18 @@ class resultComissionSecretaryController {
 
             const resultSecretary = new ResultComissionSecretary({id_DSS: id_DSS, id_U: id_U, Result: Result, RecMagistracy: RecMagistracy, RecPublication: RecPublication, NumberProtocol: NumberProtocol});
             await resultSecretary.save()
+
+            if (id_S && Red_Diplom !== undefined) {
+                const updatedRowsCount = await Student.update(
+                    { Red_Diplom: Red_Diplom },
+                    { where: { id_S: id_S} }
+                )
+    
+                if (updatedRowsCount[0] === 0) {
+                    return res.status(404).json({ message: `Студент с id ${id_S} не найден` })
+                }
+            }
+
             return res.json({message: "Результат защиты для студента, выставленный секретарем ГЭК, добавлен"})
         } catch(e) {
             console.log(e)

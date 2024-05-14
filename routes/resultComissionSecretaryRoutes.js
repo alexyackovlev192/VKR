@@ -9,7 +9,8 @@ router.post('/create', [
     check('id_DSS',"Id защиты конкретного студента не может быть пустым").notEmpty(),
     check('id_U', "Id секретаря ГЭК не может быть пустым").notEmpty(),
     check('Result', "Результат защиты не может быть пустым").notEmpty(),
-    check('NumberProtocol', "Номер протокола защиты не может быть пустым").notEmpty()
+    check('NumberProtocol', "Номер протокола защиты не может быть пустым").notEmpty(),
+    check('id_S').optional().notEmpty().withMessage('Id студента не может быть пустым')
 ], authMiddleware, roleMiddleware([4]), controller.create)
 router.get('/:id', authMiddleware, roleMiddleware([4]), controller.getResultsByIdDSS)
 
