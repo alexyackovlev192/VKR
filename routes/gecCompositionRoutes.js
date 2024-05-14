@@ -1,5 +1,5 @@
 const Router = require('express')
-const controller = require('../controllers/compositionGecController')
+const controller = require('../controllers/CompositionGecController')
 const {check} = require("express-validator")
 const router = new Router()
 const authMiddleware = require('../middleware/authMiddleware')
