@@ -10,7 +10,6 @@ const CreateGekAddMemberPage = () => {
       });
     const [membersGek, setMembersGek] = useState([]);
     const [allMembersGek, setAllMembersGek] = useState([]);
-    var id_S;
 
     useEffect(() => {
         fetchData();
@@ -24,6 +23,7 @@ const CreateGekAddMemberPage = () => {
             }
         })
         .then(response => {
+            setMembersGek([]);
             setAllMembersGek(response.data);
         })
         .catch(error => console.error('Ошибка при загрузке данных:', error));
@@ -47,44 +47,52 @@ const CreateGekAddMemberPage = () => {
     const sortedAllMembersGek = allMembersGek.slice().sort((a, b) => a.Fullname.localeCompare(b.Fullname));
 
 
-    const handleSaveGek = (data) => {
+    const handleSaveGek = async (data) => {
         const token = localStorage.getItem('token');
-        axios.post('http://localhost:5000/students/create', data, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-          .then(response => {
-            console.log('Новая гэк создана:', response.data);
-          })
-          .catch(error => console.error('Ошибка при создании гэк:', error));
-          
+        console.log(data);
+        try {
+            const createResponse = await axios.post('http://localhost:5000/gecs/create', data, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            console.log('Новая гэк создана:', createResponse.data);
+    
+            const gecsResponse = await axios.get('http://localhost:5000/gecs', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const id_G = Math.max(...gecsResponse.data.map(item => item.id_G));
+            const memberIds = membersGek.map(m => m.id_U);
+            const secretaryId = localStorage.getItem('id_U');
+    
+            console.log(secretaryId);
 
-        axios.get('http://localhost:5000/gecs', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-        .then(response => {
-            id_S = response.data.length - 1;
-        })
-        .catch(error => console.error('Ошибка при загрузке данных:', error));
-
-
-        axios.post(`http://localhost:5000/gecComposition/${id_S}`, membersGek.map(m => m.id_U), formData.Fullname, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          })
-            .then(response => {
-              console.log('Новая гэк создана:', response.data);
-              localStorage.removeItem('formData');
-            })
-            .catch(error => console.error('Ошибка при создании гэк:', error));
-
-        localStorage.removeItem('formData');
-        setFormData(null);
-      };
+            const gecCompositionResponse = await axios.post(`http://localhost:5000/gecComposition/${id_G}`, memberIds, secretaryId, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            console.log('Члены гэк добавлены:', gecCompositionResponse.data);
+    
+            localStorage.removeItem('formData');
+            setFormData(null);
+        } catch (error) {
+            console.error('Ошибка:', error);
+        }
+        
+        // axios.get('http://localhost:5000/secretariesGec/', {
+        //     headers: {
+        //         'Authorization': `Bearer ${token}`
+        //     }
+        // })
+        // .then(response => {
+        //     var id_G = Math.max(response.data.map(item => item.id_G));
+        //     console.log(id_S);
+        // })
+        // .catch(error => console.error('Ошибка при загрузке данных:', error));
+    };
 
 
     return (
@@ -138,10 +146,8 @@ const CreateGekAddMemberPage = () => {
                         </ListGroup>
                     </Card.Body>
                 </Card>
-                <Link to={ `/gek` }>
-                    <Button variant="primary" className="col-2 my-4" onClick={handleSaveGek(formData)}>Создать ГЭК</Button>
-                </Link>
             </div>
+            <Button variant="primary" className="col-2 my-4" onClick={() => handleSaveGek(formData)}>Создать ГЭК</Button>
         </div>
     );
 };

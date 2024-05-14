@@ -8,11 +8,12 @@ const CreateGekForm = ({
   directories, 
   secretaries,
 }) => {
-  const { Name_direction, Fullname, year } = formData || {};
+  const { Name_direction, Fullname, Year } = formData || {};
   
   // Сохранение данных в localStorage при изменении formData
   useEffect(() => {
     localStorage.setItem('formData', JSON.stringify(formData));
+    localStorage.setItem('id_U', JSON.stringify(secretaries));
   }, [formData]);
 
   return (
@@ -32,21 +33,20 @@ const CreateGekForm = ({
       <Form.Group controlId="formNameSec">
         <Form.Label className="my-3">ФИО секретаря</Form.Label>
         <Form.Select
-          type="text"
           name="Fullname"
+          value={formData.Fullname || ''} 
           onChange={handleInputChange}>
-          <option value="Fullname">{Fullname}</option>
-          {secretaries.map((sec, index) => ( sec.Fullname !== Fullname &&
+          {secretaries.map((sec, index) => (
             <option key={index} value={sec.Fullname}>{sec.Fullname}</option>
-          ))} 
+          ))}
         </Form.Select>
       </Form.Group>
       <Form.Group controlId="formYear">
         <Form.Label className="my-3">Год защиты</Form.Label>
         <Form.Control
           type="text"
-          name="year"
-          value={year || ""}
+          name="Year"
+          value={Year || ""}
           onChange={handleInputChange}
         />
       </Form.Group>
