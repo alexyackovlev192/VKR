@@ -7,5 +7,6 @@ const roleMiddleware = require('../middleware/roleMiddleware')
 
 
 router.get('/', authMiddleware, roleMiddleware([3]), controller.getAllDirections)
+router.get('/:id', authMiddleware, roleMiddleware([3,2,4]), controller.getDirectionById)
 
 module.exports = router

@@ -13,5 +13,24 @@ class directionController {
             return res.status(500).json(e);
         }
     }
+    async getDirectionById(req, res) {
+        try {
+            const { id } = req.params;
+            if (!id) {
+                res.status(400).json({message: "Id не указан"})
+            }
+            const direction = await Direction.findOne({
+                where: {
+                    id_D: id
+                }
+            });
+            if (!direction) {
+                return res.status(404).json({ message: 'Направление не найдено' });
+            }
+            return res.json(direction)
+        } catch(e) {
+            return res.status(500).json(e)
+        }
+    }
 }
 module.exports = new directionController()
