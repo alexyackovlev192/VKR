@@ -84,10 +84,30 @@ const SchedulePage = () => {
     console.log('Сохранение изменений:', formData);
   };
 
+  const handleSaveUpdate = (formData) => {
+    const token = localStorage.getItem('token');
+    console.log(formData);
+    axios.put(`http://localhost:5000/defenseSchedule/${schedules.id_DS}`, formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(response => {
+        console.log('Изменения информации о защите успешно:', response.data);
+        setSchedules(prevSchedules =>
+          prevSchedules.map(schedule =>
+            schedule.id_DS === formData.id_DS ? { ...schedule, ...formData } : schedule
+          )
+        );
+        handleCloseModal();
+      })
+      .catch(error => console.error('Ошибка при сохранении изменении информации о защите:', error));
+  };
+
   const handleSaveChangesAdd = () => {
     setShowAddModal(false);
     setFormData(null);
-    console.log('Добавление нового участника:', formData);
+    console.log('Добавление нового защиты:', formData);
   };
 
   const handleInputChange = (e) => {
@@ -175,7 +195,7 @@ const SchedulePage = () => {
                                                       date: sched.date, 
                                                   direction: direction,
                                                       time: sched.time,
-                                                      room: sched.room,
+                                                      room: sched.classroom,
                                                       event: sched})}
                     style={{ height: '180px', verticalAlign: 'middle' }}
                   >
@@ -224,7 +244,7 @@ const SchedulePage = () => {
         handleCloseModal={handleCloseModal}
         formData={formData}
         handleInputChange={handleInputChange}
-        handleSaveChanges={handleSaveChangesUpdate}
+        handleSaveUpdate={handleSaveUpdate}
         handleDeleteSchedule={handleDeleteSchedule}
       />
       <AddSchedule

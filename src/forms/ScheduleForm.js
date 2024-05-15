@@ -37,7 +37,7 @@ const ScheduleForm = ({ formData, handleInputChange }) => {
         <Form.Label>Время</Form.Label>
         <div>
           <Form.Control
-            type="time"
+            type="text"
             name="time"
             value={time || ""}
             onChange={handleInputChange}
