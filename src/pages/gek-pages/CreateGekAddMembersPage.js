@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate  } from 'react-router-dom';
 import axios from 'axios';
 import { Button, Card, ListGroup } from 'react-bootstrap';
 
@@ -10,7 +10,7 @@ const CreateGekAddMemberPage = () => {
       });
     const [membersGek, setMembersGek] = useState([]);
     const [allMembersGek, setAllMembersGek] = useState([]);
-
+    const navigate = useNavigate()
     useEffect(() => {
         fetchData();
     }, []);
@@ -49,49 +49,39 @@ const CreateGekAddMemberPage = () => {
 
     const handleSaveGek = async (data) => {
         const token = localStorage.getItem('token');
-        console.log(data);
         try {
             const createResponse = await axios.post('http://localhost:5000/gecs/create', data, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log('Новая гэк создана:', createResponse.data);
-    
+            console.log('Новая гэк создана:', createResponse.data); 
+            
             const gecsResponse = await axios.get('http://localhost:5000/gecs', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            
             const id_G = Math.max(...gecsResponse.data.map(item => item.id_G));
             const memberIds = membersGek.map(m => m.id_U);
-            const secretaryId = localStorage.getItem('id_U');
-    
-            console.log(secretaryId);
-
-            const gecCompositionResponse = await axios.post(`http://localhost:5000/gecComposition/${id_G}`, memberIds, secretaryId, {
+            const secretaryId = 8;
+            
+            console.log(formData);
+            console.log(memberIds);
+            
+            const gecCompositionResponse = await axios.put(`http://localhost:5000/gecComposition/${id_G}`, { memberIds, secretaryId }, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            navigate('/gek');
             console.log('Члены гэк добавлены:', gecCompositionResponse.data);
     
             localStorage.removeItem('formData');
-            setFormData(null);
         } catch (error) {
             console.error('Ошибка:', error);
         }
-        
-        // axios.get('http://localhost:5000/secretariesGec/', {
-        //     headers: {
-        //         'Authorization': `Bearer ${token}`
-        //     }
-        // })
-        // .then(response => {
-        //     var id_G = Math.max(response.data.map(item => item.id_G));
-        //     console.log(id_S);
-        // })
-        // .catch(error => console.error('Ошибка при загрузке данных:', error));
     };
 
 

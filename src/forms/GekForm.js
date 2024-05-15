@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link  } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
 
 const CreateGekForm = ({ 
@@ -13,8 +13,7 @@ const CreateGekForm = ({
   // Сохранение данных в localStorage при изменении formData
   useEffect(() => {
     localStorage.setItem('formData', JSON.stringify(formData));
-    localStorage.setItem('id_U', JSON.stringify(secretaries));
-  }, [formData]);
+  }, [formData, secretaries]);
 
   return (
     <Form>
@@ -33,10 +32,11 @@ const CreateGekForm = ({
       <Form.Group controlId="formNameSec">
         <Form.Label className="my-3">ФИО секретаря</Form.Label>
         <Form.Select
+          type="text"
           name="Fullname"
-          value={formData.Fullname || ''} 
           onChange={handleInputChange}>
-          {secretaries.map((sec, index) => (
+          <option value="Fullname">{Fullname}</option>
+          {secretaries.map((sec, index) => ( sec.Fullname !== Fullname &&
             <option key={index} value={sec.Fullname}>{sec.Fullname}</option>
           ))}
         </Form.Select>

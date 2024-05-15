@@ -40,18 +40,9 @@ const CreateGekPage = () => {
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     let update = { ...formData, [name]: value };
-  
-    // Если изменяем ФИО секретаря, сохраняем также его ID
-    if (name === 'Fullname') {
-      const selectedSecretary = secretaries.find(sec => sec.Fullname === value);
-      if (selectedSecretary) {
-        update.id_U = selectedSecretary.id;
-        localStorage.setItem('id_U', JSON.stringify(selectedSecretary.id)); // Сохраняем ID в localStorage
-      }
-    }
-  
+
     setFormData(update);
-  }, [formData, secretaries]);
+  }, [formData]);
 
   return (
       <div className="container-fluid text-center my-3">
