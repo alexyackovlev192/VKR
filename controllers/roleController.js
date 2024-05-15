@@ -13,5 +13,24 @@ class roleController {
             return res.status(500).json(e);
         }
     }
+    async getRoleById(req, res) {
+        try {
+            const { id } = req.params;
+            if (!id) {
+                res.status(400).json({message: "Id не указан"})
+            }
+            const role = await Role.findOne({
+                where: {
+                    id_R: id
+                }
+            });
+            if (!role) {
+                return res.status(404).json({ message: 'Роль не найдена' });
+            }
+            return res.json(role)
+        } catch(e) {
+            return res.status(500).json(e)
+        }
+    }
 }
 module.exports = new roleController()
