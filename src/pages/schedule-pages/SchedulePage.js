@@ -13,13 +13,13 @@ const SchedulePage = () => {
   const [uniqueDates, setUniqueDates] = useState([]);
   const [uniqueDirections, setUniqueDirections] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showAddModal, setShowAddModal] = useState(false); // Показать модальное окно
-  const [formData, setFormData] = useState(null); // Данные участника
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [formData, setFormData] = useState(null);
   const [activeCell, setActiveCell] = useState(null);
 
   const [isTableView, setIsTableView] = useState(true);
 
-  const tableRef = useRef(null); 
+  const tableRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -29,36 +29,37 @@ const SchedulePage = () => {
       }
     })
     .then(response => {
-      setSchedules(response.data); // Установить полученные данные в состояние schedules
-      // Также обновить состояния uniqueDates и uniqueDirections
-      setUniqueDates(Array.from(new Set(response.data.map(item => item.date))));
-      setUniqueDirections(Array.from(new Set(response.data.map(item => item.Name_direction))));
+      setSchedules(response.data);
+      updateUniqueValues(response.data);
     })
     .catch(error => console.error('Ошибка при загрузке данных:', error));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   useEffect(() => {
-    // Обработчик клика в любое место кроме таблицы
     const handleClickOutsideTable = (event) => {
-      // Проверяем, был ли клик сделан вне таблицы
       if (tableRef.current && !tableRef.current.contains(event.target)) {
-        setActiveCell(null); // Сбрасываем активную строку
+        setActiveCell(null);
       }
     };
-    // Добавляем обработчик события клика при монтировании компонента
     document.addEventListener('click', handleClickOutsideTable);
-    // Удаляем обработчик события клика при размонтировании компонента
     return () => {
       document.removeEventListener('click', handleClickOutsideTable);
     };
-  }, []); // Пустой массив зависимостей означает, что эффект сработает только при монтировании и размонтировании компонента
-  
+  }, []);
+
+  const updateUniqueValues = (data) => {
+    const dates = Array.from(new Set(data.map(item => item.date))).sort((a, b) => new Date(a) - new Date(b));
+    const directions = Array.from(new Set(data.map(item => item.Name_direction))).sort();
+    setUniqueDates(dates);
+    setUniqueDirections(directions);
+  };
+
   const handleSelectedClick = (item) => {
     if (item.event != null) {
-      setActiveCell(item);
+      setActiveCell(item.event);
+    } else {
+      setActiveCell(null);
     }
-    console.log('Выбрана защита:', item.date);
   };
 
   const handleCloseModal = () => {
@@ -69,55 +70,104 @@ const SchedulePage = () => {
 
   const handleEditSchedule = (selectedItem) => {
     setActiveCell(selectedItem);
-    setFormData(selectedItem); 
-    setShowUpdateModal(true); 
+    setFormData(selectedItem);
+    setShowUpdateModal(true);
   };
 
   const handleAddSchedule = () => {
     setShowAddModal(true);
-    setFormData(null); 
-  };
-
-  const handleSaveChangesUpdate= () => {
-    setShowUpdateModal(false);
     setFormData(null);
-    console.log('Сохранение изменений:', formData);
   };
 
   const handleSaveUpdate = (formData) => {
     const token = localStorage.getItem('token');
-    console.log(formData);
-    axios.put(`http://localhost:5000/defenseSchedule/${schedules.id_DS}`, formData, {
+    const data = {
+      id_G: formData.id_G,
+      Name_direction: formData.Name_direction,
+      Date: formatDate(formData.date),
+      Time: formData.time,
+      Classroom: formData.classroom
+    };
+  
+    console.log("Данные для запроса:");
+    console.log(data);
+  
+    axios.put(`http://localhost:5000/defenseSchedule/${formData.id_DS}`, data, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     })
-      .then(response => {
-        console.log('Изменения информации о защите успешно:', response.data);
-        setSchedules(prevSchedules =>
-          prevSchedules.map(schedule =>
-            schedule.id_DS === formData.id_DS ? { ...schedule, ...formData } : schedule
-          )
+    .then(response => {
+      console.log('Изменения информации о защите успешно:', response.data);
+      setSchedules(prevSchedules => {
+        const updatedSchedules = prevSchedules.map(schedule =>
+          schedule.id_DS === formData.id_DS ? { ...schedule, ...formData } : schedule
         );
-        handleCloseModal();
-      })
-      .catch(error => console.error('Ошибка при сохранении изменении информации о защите:', error));
+        updateUniqueValues(updatedSchedules);
+        return updatedSchedules;
+      });
+      setShowUpdateModal(false);
+    })
+    .catch(error => {
+      console.error('Ошибка при сохранении изменении информации о защите:', error);
+    });
   };
 
-  const handleSaveChangesAdd = () => {
-    setShowAddModal(false);
-    setFormData(null);
-    console.log('Добавление нового защиты:', formData);
+  const handleSaveAdd = (formData) => {
+    const token = localStorage.getItem('token');
+    const data = {
+      id_G: formData.id_G,
+      Name_direction: formData.Name_direction,
+      Date: formatDate(formData.date),
+      Time: formData.time,
+      Classroom: formData.classroom
+    };
+  
+    console.log("Данные для запроса:");
+    console.log(data);
+  
+    axios.post('http://localhost:5000/defenseSchedule', data, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      console.log('Добавление новой защиты успешно:', response.data);
+      setSchedules(prevSchedules => {
+        const updatedSchedules = [...prevSchedules, response.data];
+        updateUniqueValues(updatedSchedules);
+        return updatedSchedules;
+      });
+      setShowAddModal(false);
+    })
+    .catch(error => {
+      console.error('Ошибка при добавлении новой защиты:', error);
+    });
   };
 
   const handleInputChange = (e) => {
-    const { name, value, checked, type } = e.target;
-    setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
+    const { name, value } = e.target;
+    const newValue = value instanceof Date ? formatDate(value) : value;
+    setFormData({ ...formData, [name]: newValue });
+  };
+
+  const formatDate = (date) => {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return date;
+    }
+    const d = new Date(date);
+    if (isNaN(d)) {
+      throw new Error("Некорректный формат даты");
+    }
+    const month = `${d.getMonth() + 1}`.padStart(2, '0');
+    const day = `${d.getDate()}`.padStart(2, '0');
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
   };
 
   const handleDeleteSchedule = (item) => {
     console.log('Удаление защиты:', item);
-    setActiveCell(null); 
+    setActiveCell(null);
     handleCloseModal();
   };
 
@@ -126,27 +176,17 @@ const SchedulePage = () => {
     setActiveCell(null);
   };
 
-  // const groupedSchedules = schedules.reduce((acc, curr) => {
-  //   if (acc[curr.date]) {
-  //     acc[curr.date].push(curr);
-  //   } else {
-  //     acc[curr.date] = [curr];
-  //   }
-  //   return acc;
-  // }, {});
-
   return (
     <div className="schedule-container my-5 px-5">
       <div className="row">
         <div className="">
           { isTableView ? (
-            <Button variant="primary" className="mx-3" onClick={() => handleEditSchedule(activeCell)} disabled={!activeCell || activeCell.event == null}>Редактировать</Button>
+            <Button variant="primary" className="mx-3" onClick={() => handleEditSchedule(activeCell)} disabled={!activeCell || activeCell == null}>Редактировать</Button>
           ) : ("")}
           <Button variant="primary" className="mx-3" onClick={handleAddSchedule}>Добавить</Button>
           <Button variant="primary" className="mx-3" onClick={toggleView}>{isTableView ? 'Карточки' : 'Таблица'}</Button>
         </div>
         {isTableView ? (
-        // таблица
         <>
           <div className="col-1 px-0 my-4">
             <table className="table table-primary table-bordered table-hover text-center">
@@ -170,7 +210,7 @@ const SchedulePage = () => {
             </table>
           </div>
           <div className="col-11 px-0 my-4" style={{overflowX: 'auto' }}>
-            <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
+            <table className="table table-bordered table-light table-hover text-center" ref={tableRef}>
               <thead className="table-dark">
                 <tr>
                   {uniqueDirections.map((direction, index) => (
@@ -179,44 +219,39 @@ const SchedulePage = () => {
                 </tr>
               </thead>
               <tbody>
+                {uniqueDates.map((date, dateIndex) => (
+                  <tr key={dateIndex}>
+                    {uniqueDirections.map((direction, directionIndex) => {
+                      const sched = schedules.find(s => s.date === date && s.Name_direction === direction);
+                      const isActive = activeCell && sched && activeCell.date === sched.date && activeCell.Name_direction === sched.Name_direction;
 
-              {schedules.map((sched, dateIndex) => (
-              <tr key={dateIndex}>
-                {uniqueDirections.map((direction, directionIndex) => (
-                  <td 
-                    key={directionIndex}
-                    className={activeCell && 
-                      activeCell.event != null && 
-                      activeCell.event.date === sched.date && 
-                      activeCell.event.direction === direction 
-                      ? 'px-5 table-info' : 'px-5 table-light'}
-                    onClick={() => handleSelectedClick({ 
-                                                        id: sched.id, 
-                                                      date: sched.date, 
-                                                  direction: direction,
-                                                      time: sched.time,
-                                                      room: sched.classroom,
-                                                      event: sched})}
-                    style={{ height: '180px', verticalAlign: 'middle' }}
-                  >
-                    {sched.Name_direction === direction ? (
-                      <div>
-                        <p>ГЭК №{sched.id_G}</p>
-                        <p>Время: {sched.time}</p>
-                        <p>Направление: {sched.Name_direction}</p>
-                        <p>Аудитория: {sched.classroom}</p>
-                      </div>
-                    ) : ("")}
-                  </td>
+                      return (
+                        <td 
+                          key={directionIndex}
+                          className={`px-5 ${isActive ? 'table-info' : 'table-light'}`}
+                          onClick={() => handleSelectedClick({ 
+                            event: sched
+                          })}
+                          style={{ height: '180px', verticalAlign: 'middle' }}
+                        >
+                          {sched ? (
+                            <div>
+                              <p>ГЭК №{sched.id_G}</p>
+                              <p>Время: {sched.time}</p>
+                              <p>Направление: {sched.Name_direction}</p>
+                              <p>Аудитория: {sched.classroom}</p>
+                            </div>
+                          ) : ("")}
+                        </td>
+                      );
+                    })}
+                  </tr>
                 ))}
-              </tr>
-            ))}
               </tbody>
             </table>
           </div>  
         </>
         ) : (
-          // Карточки
           <div className="container-fluid text-center my-3">
             <div className="row justify-content-evenly">
               {schedules.map((item, index) => (
@@ -251,7 +286,7 @@ const SchedulePage = () => {
         showModal={showAddModal}
         handleCloseModal={handleCloseModal}
         handleInputChange={handleInputChange}
-        handleSaveChanges={handleSaveChangesAdd}
+        handleSaveChanges={handleSaveAdd}
         formData={formData}
       />
     </div>

@@ -6,30 +6,34 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 
 const ScheduleForm = ({ formData, handleInputChange }) => {
-  const { date, direction, time, room } = formData || {};
+  const { date, Name_direction, time, classroom } = formData || {};
   const [startDate, setStartDate] = useState(date); 
 
-  
+  console.log("Данные в форме:");
+  console.log(formData)
   return (
     <Form>
       <Form.Group controlId="formDate">
         <Form.Label>Дата</Form.Label>
         <div>
-          <DatePicker
-            name="date"
-            selected={startDate}
-            onChange={(d) => setStartDate(d)}
-            dateFormat="dd.MM"
-            className="form-control"
-          />          
+        <DatePicker
+          name="date"
+          selected={startDate}
+          onChange={(d) => {
+            setStartDate(d);
+            handleInputChange({ target: { name: 'date', value: d } }); // Добавлено для обновления formData в родительском компоненте
+          }}
+          dateFormat="dd-MM" // Убедитесь, что формат даты совпадает с ожидаемым
+          className="form-control"
+        />        
         </div>
       </Form.Group>
       <Form.Group controlId="formDirection">
         <Form.Label>Направление</Form.Label>
         <Form.Control
           type="text"
-          name="direction"
-          value={direction || ""}
+          name="Name_direction"
+          value={Name_direction || ""}
           onChange={handleInputChange}
         />
       </Form.Group>
@@ -48,8 +52,8 @@ const ScheduleForm = ({ formData, handleInputChange }) => {
         <Form.Label>Аудитория</Form.Label>
         <Form.Control
           type="text"
-          name="room"
-          value={room || ""}
+          name="classroom"
+          value={classroom || ""}
           onChange={handleInputChange}
         />
       </Form.Group>
