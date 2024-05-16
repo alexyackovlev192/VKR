@@ -5,7 +5,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 
-const ScheduleForm = ({ formData, handleInputChange }) => {
+const ScheduleForm = ({ formData, handleInputChange, schedules }) => {
   const { id_G, date, Name_direction, time, classroom } = formData || {};
   const [startDate, setStartDate] = useState(date); 
 
@@ -13,12 +13,16 @@ const ScheduleForm = ({ formData, handleInputChange }) => {
     <Form>
       <Form.Group controlId="formDirection">
         <Form.Label>Номер ГЭК</Form.Label>
-        <Form.Control
+        <Form.Select
           type="text"
           name="id_G"
           value={id_G || ""}
-          onChange={handleInputChange}
-        />
+          onChange={handleInputChange} >
+          <option value="id_G">{id_G}</option>
+          {schedules.map((g, index) => ( g.id_G !== id_G &&
+            <option key={index} value={g.id_G}>{g.id_G}</option>
+          ))} 
+        </Form.Select>
       </Form.Group>
       <Form.Group controlId="formDate">
         <Form.Label>Дата</Form.Label>

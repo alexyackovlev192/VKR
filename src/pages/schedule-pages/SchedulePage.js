@@ -10,6 +10,7 @@ import '../style-pages/SchedulePage.css';
 
 const SchedulePage = () => {
   const [schedules, setSchedules] = useState([]);
+  const [geks, setGeks] = useState([]);
   const [uniqueDates, setUniqueDates] = useState([]);
   const [uniqueDirections, setUniqueDirections] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -31,6 +32,16 @@ const SchedulePage = () => {
     .then(response => {
       setSchedules(response.data);
       updateUniqueValues(response.data);
+    })
+    .catch(error => console.error('Ошибка при загрузке данных:', error));
+
+    axios.get('http://localhost:5000/geks', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      setGeks(response.data);
     })
     .catch(error => console.error('Ошибка при загрузке данных:', error));
   }, []);
@@ -133,16 +144,16 @@ const SchedulePage = () => {
       axios.get('http://localhost:5000/defenseSchedule/thisYear', {
       headers: {
         'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(response => {
-      setSchedules(response.data);
-      updateUniqueValues(response.data);
-    })
-    .catch(error => console.error('Ошибка при загрузке данных:', error));
-      setShowAddModal(false);
-      setFormData(null);
-    })
+        }
+      })
+      .then(response => {
+        setSchedules(response.data);
+        updateUniqueValues(response.data);
+      })
+      .catch(error => console.error('Ошибка при загрузке данных:', error));
+        setShowAddModal(false);
+        setFormData(null);
+      })
     .catch(error => {
       console.error('Ошибка при сохранении новой защиты:', error);
     });
@@ -284,6 +295,7 @@ const SchedulePage = () => {
         handleInputChange={handleInputChange}
         handleSaveUpdate={handleSaveUpdate}
         handleDeleteSchedule={handleDeleteSchedule}
+        schedules={schedules}
       />
       <AddSchedule
         showModal={showAddModal}
@@ -291,6 +303,7 @@ const SchedulePage = () => {
         handleInputChange={handleInputChange}
         handleSaveChanges={handleSaveAdd}
         formData={formData}
+        schedules={schedules}
       />
     </div>
   );

@@ -8,7 +8,8 @@ const UpdateSchedule = ({
     formData,
     handleInputChange,
     handleSaveUpdate,
-    handleDeleteSchedule
+    handleDeleteSchedule,
+    schedules
   }) => {
     
     return (
@@ -18,7 +19,7 @@ const UpdateSchedule = ({
         </Modal.Header>
 
         <Modal.Body>
-          <ScheduleForm formData={formData} handleInputChange={handleInputChange} />
+          <ScheduleForm formData={formData} handleInputChange={handleInputChange} schedules={schedules} />
         </Modal.Body>
 
         <Modal.Footer>
