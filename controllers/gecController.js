@@ -10,13 +10,13 @@ class gecController {
             if (!errors.isEmpty()) {
                 return res.status(400).json({message:"Ошибка при создании ГЭК", errors})
             }
-            const {NameDirection, FullnameSecretary, Year} = req.body
+            const {Name_direction, Fullname, Year} = req.body
             const direction = await Direction.findOne({where: {
-                Name_direction: NameDirection
+                Name_direction: Name_direction
             }})
             
              const secretaryGec = await User.findOne({where: {
-                Fullname: FullnameSecretary
+                Fullname: Fullname
              }})
 
              const gec = new Gec({ id_D: direction.id_D, id_U: secretaryGec.id_U, year:  Year });
