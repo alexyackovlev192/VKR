@@ -89,9 +89,7 @@ const SchedulePage = () => {
       Classroom: formData.classroom
     };
   
-    console.log("Данные для запроса:");
-    console.log(data);
-  
+    console.log(formData.id_DS);
     axios.put(`http://localhost:5000/defenseSchedule/${formData.id_DS}`, data, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -104,6 +102,7 @@ const SchedulePage = () => {
           schedule.id_DS === formData.id_DS ? { ...schedule, ...formData } : schedule
         );
         updateUniqueValues(updatedSchedules);
+        setFormData(null);
         return updatedSchedules;
       });
       setShowUpdateModal(false);
@@ -116,32 +115,36 @@ const SchedulePage = () => {
   const handleSaveAdd = (formData) => {
     const token = localStorage.getItem('token');
     const data = {
-      id_G: formData.id_G,
-      Name_direction: formData.Name_direction,
+      GecId: formData.id_G,
+      NameDirection: formData.Name_direction,
       Date: formatDate(formData.date),
       Time: formData.time,
       Classroom: formData.classroom
     };
   
-    console.log("Данные для запроса:");
-    console.log(data);
-  
-    axios.post('http://localhost:5000/defenseSchedule', data, {
+    axios.post(`http://localhost:5000/defenseSchedule/create`, data, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     })
     .then(response => {
-      console.log('Добавление новой защиты успешно:', response.data);
-      setSchedules(prevSchedules => {
-        const updatedSchedules = [...prevSchedules, response.data];
-        updateUniqueValues(updatedSchedules);
-        return updatedSchedules;
-      });
+      console.log('Ответ от сервера после создания новой защиты:', response.data);
+
+      axios.get('http://localhost:5000/defenseSchedule/thisYear', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      setSchedules(response.data);
+      updateUniqueValues(response.data);
+    })
+    .catch(error => console.error('Ошибка при загрузке данных:', error));
       setShowAddModal(false);
+      setFormData(null);
     })
     .catch(error => {
-      console.error('Ошибка при добавлении новой защиты:', error);
+      console.error('Ошибка при сохранении новой защиты:', error);
     });
   };
 

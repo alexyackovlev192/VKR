@@ -6,13 +6,20 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 
 const ScheduleForm = ({ formData, handleInputChange }) => {
-  const { date, Name_direction, time, classroom } = formData || {};
+  const { id_G, date, Name_direction, time, classroom } = formData || {};
   const [startDate, setStartDate] = useState(date); 
 
-  console.log("Данные в форме:");
-  console.log(formData)
   return (
     <Form>
+      <Form.Group controlId="formDirection">
+        <Form.Label>Номер ГЭК</Form.Label>
+        <Form.Control
+          type="text"
+          name="id_G"
+          value={id_G || ""}
+          onChange={handleInputChange}
+        />
+      </Form.Group>
       <Form.Group controlId="formDate">
         <Form.Label>Дата</Form.Label>
         <div>
