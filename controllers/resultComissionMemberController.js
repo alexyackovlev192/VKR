@@ -89,5 +89,25 @@ class resultComissionMemberController {
             return res.status(500).json({ message: 'Ошибка при получении общего результата ГЭК для защиты', error });
         }
     }
+    async getResultByUserIdAndIdDSS(req, res) {
+        try {
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(400).json({message:"Ошибка при получении результата защиты студента, поставленного членом ГЭК", errors})
+            }
+            const { id } = req.params;
+            if (!id) {
+                res.status(400).json({message: "Id не указан"})
+            }
+            const {id_U} = req.body
+            const resultFromMemberGec = await ResultComissionMember.findOne({ where: { id_DSS: id, id_U: id_U } });
+            if (!resultFromMemberGec) {
+                return res.status(404).json({ message: 'Результат защиты студента, поставленный членом ГЭК, не найден' });
+            }
+            return res.json(resultFromMemberGec)
+        } catch(e) {
+            return res.status(500).json(e)
+        }
+    }
 }
 module.exports = new resultComissionMemberController()
