@@ -4,49 +4,58 @@ import DatePicker from 'react-datepicker';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
-
-const ScheduleForm = ({ formData, handleInputChange, schedules }) => {
+const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
   const { id_G, date, Name_direction, time, classroom } = formData || {};
-  const [startDate, setStartDate] = useState(date); 
+  const [startDate, setStartDate] = useState(date);
 
   return (
     <Form>
-      <Form.Group controlId="formDirection">
+      <Form.Group controlId="formIdGek">
         <Form.Label>Номер ГЭК</Form.Label>
         <Form.Select
           type="text"
           name="id_G"
+          onChange={handleInputChange}
           value={id_G || ""}
-          onChange={handleInputChange} >
-          <option value="id_G">{id_G}</option>
-          {schedules.map((g, index) => ( g.id_G !== id_G &&
-            <option key={index} value={g.id_G}>{g.id_G}</option>
-          ))} 
+          disabled={isEditMode} // поле недоступно для редактирования, если isEditMode true
+        >
+          {geks.map((g, index) => (
+            <option key={index} value={g.id_G}>
+              {g.id_G}
+            </option>
+          ))}
         </Form.Select>
       </Form.Group>
       <Form.Group controlId="formDate">
         <Form.Label>Дата</Form.Label>
         <div>
-        <DatePicker
-          name="date"
-          selected={startDate}
-          onChange={(d) => {
-            setStartDate(d);
-            handleInputChange({ target: { name: 'date', value: d } }); // Добавлено для обновления formData в родительском компоненте
-          }}
-          dateFormat="dd-MM" // Убедитесь, что формат даты совпадает с ожидаемым
-          className="form-control"
-        />        
+          <DatePicker
+            name="date"
+            selected={startDate}
+            onChange={(d) => {
+              setStartDate(d);
+              handleInputChange({ target: { name: 'date', value: d } });
+            }}
+            dateFormat="dd-MM"
+            className="form-control"
+          />
         </div>
       </Form.Group>
       <Form.Group controlId="formDirection">
         <Form.Label>Направление</Form.Label>
-        <Form.Control
+        <Form.Select
           type="text"
           name="Name_direction"
-          value={Name_direction || ""}
           onChange={handleInputChange}
-        />
+          value={Name_direction || ""}
+          disabled={isEditMode} 
+        >
+          {geks.map((g, index) => (
+            <option key={index} value={g.Name_direction}>
+              {g.Name_direction}
+            </option>
+          ))}
+        </Form.Select>
       </Form.Group>
       <Form.Group controlId="formTime">
         <Form.Label>Время</Form.Label>

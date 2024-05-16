@@ -35,7 +35,7 @@ const SchedulePage = () => {
     })
     .catch(error => console.error('Ошибка при загрузке данных:', error));
 
-    axios.get('http://localhost:5000/geks', {
+    axios.get('http://localhost:5000/gecs', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -44,6 +44,7 @@ const SchedulePage = () => {
       setGeks(response.data);
     })
     .catch(error => console.error('Ошибка при загрузке данных:', error));
+    console.log(geks);
   }, []);
 
   useEffect(() => {
@@ -155,7 +156,7 @@ const SchedulePage = () => {
         setFormData(null);
       })
     .catch(error => {
-      console.error('Ошибка при сохранении новой защиты:', error);
+      console.error('Ошибка при сохранении новой защиты:', error)
     });
   };
 
@@ -293,9 +294,9 @@ const SchedulePage = () => {
         handleCloseModal={handleCloseModal}
         formData={formData}
         handleInputChange={handleInputChange}
-        handleSaveUpdate={handleSaveUpdate}
+        handleSaveChanges={handleSaveUpdate}
         handleDeleteSchedule={handleDeleteSchedule}
-        schedules={schedules}
+        geks={geks}
       />
       <AddSchedule
         showModal={showAddModal}
@@ -303,7 +304,7 @@ const SchedulePage = () => {
         handleInputChange={handleInputChange}
         handleSaveChanges={handleSaveAdd}
         formData={formData}
-        schedules={schedules}
+        geks={geks}
       />
     </div>
   );

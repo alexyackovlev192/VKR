@@ -7,16 +7,22 @@ const AddSchedule = ({
   handleCloseModal,
   handleInputChange,
   handleSaveChanges,
-  formData
+  formData,
+  geks
 }) => {
   return (
     <Modal show={showModal} onHide={handleCloseModal}>
       <Modal.Header closeButton>
-        <Modal.Title>Добавить нового участника</Modal.Title>
+        <Modal.Title>Добавить новую защиту</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
-        <ScheduleForm formData={formData} handleInputChange={handleInputChange} />
+        <ScheduleForm 
+          formData={formData} 
+          handleInputChange={handleInputChange} 
+          geks={geks} 
+          isEditMode={false} // режим создания
+        />
       </Modal.Body>
 
       <Modal.Footer>
