@@ -12,8 +12,8 @@ const DefenseSchedule = sequelize.define('DefenseSchedule', {
         type: DataTypes.INTEGER,
         allowNull: false
     },
-    Name_direction: {
-        type: DataTypes.STRING(45),
+    id_D: {
+        type: DataTypes.INTEGER,
         allowNull: false
     },
     date: {

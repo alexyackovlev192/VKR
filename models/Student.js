@@ -36,8 +36,8 @@ const Student = sequelize.define('Student', {
         type: DataTypes.STRING(10),
         allowNull: false
     },
-    Name_direction: {
-        type: DataTypes.STRING(45),
+    id_D: {
+        type: DataTypes.INTEGER,
         allowNull: false
     }
 }, {
