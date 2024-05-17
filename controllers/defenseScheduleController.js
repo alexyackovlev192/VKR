@@ -25,7 +25,7 @@ class defenseScheduleController {
                 return res.status(404).json({ message: "ГЭК не найдена" });
             }
 
-            const defenseSchedule = new DefenseSchedule({ id_G: gec.id_G, Name_direction: direction.Name_direction, date:  Date, time: Time, classroom: Classroom });
+            const defenseSchedule = new DefenseSchedule({ id_G: gec.id_G, id_D: direction.id_D, date:  Date, time: Time, classroom: Classroom });
             await defenseSchedule.save()
             return res.json({message: "Защита успешно создана"})
         } catch(e) {
@@ -44,27 +44,30 @@ class defenseScheduleController {
             if (!id) {
                 res.status(400).json({message: "Id не указан"})
             }
-            if (NameDirection) {
-                const direction = await Direction.findOne({
-                    where: {
-                        Name_direction: NameDirection
-                    }
-                });
-    
-                if (!direction) {
-                    return res.status(404).json({ message: "Направление не найдено" });
-                }
-            }
+            let updateData = {};
+
             if (GecId) {
-                const gec = await Gec.findOne({where: {
-                    id_G: GecId
-                }})
+                const gec = await Gec.findOne({ where: { id_G: GecId } });
                 if (!gec) {
                     return res.status(404).json({ message: "ГЭК не найдена" });
                 }
+                updateData.id_G = GecId;
             }
+
+            if (NameDirection) {
+                const direction = await Direction.findOne({ where: { Name_direction: NameDirection } });
+                if (!direction) {
+                    return res.status(404).json({ message: "Направление не найдено" });
+                }
+                updateData.id_D = direction.id_D;
+            }
+
+            if (Date !== undefined) updateData.date = Date;
+            if (Time !== undefined) updateData.time = Time;
+            if (Classroom !== undefined) updateData.classroom = Classroom;
+            
             const updatedRowsCount = await DefenseSchedule.update(
-                { id_G: GecId, Name_direction: NameDirection, date: Date, time: Time, classroom: Classroom },
+                updateData,
                 { where: { id_DS: id } }
             )
             if (updatedRowsCount[0] === 0) {

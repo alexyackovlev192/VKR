@@ -19,7 +19,7 @@ class studentController {
                 return res.status(404).json({ message: "Направление не найдено" });
             }
 
-            const student = new Student({Fullname: Fullname, Group: Group, Topic: Topic, ScientificAdviser: ScientificAdviser, Avg_Mark: Avg_Mark, Red_Diplom: Red_Diplom, YearOfDefense: YearOfDefense, Name_direction: direction.Name_direction});
+            const student = new Student({Fullname: Fullname, Group: Group, Topic: Topic, ScientificAdviser: ScientificAdviser, Avg_Mark: Avg_Mark, Red_Diplom: Red_Diplom, YearOfDefense: YearOfDefense, id_D: direction.id_D});
             await student.save()
             return res.json({message: "Студент успешно добавлен"})
         } catch(e) {
@@ -38,21 +38,22 @@ class studentController {
             if (!id) {
                 res.status(400).json({message: "Id не указан"})
             }
+            let updateData = { Fullname, Group, Topic, ScientificAdviser, Avg_Mark, Red_Diplom, YearOfDefense };
+
             if (Name_direction) {
                 const direction = await Direction.findOne({
-                    where: {
-                        Name_direction: Name_direction
-                    }
+                    where: { Name_direction: Name_direction }
                 });
-    
+
                 if (!direction) {
                     return res.status(404).json({ message: "Направление не найдено" });
                 }
+
+                updateData.id_D = direction.id_D;
             }
-            const updatedRowsCount = await Student.update(
-                { Fullname, Group, Topic, ScientificAdviser, Avg_Mark, Red_Diplom, YearOfDefense, Name_direction: Name_direction },
-                { where: { id_S: id } }
-            )
+
+            const updatedRowsCount = await Student.update(updateData, { where: { id_S: id } });
+            
             if (updatedRowsCount[0] === 0) {
                 return res.status(404).json({ message: `Нет студента с таким идентификатором: ${id}` })
             }
