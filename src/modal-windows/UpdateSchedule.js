@@ -33,9 +33,9 @@ const UpdateSchedule = ({
         <Button variant="secondary" onClick={handleCloseModal}>
           Отмена
         </Button>
-        <Button variant="danger" onClick={() => handleDeleteSchedule(formData)}>
+        {/* <Button variant="danger" onClick={() => handleDeleteSchedule(formData)}>
           Удалить
-        </Button>
+        </Button> */}
       </Modal.Footer>
     </Modal>
   );

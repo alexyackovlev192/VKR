@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
@@ -15,8 +16,11 @@ const MembersPage = () => {
   
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
-  const [searchText, setSearchText] = useState('');
   const [sortedMembers, setSortedMembers] = useState([]);
+
+  const [fullnameFilter, setFullnameFilter] = useState('');
+  const [postFilter, setPostFilter] = useState('');
+  const [mailFilter, setMailFilter] = useState('');
 
   const tableRef = useRef(null);
 
@@ -36,7 +40,8 @@ const MembersPage = () => {
 
   useEffect(() => {
     setSortedMembers(members);
-  }, [members]);
+    handleSearch();
+  }, [members, fullnameFilter, postFilter, mailFilter]);
 
 
   useEffect(() => {
@@ -148,16 +153,30 @@ const MembersPage = () => {
     setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
   }, [formData]);
 
-  const handleSearch = useCallback((e) => {
-    setSearchText(e.target.value);
+
+  const handleFullnameFilterChange = useCallback((e) => {
+    setFullnameFilter(e.target.value);
+  }, []);
+
+  const handlePostFilterChange = useCallback((e) => {
+    setPostFilter(e.target.value);
+  }, []);
+
+  const handleMailFilterChange = useCallback((e) => {
+    setMailFilter(e.target.value);
+  }, []);
+
+  const handleSearch = useCallback(() => {
     const filteredData = members.filter((member) => {
-      const { Fullname, Post, Mail } = member;
-      const searchRegExp = new RegExp(e.target.value.trim(), 'i');
-      return searchRegExp.test(Fullname) || searchRegExp.test(Post) || searchRegExp.test(Mail);
+      const fullnameMatch = member.Fullname.toLowerCase().includes(fullnameFilter.toLowerCase());
+      const postMatch = member.Post.toLowerCase().includes(postFilter.toLowerCase());
+      const mailMatch = member.Mail.toLowerCase().includes(mailFilter.toLowerCase());
+      return fullnameMatch && postMatch && mailMatch;
     });
     setSortedMembers(filteredData);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [members, fullnameFilter, postFilter, mailFilter]);
+
+
 
   return (
     <div className="my-5 px-5">
@@ -165,17 +184,10 @@ const MembersPage = () => {
         <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>
           Редактировать
         </Button>
-        {/* <Button variant="primary" className="mx-3" onClick={handleAddMember}>
-          Добавить
-        </Button> */}
       </>
-      <input
-          type="text"
-          className="form-control mb-3 my-4"
-          placeholder="Поиск..."
-          value={searchText}
-          onChange={handleSearch}
-        />
+      <input type="text" placeholder="ФИО" value={fullnameFilter} onChange={handleFullnameFilterChange} />
+      <input type="text" placeholder="Должность" value={postFilter} onChange={handlePostFilterChange} />
+      <input type="text" placeholder="Почта" value={mailFilter} onChange={handleMailFilterChange} />
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
           <thead className="table-dark">
@@ -209,15 +221,7 @@ const MembersPage = () => {
         formData={formData}
         handleInputChange={handleInputChange}
         handleSaveChanges={handleSaveUpdateMembers}
-        //handleDeleteMember={handleDeleteMember}
       />
-      {/* <AddMember
-        showModal={showAddModal}
-        handleCloseModal={handleCloseModal}
-        handleInputChange={handleInputChange}
-        handleSaveChanges={handleSaveAddMemberr}
-        formData={formData}
-      /> */}
     </div>
   );
 };
