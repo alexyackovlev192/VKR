@@ -10,8 +10,7 @@ const Direction = sequelize.define('Direction', {
     },
     Name_direction: {
         type: DataTypes.STRING(45),
-        allowNull: false,
-        unique: true
+        allowNull: false
     },
     code: {
         type: DataTypes.STRING(45),
