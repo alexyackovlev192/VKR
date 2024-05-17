@@ -35,6 +35,7 @@ const SchedulePage = () => {
     })
     .catch(error => console.error('Ошибка при загрузке данных:', error));
 
+
     axios.get('http://localhost:5000/gecs', {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -44,7 +45,6 @@ const SchedulePage = () => {
       setGeks(response.data);
     })
     .catch(error => console.error('Ошибка при загрузке данных:', error));
-    console.log(geks);
   }, []);
 
   useEffect(() => {
@@ -163,7 +163,11 @@ const SchedulePage = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     const newValue = value instanceof Date ? formatDate(value) : value;
-    setFormData({ ...formData, [name]: newValue });
+  
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      [name]: newValue
+    }));
   };
 
   const formatDate = (date) => {

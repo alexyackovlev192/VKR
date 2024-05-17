@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
+import axios from 'axios';
 import DatePicker from 'react-datepicker';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -7,24 +8,66 @@ import 'react-datepicker/dist/react-datepicker.css';
 const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
   const { id_G, date, Name_direction, time, classroom } = formData || {};
   const [startDate, setStartDate] = useState(date);
+  const [selectGek, setSelectGek] = useState(null);
+
+  const handleGekChange = (e) => {
+    const { value } = e.target;
+    handleInputChange(e);
+    setSelectGek(geks.find(g => g.id_G === parseInt(value)));
+  };
+
+  useEffect(() => {
+    if (selectGek && selectGek.id_D) {
+      const token = localStorage.getItem('token');
+      axios.get(`http://localhost:5000/directions/${selectGek.id_D}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => {
+        handleInputChange({ target: { name: 'Name_direction', value: response.data.Name_direction } });
+      })
+      .catch(error => {
+        console.error('Ошибка при получении направления:', error);
+      });
+    }
+  }, [handleInputChange, selectGek]);
 
   return (
     <Form>
       <Form.Group controlId="formIdGek">
         <Form.Label>Номер ГЭК</Form.Label>
-        <Form.Select
+        {isEditMode ? (
+          <Form.Control
+            type="text"
+            name="id_G"
+            value={id_G || ""}
+            disabled={true} // поле недоступно для редактирования в режиме редактирования
+          />
+        ) : (
+          <Form.Select
+            type="text"
+            name="id_G"
+            onChange={handleGekChange}
+            value={id_G || ""}
+          >
+            {geks.map((g, index) => (
+              <option key={index} value={g.id_G}>
+                {g.id_G}
+              </option>
+            ))}
+          </Form.Select>
+        )}
+      </Form.Group>
+      <Form.Group controlId="formDirection">
+        <Form.Label>Направление</Form.Label>
+        <Form.Control
           type="text"
-          name="id_G"
+          name="Name_direction"
+          value={Name_direction || ""}
           onChange={handleInputChange}
-          value={id_G || ""}
-          disabled={isEditMode} // поле недоступно для редактирования, если isEditMode true
-        >
-          {geks.map((g, index) => (
-            <option key={index} value={g.id_G}>
-              {g.id_G}
-            </option>
-          ))}
-        </Form.Select>
+          disabled={true} 
+        />
       </Form.Group>
       <Form.Group controlId="formDate">
         <Form.Label>Дата</Form.Label>
@@ -40,22 +83,6 @@ const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
             className="form-control"
           />
         </div>
-      </Form.Group>
-      <Form.Group controlId="formDirection">
-        <Form.Label>Направление</Form.Label>
-        <Form.Select
-          type="text"
-          name="Name_direction"
-          onChange={handleInputChange}
-          value={Name_direction || ""}
-          disabled={isEditMode} 
-        >
-          {geks.map((g, index) => (
-            <option key={index} value={g.Name_direction}>
-              {g.Name_direction}
-            </option>
-          ))}
-        </Form.Select>
       </Form.Group>
       <Form.Group controlId="formTime">
         <Form.Label>Время</Form.Label>
