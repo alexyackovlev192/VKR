@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import axios from 'axios';
@@ -31,7 +32,7 @@ const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
         console.error('Ошибка при получении направления:', error);
       });
     }
-  }, [handleInputChange, selectGek]);
+  }, [selectGek]);
 
   return (
     <Form>
@@ -51,23 +52,12 @@ const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
             onChange={handleGekChange}
             value={id_G || ""}
           >
+            {!id_G && <option value="Name_direction">{Name_direction}</option>}
             {geks.map((g, index) => (
-              <option key={index} value={g.id_G}>
-                {g.id_G}
-              </option>
+              <option key={index} value={g.id_G}>{g.id_G}</option>
             ))}
           </Form.Select>
         )}
-      </Form.Group>
-      <Form.Group controlId="formDirection">
-        <Form.Label>Направление</Form.Label>
-        <Form.Control
-          type="text"
-          name="Name_direction"
-          value={Name_direction || ""}
-          onChange={handleInputChange}
-          disabled={true} 
-        />
       </Form.Group>
       <Form.Group controlId="formDate">
         <Form.Label>Дата</Form.Label>
@@ -83,6 +73,16 @@ const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
             className="form-control"
           />
         </div>
+      </Form.Group>
+      <Form.Group controlId="formDirection">
+        <Form.Label>Направление</Form.Label>
+        <Form.Control
+          type="text"
+          name="Name_direction"
+          value={Name_direction || ""}
+          onChange={handleInputChange}
+          disabled={true} // поле недоступно для редактирования, так как заполняется автоматически
+        />
       </Form.Group>
       <Form.Group controlId="formTime">
         <Form.Label>Время</Form.Label>

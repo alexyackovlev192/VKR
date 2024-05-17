@@ -10,7 +10,6 @@ const CreateGekForm = ({
 }) => {
   const { Name_direction, Fullname, Year } = formData || {};
   
-  // Сохранение данных в localStorage при изменении formData
   useEffect(() => {
     localStorage.setItem('formData', JSON.stringify(formData));
   }, [formData, secretaries]);
