@@ -180,14 +180,21 @@ const MembersPage = () => {
 
   return (
     <div className="my-5 px-5">
-      <>
+      <div className="row justify-content-center text-center">
+        <h4 className="">Поиск</h4>
+        <div className="col-3">
+        <input type="text" className="form-control my-4 mx-2" placeholder="ФИО" value={fullnameFilter} onChange={handleFullnameFilterChange} />
+        </div>
+        <div className="col-3">
+        <input type="text" className="form-control my-4 mx-2" placeholder="Должность" value={postFilter} onChange={handlePostFilterChange} />
+        </div>
+        <div className="col-3">
+        <input type="text" className="form-control my-4 mx-2" placeholder="Почта" value={mailFilter} onChange={handleMailFilterChange} />
+      </div>
+      </div>
         <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>
           Редактировать
         </Button>
-      </>
-      <input type="text" placeholder="ФИО" value={fullnameFilter} onChange={handleFullnameFilterChange} />
-      <input type="text" placeholder="Должность" value={postFilter} onChange={handlePostFilterChange} />
-      <input type="text" placeholder="Почта" value={mailFilter} onChange={handleMailFilterChange} />
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
           <thead className="table-dark">
