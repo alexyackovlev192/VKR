@@ -11,6 +11,8 @@ import '../style-pages/SchedulePage.css';
 const SchedulePage = () => {
   const [schedules, setSchedules] = useState([]);
   const [geks, setGeks] = useState([]);
+  const [directions, setDirections] = useState([])
+
   const [uniqueDates, setUniqueDates] = useState([]);
   const [uniqueDirections, setUniqueDirections] = useState([]);
 
@@ -32,12 +34,37 @@ const SchedulePage = () => {
       }
     })
     .then(response => {
-      setSchedules(response.data);
-      updateUniqueValues(response.data);
+      // Получение данных о направлениях для каждого элемента расписания
+      const fetchDirectionsPromises = response.data.map(sched => {
+        return axios.get(`http://localhost:5000/directions/${sched.id_D}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        .then(response => {
+          return response.data;
+        })
+        .catch(error => {
+          console.error('Ошибка при получении направления:', error);
+          return null;
+        });
+      });
+  
+      // Обработка всех промисов получения данных о направлениях
+      Promise.all(fetchDirectionsPromises)
+        .then(directionsData => {
+          // Объединение данных о расписании с полученными данными о направлениях
+          const updatedSchedules = response.data.map((schedule, index) => ({
+            ...schedule,
+            direction: directionsData[index] // Предполагается, что данные о направлениях возвращаются в виде объекта
+          }));
+          setSchedules(updatedSchedules);
+          updateUniqueValues(updatedSchedules);
+          setDirections(directionsData); // Обновляем directions
+        });
     })
     .catch(error => console.error('Ошибка при загрузке данных:', error));
-
-
+  
     axios.get('http://localhost:5000/gecs', {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -63,7 +90,17 @@ const SchedulePage = () => {
 
   const updateUniqueValues = (data) => {
     const dates = Array.from(new Set(data.map(item => item.date))).sort((a, b) => new Date(a) - new Date(b));
-    const directions = Array.from(new Set(data.map(item => item.Name_direction))).sort();
+    
+    // Create a map of unique directions with their names
+    const directionMap = new Map();
+    data.forEach(item => {
+      if (!directionMap.has(item.id_D)) {
+        directionMap.set(item.id_D, item.direction.Name_direction);
+      }
+    });
+  
+    const directions = Array.from(directionMap.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+  
     setUniqueDates(dates);
     setUniqueDirections(directions);
   };
@@ -104,7 +141,7 @@ const SchedulePage = () => {
         'Authorization': `Bearer ${token}`
       }
     })
-    .then(response => {
+    .then(() => {
       setSchedules(prevSchedules => {
         const updatedSchedules = prevSchedules.map(schedule =>
           schedule.id_DS === formData.id_DS ? { ...schedule, ...formData } : schedule
@@ -133,7 +170,7 @@ const SchedulePage = () => {
         'Authorization': `Bearer ${token}`
       }
     })
-    .then(response => {
+    .then(() => {
       axios.get('http://localhost:5000/defenseSchedule/thisYear', {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -185,11 +222,21 @@ const SchedulePage = () => {
   const filteredSchedules = useMemo(() => {
     const schedulesByDate = uniqueDates.map(date => ({
       date,
-      schedules: uniqueDirections.map(direction => schedules.find(s => s.date === date && s.Name_direction === direction))
+      schedules: uniqueDirections.map(direction => {
+        const directionObject = directions.find(dir => dir.id_D === direction[0]);
+        
+        
+        const schedule = directionObject 
+        ? schedules.find(s => s.date === date && s.id_D === directionObject.id_D) 
+        : null;
+        
+        return schedule ? { ...schedule, Name_direction: directionObject.Name_direction } : null;
+      })
     }));
+    console.log(uniqueDirections);
     return schedulesByDate;
-  }, [uniqueDates, uniqueDirections, schedules]);
-
+  }, [uniqueDates, schedules, directions]);
+  
   return (
     <div className="schedule-container my-5 px-5">
       <div className="row">
@@ -263,7 +310,7 @@ const TableView = ({ uniqueDates, uniqueDirections, filteredSchedules, handleSel
           <thead className="table-dark">
             <tr>
               {uniqueDirections.map((direction, index) => (
-                <th className="px-5 py-3" key={index}>{direction}</th>
+                <th className="px-5 py-3" key={index}>{direction[1]}</th>
               ))}
             </tr>
           </thead>

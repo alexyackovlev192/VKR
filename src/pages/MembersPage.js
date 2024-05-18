@@ -129,9 +129,9 @@ const MembersPage = () => {
   const handleSearch = () => {
     const { fullname, post, mail } = filters;
     const filteredData = members.filter((member) => {
-      const fullnameMatch = member.Fullname.toLowerCase().includes(fullname.toLowerCase());
-      const postMatch = member.Post.toLowerCase().includes(post.toLowerCase());
-      const mailMatch = member.Mail.toLowerCase().includes(mail.toLowerCase());
+      const fullnameMatch = member.Fullname ? member.Fullname.toLowerCase().includes(fullname.toLowerCase()) : false;
+      const postMatch = member.Post ? member.Post.toLowerCase().includes(post.toLowerCase()) : false;
+      const mailMatch = member.Mail ? member.Mail.toLowerCase().includes(mail.toLowerCase()) : false;
       return fullnameMatch && postMatch && mailMatch;
     });
     setSortedMembers(filteredData);

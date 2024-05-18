@@ -3,7 +3,6 @@ import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import UpdateDefender from '../modal-windows/UpdateDefender';
 import AddDefender from '../modal-windows/AddDefender';
-import Search from '../components/SearchMember'; 
 import './style-pages/DefendersPage.css';
 
 const DefendersPage = () => {
@@ -35,7 +34,6 @@ const DefendersPage = () => {
 
   useEffect(() => {
     setSortedDefenders(defenders);
-    handleSearch();
   }, [defenders]);
   
   useEffect(() => {
@@ -53,45 +51,94 @@ const DefendersPage = () => {
 
   useEffect(() => {
     const sortedData = defenders.slice().sort((a, b) => {
-      // Логика сортировки остается без изменений
+      if (!sortColumn) return 0;
+      if (sortColumn === 'Avg_Mark') {
+        return sortOrder === 'asc' ? a[sortColumn] - b[sortColumn] : b[sortColumn] - a[sortColumn];
+      } else if (sortColumn === 'Red_Diplom') {
+        let valA = a[sortColumn] ? 'Да' : 'Нет';
+        let valB = b[sortColumn] ? 'Да' : 'Нет';
+        return sortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      } else {
+        return sortOrder === 'asc' ? a[sortColumn].localeCompare(b[sortColumn]) : b[sortColumn].localeCompare(a[sortColumn]);
+      }
     });
     setSortedDefenders(sortedData);
   }, [sortOrder, sortColumn, defenders]);
 
   const sortData = (column) => {
-    // Логика сортировки остается без изменений
+    if (sortColumn === column) {
+      setSortOrder(prevOrder => prevOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortOrder('asc');
+    }
   };
 
   const renderSortArrow = (column) => {
-    // Логика отрисовки стрелки сортировки остается без изменений
+    if (sortColumn === column) {
+      return sortOrder === 'asc' ? ' ↑' : ' ↓';
+    }
+    return null;
   };
 
   const handleRowClick = (defender) => {
-    // Логика обработки клика по строке таблицы остается без изменений
+    setActiveRow(defender);
+    console.log('Выбран студент:', defender.id_S);
   };
 
   const handleCloseModal = () => {
-    // Логика закрытия модальных окон остается без изменений
+    setShowUpdateModal(false);
+    setShowAddModal(false);
+    setFormData(null);
   };
 
   const handleEditDefender = () => {
-    // Логика редактирования студента остается без изменений
+    setFormData(activeRow);
+    setShowUpdateModal(true);
   };
 
   const handleAddDefender = () => {
-    // Логика добавления студента остается без изменений
+    setShowAddModal(true);
+    setFormData(null);
   };
 
   const handleSaveAddDefender = (formData) => {
-    // Логика сохранения добавленного студента остается без изменений
+    const token = localStorage.getItem('token');
+    axios.post('http://localhost:5000/students/create', formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(response => {
+        console.log('Новый студент успешно добавлен:', response.data);
+        setDefenders(prevDefenders => [...prevDefenders, response.data]);
+        handleCloseModal();
+      })
+      .catch(error => console.error('Ошибка при добавлении студента:', error));
   };
 
   const handleSaveUpdateDefender = (formData) => {
-    // Логика сохранения изменений студента остается без изменений
+    const token = localStorage.getItem('token');
+    axios.put(`http://localhost:5000/students/${formData.id_S}`, formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+      .then(response => {
+        console.log('Изменения студента успешно сохранены:', response.data);
+        setDefenders(prevDefenders =>
+          prevDefenders.map(defender =>
+            defender.id_S === formData.id_S ? { ...defender, ...formData } : defender
+          )
+        );
+        handleCloseModal();
+      })
+      .catch(error => console.error('Ошибка при сохранении изменений студента:', error));
   };
 
   const handleInputChange = (e) => {
-    // Логика обработки изменений в форме остается без изменений
+    const { name, value, checked, type } = e.target;
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: type === 'checkbox' ? checked : value }));
   };
 
   const handleSearch = (e) => {
@@ -111,16 +158,23 @@ const DefendersPage = () => {
     setSortedDefenders(filteredData);
   };
 
-
   return (
     <div className="my-5 px-5">
-      <Search searchText={searchText} handleSearch={handleSearch} />        
-      <Button variant="primary" className="mx-3" onClick={handleEditDefender} disabled={!activeRow}>
-        Редактировать
-      </Button>
-      <Button variant="primary" className="mx-3" onClick={handleAddDefender}>
-        Добавить
-      </Button>
+      <>
+        <Button variant="primary" className="mx-3" onClick={handleEditDefender} disabled={!activeRow}>
+          Редактировать
+        </Button>
+        <Button variant="primary" className="mx-3" onClick={handleAddDefender}>
+          Добавить
+        </Button>
+      </>
+      <input
+        type="text"
+        className="form-control mb-3 my-3"
+        placeholder="Поиск..."
+        value={searchText}
+        onChange={handleSearch}
+      />
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
           <thead className="table-dark">
