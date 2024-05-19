@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import UpdateMember from '../modal-windows/UpdateMember';
-import Search from '../components/SearchMember'; 
+import SearchMem from '../components/SearchMember'; 
 
 import './style-pages/MembersPage.css';
 
@@ -34,7 +34,7 @@ const MembersPage = () => {
     })
     .then(response => {
       setMembers(response.data);
-      setSortedMembers(response.data); // Initialize sortedMembers with data
+      setSortedMembers(response.data); 
     })
     .catch(error => console.error('Ошибка при загрузке данных:', error));
   }, []);
@@ -139,7 +139,7 @@ const MembersPage = () => {
 
   return (
     <div className="my-5 px-5">
-      <Search filters={filters} handleFilterChange={handleFilterChange} /> 
+      <SearchMem filters={filters} handleFilterChange={handleFilterChange} /> 
       <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>
         Редактировать
       </Button>

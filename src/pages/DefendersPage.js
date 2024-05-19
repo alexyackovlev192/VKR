@@ -3,6 +3,8 @@ import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import UpdateDefender from '../modal-windows/UpdateDefender';
 import AddDefender from '../modal-windows/AddDefender';
+import SearchStud from '../components/SearchDefender';
+
 import './style-pages/DefendersPage.css';
 
 const DefendersPage = () => {
@@ -14,8 +16,16 @@ const DefendersPage = () => {
 
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
-  const [searchText, setSearchText] = useState('');
   const [sortedDefenders, setSortedDefenders] = useState([]);
+
+  const [filters, setFilters] = useState({
+    fullname: '',
+    group: '',
+    topic: '',
+    scientificAdviser: '',
+    avgMark: '',
+    redDiplom: '' 
+  });
 
   const tableRef = useRef(null);
 
@@ -28,13 +38,14 @@ const DefendersPage = () => {
     })
     .then(response => {
       setDefenders(response.data);
+      setSortedDefenders(response.data);
     })
     .catch(error => console.error('Ошибка при загрузке данных:', error));
   }, []);
 
   useEffect(() => {
-    setSortedDefenders(defenders);
-  }, [defenders]);
+    handleSearch();
+  }, [defenders, filters]);
   
   useEffect(() => {
     const handleClickOutsideTable = (event) => {
@@ -141,40 +152,34 @@ const DefendersPage = () => {
     setFormData((prevFormData) => ({ ...prevFormData, [name]: type === 'checkbox' ? checked : value }));
   };
 
-  const handleSearch = (e) => {
-    setSearchText(e.target.value);
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters({ ...filters, [name]: value });
+  };
+
+  const handleSearch = () => {
+    const { fullname, group, topic, scientificAdviser, avgMark, redDiplom } = filters;
     const filteredData = defenders.filter((defender) => {
-      const { Fullname, Group, Topic, ScientificAdviser, Avg_Mark, Red_Diplom } = defender;
-      const searchRegExp = new RegExp(e.target.value.trim(), 'i');
-      return (
-        searchRegExp.test(Fullname) ||
-        searchRegExp.test(Group) ||
-        searchRegExp.test(Topic) ||
-        searchRegExp.test(ScientificAdviser) ||
-        searchRegExp.test(Avg_Mark.toString()) ||
-        searchRegExp.test(Red_Diplom ? 'Да' : 'Нет')
-      );
+      const fullnameMatch = defender.Fullname ? defender.Fullname.toLowerCase().includes(fullname.toLowerCase()) : true;
+      const groupMatch = defender.Group ? defender.Group.toLowerCase().includes(group.toLowerCase()) : true;
+      const topicMatch = defender.Topic ? defender.Topic.toLowerCase().includes(topic.toLowerCase()) : true;
+      const scientificAdviserMatch = defender.ScientificAdviser ? defender.ScientificAdviser.toLowerCase().includes(scientificAdviser.toLowerCase()) : true;
+      const avgMarkMatch = avgMark ? defender.Avg_Mark == parseFloat(avgMark) : true;
+      const redDiplomMatch = redDiplom === '' ? true : (defender.Red_Diplom ? 'Да' : 'Нет') === redDiplom;
+      return fullnameMatch && groupMatch && topicMatch && scientificAdviserMatch && avgMarkMatch && redDiplomMatch;
     });
     setSortedDefenders(filteredData);
   };
 
   return (
     <div className="my-5 px-5">
-      <>
+        <SearchStud filters={filters} handleFilterChange={handleFilterChange} /> 
         <Button variant="primary" className="mx-3" onClick={handleEditDefender} disabled={!activeRow}>
           Редактировать
         </Button>
         <Button variant="primary" className="mx-3" onClick={handleAddDefender}>
           Добавить
         </Button>
-      </>
-      <input
-        type="text"
-        className="form-control mb-3 my-3"
-        placeholder="Поиск..."
-        value={searchText}
-        onChange={handleSearch}
-      />
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
           <thead className="table-dark">
