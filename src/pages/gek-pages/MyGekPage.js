@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Card, ListGroup } from 'react-bootstrap';
 import axios from 'axios';
-import {jwtDecode} from 'jwt-decode'; // Correct import statement
+import {jwtDecode} from 'jwt-decode'; 
 
 const MyGekPage = () => {
   const [geks, setGeks] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) {
-      console.error('Token not found');
-      return;
-    }
-
     const decodedToken = jwtDecode(token);
     const id_U = decodedToken.id_U; // Extracting id_U from token
 
@@ -96,23 +91,21 @@ const MyGekPage = () => {
             <Card.Body>
               <Card.Title className="text-center fs-5">Направление</Card.Title>
               <ListGroup className="text-center">
-                <ListGroup.Item>{gek.directs.Name_direction || 'Unknown'}</ListGroup.Item>
+                <ListGroup.Item>{gek.directs.Name_direction || ''}</ListGroup.Item>
               </ListGroup>
               <Card.Title className="text-center fs-5">Состав</Card.Title>
               <ListGroup className="text-center">
                 {gek.compositions.map((comp, compIndex) => (
                   <ListGroup.Item key={compIndex}>
-                    {comp.member.Fullname || 'Unknown'} - {comp.member.Post || 'Unknown'}
+                    {comp.member.Fullname || ''} - {comp.member.Post || ''}
                   </ListGroup.Item>
                 ))}
               </ListGroup>
               <Card.Title className="text-center fs-5">Секретари</Card.Title>
               <ListGroup className="text-center">
-                <ListGroup.Item>{gek.secretary.Fullname || 'Unknown'}</ListGroup.Item>
+                <ListGroup.Item>{gek.secretary.Fullname || ''}</ListGroup.Item>
               </ListGroup>
             </Card.Body>
-            <Card.Footer className="text-left bg-light">
-            </Card.Footer>
           </Card>
         ))}
       </div>
