@@ -13,5 +13,6 @@ router.post('/create', [
 router.get('/', authMiddleware, roleMiddleware([3]), controller.getAllGecs)
 router.get('/UserGecs/:id', authMiddleware, roleMiddleware([4]), controller.getGecIdsByUserId)
 router.get('/SecretaryId/:id', authMiddleware, roleMiddleware([3]), controller.getSecretaryIdByGecId)
+router.get('/:id', authMiddleware, roleMiddleware([2,3,4]), controller.getGecById)
 
 module.exports = router

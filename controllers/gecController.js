@@ -86,6 +86,25 @@ class gecController {
             return res.status(500).json(e);
         }
     }
+    async getGecById(req, res) {
+        try {
+            const { id } = req.params;
+            if (!id) {
+                res.status(400).json({message: "Id не указан"})
+            }
+            const gec = await Gec.findOne({
+                where: {
+                    id_G: id
+                }
+            });
+            if (!gec) {
+                return res.status(404).json({ message: 'ГЭК не найдена' });
+            }
+            return res.json(gec)
+        } catch(e) {
+            return res.status(500).json(e)
+        }
+    }
 
 
 }
