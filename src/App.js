@@ -22,15 +22,6 @@ import './App.css';
 
 
 const App = () => {
-    // axios.get('/api/data') // замените '/api/data' на путь к вашему API на сервере
-    // .then(response => {
-    //   // Обработка полученных данных
-    //   console.log(response.data);
-    // })
-    // .catch(error => {
-    //   console.error('There was a problem with the fetch operation:', error);
-    // });
-    
     const PageLayout = ({ children }) => (
       <div>
         <Navigation />

@@ -68,7 +68,6 @@ const GekPage = () => {
     fetchGeks();
   }, []);
 
-  console.log(geks);
 
   return (
     <div className="container-fluid text-center my-3">

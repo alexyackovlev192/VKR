@@ -258,7 +258,7 @@
         })
       }));
       return schedulesByDate;
-    }, [uniqueDates, schedules, directions]);
+    }, [uniqueDates, uniqueDirections, directions, schedules]);
   
   return (
     <div className="schedule-container my-5 px-5">

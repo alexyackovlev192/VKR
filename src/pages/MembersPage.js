@@ -2,9 +2,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import UpdateMember from '../modal-windows/UpdateMember';
 import SearchMem from '../components/SearchMember'; 
-
 import './style-pages/MembersPage.css';
 
 const MembersPage = () => {
@@ -12,6 +12,7 @@ const MembersPage = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [formData, setFormData] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
@@ -27,6 +28,12 @@ const MembersPage = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      console.log(decodedToken.roles);
+      setUserRole(decodedToken.roles); // Assuming 'roles' is the key in the token containing the user's roles
+    }
+
     axios.get('http://localhost:5000/gecMembers', {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -137,46 +144,93 @@ const MembersPage = () => {
     setSortedMembers(filteredData);
   };
 
+  // Function to render content based on user role
+  const renderContentByRole = () => {
+    if (!userRole) return null;
+
+    // Assuming userRole is an array of roles
+    if (userRole.includes(3)) {
+      return (
+        <>
+          <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>
+            Редактировать
+          </Button>
+          <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+            <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
+              <thead className="table-dark">
+                <tr>
+                  <th>№</th>
+                  <th onClick={() => sortData('Fullname')}>ФИО{renderSortArrow('Fullname')}</th>
+                  <th onClick={() => sortData('Post')}>Должность{renderSortArrow('Post')}</th>
+                  <th onClick={() => sortData('Mail')}>Почта{renderSortArrow('Mail')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedMembers.map((member, index) => (
+                  <tr
+                    key={member.id}
+                    className={activeRow === member ? 'table-info' : 'table-light'}
+                    onClick={() => handleRowClick(member)}
+                  >
+                    <td>{index + 1}</td>
+                    <td>{member.Fullname}</td>
+                    <td>{member.Post}</td>
+                    <td>{member.Mail}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <UpdateMember
+            members={members}
+            showModal={showUpdateModal}
+            handleCloseModal={handleCloseModal}
+            formData={formData}
+            handleInputChange={handleInputChange}
+            handleSaveChanges={handleSaveUpdateMembers}
+          />
+        </>
+      );
+    } else if (userRole.includes(2)) {
+      return (
+        <>
+          <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+            <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
+              <thead className="table-dark">
+                <tr>
+                  <th>№</th>
+                  <th onClick={() => sortData('Fullname')}>ФИО{renderSortArrow('Fullname')}</th>
+                  <th onClick={() => sortData('Post')}>Должность{renderSortArrow('Post')}</th>
+                  <th onClick={() => sortData('Mail')}>Почта{renderSortArrow('Mail')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedMembers.map((member, index) => (
+                  <tr
+                    key={member.id}
+                    className={activeRow === member ? 'table-info' : 'table-light'}
+                    onClick={() => handleRowClick(member)}
+                  >
+                    <td>{index + 1}</td>
+                    <td>{member.Fullname}</td>
+                    <td>{member.Post}</td>
+                    <td>{member.Mail}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      );
+    } else {
+      return <div>У вас нет доступа к этой странице</div>;
+    }
+  };
+
   return (
     <div className="my-5 px-5">
       <SearchMem filters={filters} handleFilterChange={handleFilterChange} /> 
-      <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>
-        Редактировать
-      </Button>
-      <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-        <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
-          <thead className="table-dark">
-            <tr>
-              <th>№</th>
-              <th onClick={() => sortData('Fullname')}>ФИО{renderSortArrow('Fullname')}</th>
-              <th onClick={() => sortData('Post')}>Должность{renderSortArrow('Post')}</th>
-              <th onClick={() => sortData('Mail')}>Почта{renderSortArrow('Mail')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedMembers.map((member, index) => (
-              <tr
-                key={member.id}
-                className={activeRow === member ? 'table-info' : 'table-light'}
-                onClick={() => handleRowClick(member)}
-              >
-                <td>{index + 1}</td>
-                <td>{member.Fullname}</td>
-                <td>{member.Post}</td>
-                <td>{member.Mail}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <UpdateMember
-        members={members}
-        showModal={showUpdateModal}
-        handleCloseModal={handleCloseModal}
-        formData={formData}
-        handleInputChange={handleInputChange}
-        handleSaveChanges={handleSaveUpdateMembers}
-      />
+      {renderContentByRole()}
     </div>
   );
 };

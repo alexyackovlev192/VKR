@@ -1,30 +1,114 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Card, ListGroup } from 'react-bootstrap';
-import geksData from '../../data/geksData.json';
+import React, { useState, useEffect } from 'react';
+import { Card, ListGroup } from 'react-bootstrap';
+import axios from 'axios';
+import {jwtDecode} from 'jwt-decode'; // Correct import statement
 
 const MyGekPage = () => {
+  const [geks, setGeks] = useState([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('Token not found');
+      return;
+    }
+
+    const decodedToken = jwtDecode(token);
+    const id_U = decodedToken.id_U; // Extracting id_U from token
+
+    const fetchGeks = async () => {
+      try {
+        const gekResponse = await axios.get(`http://localhost:5000/gecComposition/UserGecs/${id_U}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const detailedGeks = await Promise.all(gekResponse.data.map(async (gek) => {
+          try {
+            // Fetch detailed GEC information
+            const detailedGekResponse = await axios.get(`http://localhost:5000/gecs/${gek.id_G}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+
+            const detailedGek = detailedGekResponse.data;
+
+            // Fetch compositions
+            const compResponse = await axios.get(`http://localhost:5000/gecComposition/${gek.id_G}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+
+            const compositions = await Promise.all(compResponse.data.map(async (comp) => {
+              const memberResponse = await axios.get(`http://localhost:5000/users/${comp.id_U}`, {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+              return { ...comp, member: memberResponse.data || {} };
+            }));
+
+            // Fetch directions
+            const directsResponse = await axios.get(`http://localhost:5000/directions/${detailedGek.id_D}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+
+            // Fetch secretaries
+            const secretariesResponse = await axios.get(`http://localhost:5000/users/${detailedGek.id_U}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+
+            return { 
+              ...detailedGek, 
+              compositions, 
+              directs: directsResponse.data || {},
+              secretary: secretariesResponse.data || {}
+            };
+          } catch (error) {
+            console.error('Error loading detailed GEC data:', error);
+            return { ...gek, compositions: [], directs: {}, secretary: {} };
+          }
+        }));
+
+        setGeks(detailedGeks);
+      } catch (error) {
+        console.error('Error loading GECs:', error);
+      }
+    };
+
+    fetchGeks();
+  }, []);
 
   return (
     <div className="container-fluid text-center my-3">
-    <h4 className="col-12">Мои ГЭК</h4>
+      <h4 className="col-12">Мои ГЭК</h4>
       <div className="row justify-content-evenly">
-        {geksData.map(gekData => (
-        gekData.id % 2 === 1 &&
-          <Card key={gekData.id} style={{ minWidth: '400px', width: '30%' }} className="col-4 my-4 text-center bg-light">
-            <Card.Header className="fs-4 bg-light" >ГЭК №{gekData.number}</Card.Header>
-            <Card.Body> 
+        {geks.map((gek, index) => (
+          <Card key={index} style={{ minWidth: '400px', width: '30%' }} className="col-4 my-4 text-center bg-light">
+            <Card.Header className="fs-4 bg-light">ГЭК №{gek.id_G}</Card.Header>
+            <Card.Body>
+              <Card.Title className="text-center fs-5">Направление</Card.Title>
+              <ListGroup className="text-center">
+                <ListGroup.Item>{gek.directs.Name_direction || 'Unknown'}</ListGroup.Item>
+              </ListGroup>
               <Card.Title className="text-center fs-5">Состав</Card.Title>
               <ListGroup className="text-center">
-                {gekData.members.map((member, index) => (
-                  <ListGroup.Item key={index}>{member.name} - {member.position}</ListGroup.Item>
+                {gek.compositions.map((comp, compIndex) => (
+                  <ListGroup.Item key={compIndex}>
+                    {comp.member.Fullname || 'Unknown'} - {comp.member.Post || 'Unknown'}
+                  </ListGroup.Item>
                 ))}
               </ListGroup>
               <Card.Title className="text-center fs-5">Секретари</Card.Title>
               <ListGroup className="text-center">
-                {gekData.secretaries.map((secretary, index) => (
-                  <ListGroup.Item key={index}>{secretary.name}</ListGroup.Item>
-                ))}
+                <ListGroup.Item>{gek.secretary.Fullname || 'Unknown'}</ListGroup.Item>
               </ListGroup>
             </Card.Body>
             <Card.Footer className="text-left bg-light">

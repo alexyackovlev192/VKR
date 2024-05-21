@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
@@ -164,7 +165,7 @@ const DefendersPage = () => {
       const groupMatch = defender.Group ? defender.Group.toLowerCase().includes(group.toLowerCase()) : true;
       const topicMatch = defender.Topic ? defender.Topic.toLowerCase().includes(topic.toLowerCase()) : true;
       const scientificAdviserMatch = defender.ScientificAdviser ? defender.ScientificAdviser.toLowerCase().includes(scientificAdviser.toLowerCase()) : true;
-      const avgMarkMatch = avgMark ? defender.Avg_Mark == parseFloat(avgMark) : true;
+      const avgMarkMatch = avgMark ? defender.Avg_Mark === parseFloat(avgMark) : true;
       const redDiplomMatch = redDiplom === '' ? true : (defender.Red_Diplom ? 'Да' : 'Нет') === redDiplom;
       return fullnameMatch && groupMatch && topicMatch && scientificAdviserMatch && avgMarkMatch && redDiplomMatch;
     });
