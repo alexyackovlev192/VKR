@@ -68,9 +68,6 @@ const CreateGekAddMemberPage = () => {
             const memberIds = membersGek.map(m => m.id_U);
             const secretaryId = 8;
             
-            console.log(formData);
-            console.log(memberIds);
-            
             const gecCompositionResponse = await axios.put(`http://localhost:5000/gecComposition/${id_G}`, { memberIds, secretaryId }, {
                 headers: {
                     'Authorization': `Bearer ${token}`

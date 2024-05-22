@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -11,6 +11,8 @@ const OpenMySchedulePage = () => {
     const [sortOrder, setSortOrder] = useState('asc');
     const [defenders, setDefenders] = useState([]);
     const [filteredDefenders, setFilteredDefenders] = useState([]);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchData();
@@ -70,6 +72,12 @@ const OpenMySchedulePage = () => {
         return null;
     };
 
+    const handleClickButton = (d) => {
+        //не работает т.к. id_DSS не существует
+        localStorage.setItem('id_DSS', d.id_DSS); 
+        navigate(`/defender-schedule/${d.id_S}`);
+    }
+
     return (
         <div className="container-fluid text-center my-3">
             <h4 className="col-12">Мои защиты</h4>
@@ -104,9 +112,7 @@ const OpenMySchedulePage = () => {
                                 <td>{defender.publRec ? 'Да' : ''}</td>
                                 <td>{defender.result}</td>
                                 <td>
-                                    <Link to={`/defender-schedule/${defender.id_S}`}>
-                                        <Button variant="primary">Начать</Button>
-                                    </Link>
+                                    <Button variant="primary" onClick={() => handleClickButton(defender)}>Начать</Button>
                                 </td>
                             </tr>
                         ))}

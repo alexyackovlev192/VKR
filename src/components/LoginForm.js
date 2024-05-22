@@ -16,9 +16,7 @@ const LoginPage = () => {
         Password: password
       });
       const token = response.data.token;
-      // Сохраняем токен в localStorage
       localStorage.setItem('token', token);
-      // Переходим на главную страницу
       navigate('/main');
     } catch (error) {
       console.error('Ошибка при авторизации:', error);

@@ -8,6 +8,9 @@ const DefenderSchedulePage = () => {
     const { id_S } = useParams();
     const [defenderData, setDefenderData] = useState(null);
     const [ratings, setRatings] = useState({});
+
+    const id_U = localStorage.getItem('id_U');
+    const id_DSS = localStorage.getItem('id_DSS');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -45,8 +48,8 @@ const DefenderSchedulePage = () => {
     const handleSave = async () => {
         const token = localStorage.getItem('token');
         const dataToSave = {
-            id_DSS: 9,
-            id_U: 11,
+            id_DSS: id_DSS,
+            id_U: id_U,
             scores: Object.values(ratings),
             RecMagistracy: defenderData.magRec ? 'Да' : 'Нет',
             RecPublication: defenderData.publRec ? 'Да' : 'Нет'
@@ -59,6 +62,8 @@ const DefenderSchedulePage = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            localStorage.removeItem('id_DSS');
+            localStorage.removeItem('id_U');
             navigate('/my-schedule/5');
         } catch (error) {
             console.error('Error saving data:', error);

@@ -13,6 +13,7 @@ const MySchedulePage = () => {
         const token = localStorage.getItem('token');
         const decodedToken = jwtDecode(token);
         const id_U = decodedToken.id_U;
+        localStorage.setItem('id_U', id_U);
 
         const fetchSchedules = async () => {
             try {
@@ -49,7 +50,7 @@ const MySchedulePage = () => {
                 
                 const flattenedScheduleDetails = schedulesWithDetails.flat().sort((a, b) => new Date(a.date) - new Date(b.date));
                 setScheduleDetails(flattenedScheduleDetails);
-                console.log(flattenedScheduleDetails[1].id_DS);
+                console.log(flattenedScheduleDetails);
             } catch (error) {
                 console.error('Error loading schedules:', error);
             }
