@@ -12,7 +12,7 @@ const MySchedulePage = () => {
     useEffect(() => {
         const token = localStorage.getItem('token');
         const decodedToken = jwtDecode(token);
-        const id_U = decodedToken.id_U; 
+        const id_U = decodedToken.id_U;
 
         const fetchSchedules = async () => {
             try {
@@ -31,7 +31,6 @@ const MySchedulePage = () => {
 
                     const defenseSchedules = detailedGekResponse.data;
 
-                    // Fetch directions for each defense schedule
                     const schedulesWithDirections = await Promise.all(defenseSchedules.map(async (schedule) => {
                         const directionResponse = await axios.get(`http://localhost:5000/directions/${schedule.id_D}`, {
                             headers: {
@@ -47,9 +46,10 @@ const MySchedulePage = () => {
 
                     return schedulesWithDirections;
                 }));
-
-                console.log(schedulesWithDetails);
-                setScheduleDetails(schedulesWithDetails);
+                
+                // Flatten and sort the schedule details by date
+                const flattenedScheduleDetails = schedulesWithDetails.flat().sort((a, b) => new Date(a.date) - new Date(b.date));
+                setScheduleDetails(flattenedScheduleDetails);
             } catch (error) {
                 console.error('Error loading schedules:', error);
             }
@@ -58,24 +58,21 @@ const MySchedulePage = () => {
         fetchSchedules();
     }, []);
 
-    // Flattening the array of arrays for rendering purposes
-    const flattenedScheduleDetails = scheduleDetails.flat();
-
     return (
         <div className="container-fluid text-center my-3">
             <h4 className="col-12">Мои защиты</h4>
             <div className="row justify-content-evenly col-12 mx-3">
-                {flattenedScheduleDetails.map((item, index) => (
+                {scheduleDetails.map((item, index) => (
                     <Card key={index} className="col-2 mx-2 my-4 text-center bg-light">
                         <Card.Body>
                             <Card.Title>{new Date(item.date).toLocaleDateString('ru', { day: '2-digit', month: '2-digit' })}</Card.Title>
                             <Card.Text>
-                                <div>
+                                <span>
                                     <p>ГЭК №{item.id_G}</p>
                                     <p>Время: {item.time}</p>
                                     <p>Направление: {item.Name_direction}</p>
                                     <p>Аудитория: {item.classroom}</p>
-                                </div>
+                                </span>
                             </Card.Text>
                             <Link to={`/my-schedule/${item.id}`} className="col-1">
                                 <Button variant="primary">Начать</Button>

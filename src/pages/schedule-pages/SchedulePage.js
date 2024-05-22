@@ -351,12 +351,12 @@ const TableView = ({ uniqueDates, uniqueDirections, filteredSchedules, handleSel
                       style={{ height: '180px', verticalAlign: 'middle' }}
                     >
                       {sched ? (
-                        <div>
+                        <span>
                           <p>ГЭК №{sched.id_G}</p>
                           <p>Время: {sched.time}</p>
                           <p>Направление: {sched.Name_direction}</p>
                           <p>Аудитория: {sched.classroom}</p>
-                        </div>
+                        </span>
                       ) : ("")}
                     </td>
                   );
