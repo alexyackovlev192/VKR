@@ -1,26 +1,31 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
-import { Form } from 'react-bootstrap';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 
 const DefenderSchedulePage = () => {
     const { id_S } = useParams();
     const [defenderData, setDefenderData] = useState(null);
+    const [ratings, setRatings] = useState({});
+    const navigate = useNavigate();
 
     useEffect(() => {
-        console.log(id_S);
         fetchData();
     }, [id_S]);
 
     const fetchData = async () => {
         const token = localStorage.getItem('token');
-        const studentResponse = await axios.get(`http://localhost:5000/students/${id_S}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        setDefenderData(studentResponse.data);
+        try {
+            const studentResponse = await axios.get(`http://localhost:5000/students/${id_S}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            setDefenderData(studentResponse.data);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     };
 
     const handleRecChange = useCallback((field, value) => {
@@ -31,11 +36,34 @@ const DefenderSchedulePage = () => {
     }, []);
 
     const handleRatingChange = useCallback((criteria, value) => {
-        setDefenderData(prevState => ({
-            ...prevState,
+        setRatings(prevRatings => ({
+            ...prevRatings,
             [criteria]: value
         }));
     }, []);
+
+    const handleSave = async () => {
+        const token = localStorage.getItem('token');
+        const dataToSave = {
+            id_DSS: 9,
+            id_U: 11,
+            scores: Object.values(ratings),
+            RecMagistracy: defenderData.magRec ? 'Да' : 'Нет',
+            RecPublication: defenderData.publRec ? 'Да' : 'Нет'
+        };
+
+        try {
+            console.log(dataToSave);
+            await axios.post(`http://localhost:5000/resultComissionMember/create`, dataToSave, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            navigate('/my-schedule/5');
+        } catch (error) {
+            console.error('Error saving data:', error);
+        }
+    };
 
     const RatingCriteria = ({ criteria }) => {
         const ratingOptions = [5, 4, 3, 2];
@@ -53,7 +81,7 @@ const DefenderSchedulePage = () => {
                                 type="radio"
                                 label={option.toString()}
                                 name={`rating-${criteria}`}
-                                checked={defenderData[criteria] === option}
+                                checked={ratings[criteria] === option}
                                 onChange={() => handleRatingChange(criteria, option)}
                             />
                         ))}
@@ -119,6 +147,8 @@ const DefenderSchedulePage = () => {
                     <RatingCriteria criteria="Сложность работы" />
                     <RatingCriteria criteria="Возможность развития" />
                 </div>
+
+                <Button onClick={handleSave} className="mt-3" variant="primary">Сохранить</Button>
             </div>
         </div>
     );

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate  } from 'react-router-dom';
 import axios from 'axios';
@@ -10,7 +11,7 @@ const CreateGekAddMemberPage = () => {
       });
     const [membersGek, setMembersGek] = useState([]);
     const [allMembersGek, setAllMembersGek] = useState([]);
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     useEffect(() => {
         fetchData();
     }, []);

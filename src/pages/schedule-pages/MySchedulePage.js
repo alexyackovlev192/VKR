@@ -47,7 +47,6 @@ const MySchedulePage = () => {
                     return schedulesWithDirections;
                 }));
                 
-                // Flatten and sort the schedule details by date
                 const flattenedScheduleDetails = schedulesWithDetails.flat().sort((a, b) => new Date(a.date) - new Date(b.date));
                 setScheduleDetails(flattenedScheduleDetails);
                 console.log(flattenedScheduleDetails[1].id_DS);
