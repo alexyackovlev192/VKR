@@ -1,31 +1,43 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Form } from 'react-bootstrap';
-
-import defendersData from '../../data/defendersData.json';
+import axios from 'axios';
 
 const DefenderSchedulePage = () => {
-    const { defId } = useParams();
-    const [defenders, setDefenders] = useState([]);
+    const { id_S } = useParams();
+    const [defenderData, setDefenderData] = useState(null);
 
     useEffect(() => {
-        const defs = defendersData.filter(def => def.id === parseInt(defId));
-        setDefenders(defs || []);
-    }, [defId]);
+        console.log(id_S);
+        fetchData();
+    }, [id_S]);
 
-    const handleRecChange = useCallback((index, field, value) => {
-        const updatedDefenders = [...defenders];
-        updatedDefenders[index][field] = value;
-        setDefenders(updatedDefenders);
-    }, [defenders]);
+    const fetchData = async () => {
+        const token = localStorage.getItem('token');
+        const studentResponse = await axios.get(`http://localhost:5000/students/${id_S}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        setDefenderData(studentResponse.data);
+    };
 
-    const handleRatingChange = useCallback((index, criteria, value) => {
-        const updatedDefenders = [...defenders];
-        updatedDefenders[index][criteria] = value;
-        setDefenders(updatedDefenders);
-    }, [defenders]);
+    const handleRecChange = useCallback((field, value) => {
+        setDefenderData(prevState => ({
+            ...prevState,
+            [field]: value
+        }));
+    }, []);
 
-    const RatingCriteria = ({ index, criteria }) => {
+    const handleRatingChange = useCallback((criteria, value) => {
+        setDefenderData(prevState => ({
+            ...prevState,
+            [criteria]: value
+        }));
+    }, []);
+
+    const RatingCriteria = ({ criteria }) => {
         const ratingOptions = [5, 4, 3, 2];
 
         return (
@@ -40,9 +52,9 @@ const DefenderSchedulePage = () => {
                                 inline
                                 type="radio"
                                 label={option.toString()}
-                                name={`rating-${index}-${criteria}`}
-                                checked={defenders[index][criteria] === option}
-                                onChange={() => handleRatingChange(index, criteria, option)}
+                                name={`rating-${criteria}`}
+                                checked={defenderData[criteria] === option}
+                                onChange={() => handleRatingChange(criteria, option)}
                             />
                         ))}
                     </Form.Group>
@@ -50,6 +62,10 @@ const DefenderSchedulePage = () => {
             </div>
         );
     };
+
+    if (!defenderData) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="container-fluid text-center my-3">
@@ -71,42 +87,38 @@ const DefenderSchedulePage = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {defenders.map((defender, index) => (
-                            <tr key={defender.id}>
-                                <td>{index + 1}</td>
-                                <td>{defender.name}</td>
-                                <td>{defender.group}</td>
-                                <td>{defender.topic}</td>
-                                <td>{defender.supervisor}</td>
-                                <td>{defender.averageGrade}</td>
-                                <td>{defender.hasHonors ? 'Да' : 'Нет'}</td>
-                                <td>
-                                    <Form.Check
-                                        type="checkbox"
-                                        checked={defender.magRec}
-                                        onChange={(e) => handleRecChange(index, 'magRec', e.target.checked)}
-                                    />
-                                </td>
-                                <td>
-                                    <Form.Check
-                                        type="checkbox"
-                                        checked={defender.publRec}
-                                        onChange={(e) => handleRecChange(index, 'publRec', e.target.checked)}
-                                    />
-                                </td>
-                                <td>{defender.result}</td>
-                            </tr>
-                        ))}
+                        <tr key={defenderData.id}>
+                            <td>1</td>
+                            <td>{defenderData.Fullname}</td>
+                            <td>{defenderData.Group}</td>
+                            <td>{defenderData.Topic}</td>
+                            <td>{defenderData.ScientificAdviser}</td>
+                            <td>{defenderData.Avg_Mark}</td>
+                            <td>{defenderData.Red_Diplom ? 'Да' : 'Нет'}</td>
+                            <td>
+                                <Form.Check
+                                    type="checkbox"
+                                    checked={defenderData.magRec}
+                                    onChange={(e) => handleRecChange('magRec', e.target.checked)}
+                                />
+                            </td>
+                            <td>
+                                <Form.Check
+                                    type="checkbox"
+                                    checked={defenderData.publRec}
+                                    onChange={(e) => handleRecChange('publRec', e.target.checked)}
+                                />
+                            </td>
+                            <td>{defenderData.result}</td>
+                        </tr>
                     </tbody>
                 </table>
 
-                {defenders.map((_, index) => (
-                    <div key={index}>
-                        <RatingCriteria index={index} criteria="Актуальность" />
-                        <RatingCriteria index={index} criteria="Сложность работы" />
-                        <RatingCriteria index={index} criteria="Возможность развития" />
-                    </div>
-                ))}
+                <div>
+                    <RatingCriteria criteria="Актуальность" />
+                    <RatingCriteria criteria="Сложность работы" />
+                    <RatingCriteria criteria="Возможность развития" />
+                </div>
             </div>
         </div>
     );

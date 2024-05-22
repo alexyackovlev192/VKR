@@ -50,11 +50,11 @@ const MySchedulePage = () => {
                 // Flatten and sort the schedule details by date
                 const flattenedScheduleDetails = schedulesWithDetails.flat().sort((a, b) => new Date(a.date) - new Date(b.date));
                 setScheduleDetails(flattenedScheduleDetails);
+                console.log(flattenedScheduleDetails[1].id_DS);
             } catch (error) {
                 console.error('Error loading schedules:', error);
             }
         };
-
         fetchSchedules();
     }, []);
 
@@ -74,7 +74,7 @@ const MySchedulePage = () => {
                                     <p>Аудитория: {item.classroom}</p>
                                 </span>
                             </Card.Text>
-                            <Link to={`/my-schedule/${item.id}`} className="col-1">
+                            <Link to={`/my-schedule/${item.id_DS}`} className="col-1">
                                 <Button variant="primary">Начать</Button>
                             </Link>
                         </Card.Body>
