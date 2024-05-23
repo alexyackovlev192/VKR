@@ -37,7 +37,7 @@ const App = () => {
                 <Route path="/members" element={<PageLayout><MembersPage /></PageLayout>} />
                 <Route path="/schedule" element={<PageLayout><SchedulePage /></PageLayout>} />
                 <Route path="/my-schedule" element={<PageLayout><MySchedulePage /></PageLayout>} />
-                <Route path="/my-schedule/:scheduleId" element={<PageLayout><OpenMySchedulePage /></PageLayout>} />
+                <Route path="/my-schedule/:id_DS" element={<PageLayout><OpenMySchedulePage /></PageLayout>} />
                 <Route path="/defender-schedule/:id_S" element={<PageLayout><DefenderSchedulePage /></PageLayout>} />
                 <Route path="/my-gek" element={<PageLayout><MyGekPage /></PageLayout>} />
                 <Route path="/gek" element={<PageLayout><GekPage /></PageLayout>} />

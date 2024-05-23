@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'react-bootstrap';
 import axios from 'axios';
 
 const OpenMySchedulePage = () => {
-    const { scheduleId } = useParams();
-  
+    const { id_DS } = useParams();
+
     const [sortColumn, setSortColumn] = useState(null);
     const [sortOrder, setSortOrder] = useState('asc');
     const [defenders, setDefenders] = useState([]);
@@ -16,29 +16,61 @@ const OpenMySchedulePage = () => {
 
     useEffect(() => {
         fetchData();
-    }, [scheduleId]);
+    }, [id_DS]);
 
     const fetchData = async () => {
         const token = localStorage.getItem('token');
+        const id_U = localStorage.getItem('id_U');
+
         try {
-            const scheduleResponse = await axios.get(`http://localhost:5000/defenseScheduleStudents/${scheduleId}`, {
+            const scheduleResponse = await axios.get(`http://localhost:5000/defenseScheduleStudents/${id_DS}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
 
-            const studentIds = scheduleResponse.data.map(s => s.id_S);
-            const studentResponses = await Promise.all(studentIds.map(id =>
-                axios.get(`http://localhost:5000/students/${id}`, {
+            const studentScheduleData = scheduleResponse.data;
+
+            const studentResponses = await Promise.all(studentScheduleData.map(s =>
+                axios.get(`http://localhost:5000/students/${s.id_S}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
+                }).then(async res => {
+                    const studentData = res.data;
+                    let resultData = null;
+                    try {
+                        const resultResponse = await axios.get(`http://localhost:5000/resultComissionMember/${s.id_DSS}/${id_U}`, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        resultData = resultResponse.data;
+                    } catch (error) {
+                        console.error('Error fetching resultComissionMember data: ', error);
+                    }
+                    return { ...studentData, id_DSS: s.id_DSS, ...resultData };
                 })
             ));
-            
-            const students = studentResponses.map(response => response.data);
-            setDefenders(students.flat());
-            setFilteredDefenders(students.flat());
+
+            const students = studentResponses.map(defender => {
+                if (!defender.resultData) {
+                    return {
+                        ...defender,
+                        resultData: {
+                            RecMagistracy: null,
+                            RecPublication: null,
+                            Result: null
+                        }
+                    };
+                }
+                return defender;
+            });
+
+
+            console.log(students);
+            setDefenders(students);
+            setFilteredDefenders(students);
         } catch (error) {
             console.error('Error fetching data: ', error);
         }
@@ -73,10 +105,9 @@ const OpenMySchedulePage = () => {
     };
 
     const handleClickButton = (d) => {
-        //не работает т.к. id_DSS не существует
-        localStorage.setItem('id_DSS', d.id_DSS); 
+        localStorage.setItem('id_DSS', d.id_DSS);
         navigate(`/defender-schedule/${d.id_S}`);
-    }
+    };
 
     return (
         <div className="container-fluid text-center my-3">
@@ -108,9 +139,9 @@ const OpenMySchedulePage = () => {
                                 <td>{defender.ScientificAdviser}</td>
                                 <td>{defender.Avg_Mark}</td>
                                 <td>{defender.Red_Diplom ? 'Да' : 'Нет'}</td>
-                                <td>{defender.magRec ? 'Да' : ''}</td>
-                                <td>{defender.publRec ? 'Да' : ''}</td>
-                                <td>{defender.result}</td>
+                                <td>{defender.RecMagistracy ? defender.RecMagistracy : ''}</td>
+                                <td>{defender.RecPublication ? defender.RecPublication : ''}</td>
+                                <td>{defender.Result}</td>
                                 <td>
                                     <Button variant="primary" onClick={() => handleClickButton(defender)}>Начать</Button>
                                 </td>

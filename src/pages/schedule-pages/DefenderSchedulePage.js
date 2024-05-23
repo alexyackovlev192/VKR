@@ -63,7 +63,6 @@ const DefenderSchedulePage = () => {
                 }
             });
             localStorage.removeItem('id_DSS');
-            localStorage.removeItem('id_U');
             navigate('/my-schedule/5');
         } catch (error) {
             console.error('Error saving data:', error);
