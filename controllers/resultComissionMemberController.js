@@ -95,11 +95,10 @@ class resultComissionMemberController {
             if (!errors.isEmpty()) {
                 return res.status(400).json({message:"Ошибка при получении результата защиты студента, поставленного членом ГЭК", errors})
             }
-            const { id } = req.params;
-            if (!id) {
-                res.status(400).json({message: "Id не указан"})
+            const { id, id_U } = req.params; 
+            if (!id || !id_U) {
+                return res.status(400).json({message: "Id или id_U не указаны"})
             }
-            const {id_U} = req.body
             const resultFromMemberGec = await ResultComissionMember.findOne({ where: { id_DSS: id, id_U: id_U } });
             if (!resultFromMemberGec) {
                 return res.status(404).json({ message: 'Результат защиты студента, поставленный членом ГЭК, не найден' });
