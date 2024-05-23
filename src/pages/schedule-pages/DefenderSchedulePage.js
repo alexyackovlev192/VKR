@@ -115,7 +115,6 @@ const DefenderSchedulePage = () => {
                             <th>Красный диплом</th>
                             <th>Рекомендация в магистратуру</th>
                             <th>Рекомендация к публикации</th>
-                            <th>Оценка</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -141,7 +140,6 @@ const DefenderSchedulePage = () => {
                                     onChange={(e) => handleRecChange('publRec', e.target.checked)}
                                 />
                             </td>
-                            <td>{defenderData.result}</td>
                         </tr>
                     </tbody>
                 </table>

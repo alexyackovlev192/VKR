@@ -67,7 +67,6 @@ const OpenMySchedulePage = () => {
                 return defender;
             });
 
-
             console.log(students);
             setDefenders(students);
             setFilteredDefenders(students);
@@ -143,7 +142,13 @@ const OpenMySchedulePage = () => {
                                 <td>{defender.RecPublication ? defender.RecPublication : ''}</td>
                                 <td>{defender.Result}</td>
                                 <td>
-                                    <Button variant="primary" onClick={() => handleClickButton(defender)}>Начать</Button>
+                                    <Button 
+                                        variant="primary" 
+                                        onClick={() => handleClickButton(defender)} 
+                                        disabled={defender.RecMagistracy && defender.RecPublication && defender.Result}
+                                    >
+                                        {defender.RecMagistracy && defender.RecPublication && defender.Result ? 'Проведена' : 'Начать'}
+                                    </Button>
                                 </td>
                             </tr>
                         ))}

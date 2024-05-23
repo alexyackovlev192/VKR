@@ -74,7 +74,7 @@ const MySchedulePage = () => {
                                 </span>
                             </Card.Text>
                             <Link to={`/my-schedule/${item.id_DS}`} className="col-1">
-                                <Button variant="primary">Начать</Button>
+                                <Button variant="primary">Открыть</Button>
                             </Link>
                         </Card.Body>
                     </Card>
