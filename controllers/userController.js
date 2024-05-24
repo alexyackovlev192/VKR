@@ -106,7 +106,10 @@ class userController {
     
                 usersWithRoles.push({
                     id_U: user.id_U,
+                    Login: user.Login,
                     Fullname: user.Fullname,
+                    Post: user.Post,
+                    Mail: user.Mail,
                     roles: roles
                 });
             }
