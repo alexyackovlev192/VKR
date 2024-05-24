@@ -5,6 +5,11 @@ import './style-components/Navigation.css';
 import { Nav } from 'react-bootstrap';
 
 const navigationItems = {
+  1: [
+    { href: "/", text: "Главная" },
+    { href: "/users", text: "Админка" },
+    { href: "/logout", text: "Выход" }
+  ],
   2: [
     { href: "/", text: "Главная" },
     { href: "/my-schedule", text: "Мои защиты" },

@@ -8,6 +8,7 @@ import OpenMySchedulePage from './pages/schedule-pages/OpenMySchedulePage';
 import DefenderSchedulePage from './pages/schedule-pages/DefenderSchedulePage';
 import GekPage from './pages/gek-pages/GekPage';
 import MyGekPage from './pages/gek-pages/MyGekPage';
+import UsersPage from './pages/UsersPage';
 import EditGekPage from './pages/gek-pages/EditGekPage';
 import CreateGekPage from './pages/gek-pages/CreateGekPage';
 import CreateGekAddMemberPage from './pages/gek-pages/CreateGekAddMembersPage';
@@ -32,8 +33,9 @@ const App = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<Navigate to="/auth" />} />
-                <Route path="/main" element={<PageLayout><HomePage /></PageLayout>} />
                 <Route path="/auth" element={<LoginForm />} />
+                <Route path="/users" element={<PageLayout><UsersPage /></PageLayout>} />
+                <Route path="/main" element={<PageLayout><HomePage /></PageLayout>} />
                 <Route path="/members" element={<PageLayout><MembersPage /></PageLayout>} />
                 <Route path="/schedule" element={<PageLayout><SchedulePage /></PageLayout>} />
                 <Route path="/my-schedule" element={<PageLayout><MySchedulePage /></PageLayout>} />
