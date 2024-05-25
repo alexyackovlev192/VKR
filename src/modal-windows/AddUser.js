@@ -2,29 +2,29 @@ import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import UserForm from '../forms/UserForm';
 
-const UpdateUser = ({
+const AddUser = ({
   showModal,
   handleCloseModal,
   handleInputChange,
   handleSaveChanges,
   formData
 }) => {
+  const onSave = () => {
+    handleSaveChanges(formData);
+  };
+
   return (
     <Modal show={showModal} onHide={handleCloseModal}>
       <Modal.Header closeButton>
-        <Modal.Title>Редактирование ролей пользователя</Modal.Title>
+        <Modal.Title>Создание нового пользователя</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
-        <UserForm 
-          formData={formData} 
-          handleInputChange={handleInputChange}
-          isEditMode={true} 
-        />
+        <UserForm formData={formData} handleInputChange={handleInputChange} />
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="primary" onClick={() => handleSaveChanges(formData)}>
+        <Button variant="primary" onClick={onSave}>
           Сохранить изменения
         </Button>
         <Button variant="secondary" onClick={handleCloseModal}>
@@ -35,4 +35,4 @@ const UpdateUser = ({
   );
 };
 
-export default UpdateUser;
+export default AddUser;

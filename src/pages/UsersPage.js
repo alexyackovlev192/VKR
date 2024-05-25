@@ -1,19 +1,20 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
 import UpdateUser from '../modal-windows/UpdateUser';
-import SearchUser from '../components/SearchUser'; 
+import AddUser from '../modal-windows/AddUser';
+import SearchUser from '../components/SearchUser';
 import './style-pages/UsersPage.css';
 
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [formData, setFormData] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [formData, setFormData] = useState({});
   const [activeRow, setActiveRow] = useState(null);
   const [userRole, setUserRole] = useState(null);
-  
+
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
   const [sortedUsers, setSortedUsers] = useState([]);
@@ -28,12 +29,16 @@ const UsersPage = () => {
   const tableRef = useRef(null);
 
   useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = () => {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken = jwtDecode(token);
       setUserRole(decodedToken.roles);
     }
-  
+
     axios.get('http://localhost:5000/admin/users', {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -44,10 +49,9 @@ const UsersPage = () => {
         if (user.roles && user.roles.length > 0) {
           const roles = await Promise.all(user.roles.map(async roleId => {
             const token = localStorage.getItem('token');
-            
             const roleResponse = await axios.get(`http://localhost:5000/roles/${roleId}`, {
               headers: {
-                'Authorization': `Bearer ${token}` 
+                'Authorization': `Bearer ${token}`
               }
             });
             return roleResponse.data.Name_role;
@@ -63,7 +67,7 @@ const UsersPage = () => {
       });
     })
     .catch(error => console.error('Ошибка при загрузке данных:', error));
-  }, []);
+  };
 
   useEffect(() => {
     handleSearch();
@@ -106,44 +110,22 @@ const UsersPage = () => {
     }
     return null;
   };
-  
+
   const handleRowClick = (user) => {
     setActiveRow(user);
   };
 
   const handleCloseModal = () => {
+    setShowAddModal(false);
     setShowUpdateModal(false);
     setFormData(null);
   };
 
-  const handleEditUser = () => {
-    setFormData(activeRow);
-    setShowUpdateModal(true);
-  };
-
-  const handleSaveUpdateUsers = (formData) => {
-    const token = localStorage.getItem('token');
-    axios.put(`http://localhost:5000/admin/users/${formData.id_U}`, formData, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(response => {
-      console.log('Изменения информации о пользователе успешно сохранены:', response.data);
-      setUsers(prevUsers =>
-        prevUsers.map(user =>
-          user.id_U === formData.id_U ? { ...user, ...formData } : user
-        )
-      );
-      handleCloseModal();
-    })
-    .catch(error => console.error('Ошибка при сохранении изменений информации о пользователе:', error));
-  };
-
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+    const { name, value, checked, type } = e.target;
+    const newValue = type === 'checkbox' ? (checked ? [...(formData[name] || []), parseInt(value)] : formData[name].filter(role => role !== parseInt(value))) : value;
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: newValue }));
+};
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -162,11 +144,68 @@ const UsersPage = () => {
     setSortedUsers(filteredData);
   };
 
+  const handleAddUser = () => {
+    setShowAddModal(true);
+    setFormData({});
+  };
+
+  const handleEditUser = () => {
+    setFormData(activeRow);
+    setShowUpdateModal(true);
+  };
+
+  const handleSaveUpdateUser = (formData) => {
+    const token = localStorage.getItem('token');
+    axios.put(`http://localhost:5000/admin/users/${formData.id_U}`, formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      console.log('Изменения информации о пользователе успешно сохранены:', response.data);
+      setUsers(prevUsers =>
+        prevUsers.map(user =>
+          user.id_U === formData.id_U ? { ...user, ...formData } : user
+        )
+      );
+      handleCloseModal();
+      fetchUsers(); // Обновление данных после успешного сохранения изменений
+    })
+    .catch(error => console.error('Ошибка при сохранении изменений информации о пользователе:', error));
+  };
+  
+  const handleSaveAddUser = (formData) => {
+    const token = localStorage.getItem('token');
+  
+    const sanitizedFormData = {
+      Fullname: formData.Fullname,
+      Login: formData.Login,
+      Password: formData.Password,
+      Mail: formData.Mail,
+      Post: formData.Post,
+      Roles: formData.Roles || []
+    };
+    axios.post('http://localhost:5000/admin/registration', sanitizedFormData, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      console.log('Новый пользователь успешно добавлен:', response.data);
+      fetchUsers(); // Обновление данных после успешного добавления пользователя
+      handleCloseModal();
+    })
+    .catch(error => console.error('Ошибка при создании пользователя:', error));
+  };
+
   return (
     <div className="my-5 px-5">
-      {/* <SearchUser filters={filters} handleFilterChange={handleFilterChange} /> */}
+    {/* <SearchUser filters={filters} handleFilterChange={handleFilterChange} /> */}
       <Button variant="primary" className="mx-3" onClick={handleEditUser} disabled={!activeRow}>
         Редактировать
+      </Button>
+      <Button variant="primary" className="mx-3" onClick={handleAddUser}>
+        Добавить
       </Button>
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
@@ -204,14 +243,24 @@ const UsersPage = () => {
           </tbody>
         </table>
       </div>
-      {/* <UpdateUser
-        users={users}
-        showModal={showUpdateModal}
-        handleCloseModal={handleCloseModal}
-        formData={formData}
-        handleInputChange={handleInputChange}
-        handleSaveChanges={handleSaveUpdateUsers}
-      /> */}
+     {showUpdateModal && (
+        <UpdateUser
+          showModal={showUpdateModal}
+          handleCloseModal={handleCloseModal}
+          handleSaveChanges={handleSaveUpdateUser}
+          formData={formData}
+          handleInputChange={handleInputChange}
+        />
+      )}
+      {showAddModal && (
+        <AddUser
+          showModal={showAddModal}
+          handleCloseModal={handleCloseModal}
+          handleSaveChanges={handleSaveAddUser}
+          formData={formData}
+          handleInputChange={handleInputChange}
+        />
+      )}
     </div>
   );
 };

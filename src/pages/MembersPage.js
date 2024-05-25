@@ -30,8 +30,7 @@ const MembersPage = () => {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken = jwtDecode(token);
-      console.log(decodedToken.roles);
-      setUserRole(decodedToken.roles); // Assuming 'roles' is the key in the token containing the user's roles
+      setUserRole(decodedToken.roles); 
     }
 
     axios.get('http://localhost:5000/gecMembers', {

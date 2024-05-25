@@ -8,8 +8,8 @@ const UpdateSchedule = ({
   handleInputChange,
   handleSaveChanges,
   formData,
-  geks,
-  handleDeleteSchedule
+  geks
+  //handleDeleteSchedule
 }) => {
   return (
     <Modal show={showModal} onHide={handleCloseModal}>
@@ -22,7 +22,7 @@ const UpdateSchedule = ({
           formData={formData} 
           handleInputChange={handleInputChange} 
           geks={geks} 
-          isEditMode={true} // режим редактирования
+          isEditMode={true}
         />
       </Modal.Body>
 
