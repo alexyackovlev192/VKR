@@ -11,6 +11,7 @@ const DefenderSchedulePage = () => {
 
     const id_U = localStorage.getItem('id_U');
     const id_DSS = localStorage.getItem('id_DSS');
+    const id_DS = localStorage.getItem('id_DS');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -56,14 +57,14 @@ const DefenderSchedulePage = () => {
         };
 
         try {
-            console.log(dataToSave);
             await axios.post(`http://localhost:5000/resultComissionMember/create`, dataToSave, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            navigate(`/my-schedule/${id_DS}`);
             localStorage.removeItem('id_DSS');
-            navigate('/my-schedule/5');
+            localStorage.removeItem('id_DS');
         } catch (error) {
             console.error('Error saving data:', error);
         }

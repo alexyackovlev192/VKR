@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Card } from 'react-bootstrap';
 import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
@@ -8,10 +8,12 @@ import '../style-pages/MySchedulePage.css';
 
 const MySchedulePage = () => {
     const [scheduleDetails, setScheduleDetails] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
         const decodedToken = jwtDecode(token);
+
         const id_U = decodedToken.id_U;
         localStorage.setItem('id_U', id_U);
 
@@ -49,13 +51,20 @@ const MySchedulePage = () => {
                 }));
                 
                 const flattenedScheduleDetails = schedulesWithDetails.flat().sort((a, b) => new Date(a.date) - new Date(b.date));
+
                 setScheduleDetails(flattenedScheduleDetails);
+                localStorage.setItem('id_DS', flattenedScheduleDetails.id_DS);
             } catch (error) {
                 console.error('Error loading schedules:', error);
             }
         };
         fetchSchedules();
     }, []);
+
+    const handleOpen = (i) => {
+        navigate(`/my-schedule/${i.id_DS}`);
+        localStorage.setItem('id_DS', i.id_DS);
+    }
 
     return (
         <div className="container-fluid text-center my-3">
@@ -73,9 +82,7 @@ const MySchedulePage = () => {
                                     <p>Аудитория: {item.classroom}</p>
                                 </span>
                             </Card.Text>
-                            <Link to={`/my-schedule/${item.id_DS}`} className="col-1">
-                                <Button variant="primary">Открыть</Button>
-                            </Link>
+                            <Button onClick={() => handleOpen(item)} className="mt-3" variant="primary">Открыть</Button>
                         </Card.Body>
                     </Card>
                 ))}

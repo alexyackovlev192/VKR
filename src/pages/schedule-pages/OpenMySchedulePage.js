@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button, Table } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -21,39 +21,42 @@ const OpenMySchedulePage = () => {
     const fetchData = async () => {
         const token = localStorage.getItem('token');
         const id_U = localStorage.getItem('id_U');
-
+    
         try {
             const scheduleResponse = await axios.get(`http://localhost:5000/defenseScheduleStudents/${id_DS}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
-
+    
             const studentScheduleData = scheduleResponse.data;
-
-            const studentResponses = await Promise.all(studentScheduleData.map(s =>
-                axios.get(`http://localhost:5000/students/${s.id_S}`, {
+    
+            const studentResponses = await Promise.all(studentScheduleData.map(async (s) => {
+                const studentDataResponse = await axios.get(`http://localhost:5000/students/${s.id_S}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
-                }).then(async res => {
-                    const studentData = res.data;
-                    let resultData = null;
-                    try {
-                        const resultResponse = await axios.get(`http://localhost:5000/resultComissionMember/${s.id_DSS}/${id_U}`, {
-                            headers: {
-                                'Authorization': `Bearer ${token}`
-                            }
-                        });
-                        resultData = resultResponse.data;
-                    } catch (error) {
+                });
+                const studentData = studentDataResponse.data;
+                let resultData = null;
+                try {
+                    const resultResponse = await axios.get(`http://localhost:5000/resultComissionMember/${s.id_DSS}/${id_U}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    resultData = resultResponse.data;
+                } catch (error) {
+                    if (error.response && error.response.status === 404) {
+                        console.warn(`Result not found for student ID: ${s.id_S} and DSS ID: ${s.id_DSS}`);
+                    } else {
                         console.error('Error fetching resultComissionMember data: ', error);
                     }
-                    return { ...studentData, id_DSS: s.id_DSS, ...resultData };
-                })
-            ));
-
-            const students = studentResponses.map(defender => {
+                }
+                return { ...studentData, id_DSS: s.id_DSS, ...resultData };
+            }));
+    
+            const students = studentResponses.map((defender) => {
                 if (!defender.resultData) {
                     return {
                         ...defender,
@@ -66,8 +69,7 @@ const OpenMySchedulePage = () => {
                 }
                 return defender;
             });
-
-            console.log(students);
+    
             setDefenders(students);
             setFilteredDefenders(students);
         } catch (error) {
@@ -110,7 +112,12 @@ const OpenMySchedulePage = () => {
 
     return (
         <div className="container-fluid text-center my-3">
-            <h4 className="col-12">Мои защиты</h4>
+            <div className="row my-3">
+                <Link to={`/my-schedule`} className="col-1">
+                    <Button variant="primary" className="">Назад</Button>
+                </Link>
+                <h4 className="col-10">Мои защиты</h4>
+            </div>
             <div className="my-4 mx-5" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
                 <Table striped bordered hover>
                     <thead className="table-dark">
