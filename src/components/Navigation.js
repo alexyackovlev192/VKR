@@ -27,8 +27,8 @@ const navigationItems = {
   ],
   4: [
     { href: "/", text: "Главная" },
-    { href: "/my-schedule", text: "Мои защиты" },
-    { href: "/my-gek", text: "Мои ГЭК" },
+    { href: "/my-schedule-sec", text: "Мои защиты" },
+    { href: "/my-gek-sec", text: "Мои ГЭК" },
     { href: "/logout", text: "Выход" }
   ]
 };
