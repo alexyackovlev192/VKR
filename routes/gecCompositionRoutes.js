@@ -7,5 +7,5 @@ const roleMiddleware = require('../middleware/roleMiddleware')
 
 router.put('/:id', authMiddleware, roleMiddleware([3]), controller.updateGecComposition)
 router.get('/:id', authMiddleware, roleMiddleware([3,2,4]), controller.getGecComposition)
-router.get('/UserGecs/:id', authMiddleware, roleMiddleware([2,4]), controller.getGecIdsByUserId);
+router.get('/UserGecs/:id', authMiddleware, roleMiddleware([2]), controller.getGecIdsByUserId);
 module.exports = router
