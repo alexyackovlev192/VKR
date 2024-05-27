@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Link  } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
 
 const CreateGekForm = ({ 
@@ -12,7 +12,7 @@ const CreateGekForm = ({
   
   useEffect(() => {
     localStorage.setItem('formData', JSON.stringify(formData));
-  }, [formData, secretaries]);
+  }, [formData]);
 
   return (
     <Form>

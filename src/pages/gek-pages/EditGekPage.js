@@ -42,6 +42,8 @@ const EditGekPage = () => {
                 }
             });
 
+            localStorage.setItem('id_U', secretarieIdResponse.data.id_U);
+
             const secretariesResponse = await axios.get('http://localhost:5000/secretariesGec', {
                 headers: {
                     'Authorization': `Bearer ${token}`

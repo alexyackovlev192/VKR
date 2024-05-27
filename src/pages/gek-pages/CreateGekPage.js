@@ -8,13 +8,11 @@ const CreateGekPage = () => {
   const [directories, setDirectories] = useState([]);
   const [secretaries, setSecretaries] = useState([]);
   const [formData, setFormData] = useState(() => {
-    // Извлечение данных из localStorage при первой загрузке страницы
     const savedFormData = localStorage.getItem('formData');
     return savedFormData ? JSON.parse(savedFormData) : null;
   });
   
   useEffect(() => {
-    // Запрос данных директорий и секретарей при загрузке страницы
     const token = localStorage.getItem('token');
     axios.get('http://localhost:5000/directions', {
       headers: {
@@ -36,13 +34,20 @@ const CreateGekPage = () => {
     .catch(error => console.error('Ошибка при загрузке данных:', error));
   }, []);
 
-  // Обработчик изменения данных формы
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     let update = { ...formData, [name]: value };
 
+    if (name === "Fullname") {
+      const selectedSecretary = secretaries.find(sec => sec.Fullname === value);
+      if (selectedSecretary) {
+        localStorage.setItem('id_Sec', selectedSecretary.id_U); 
+        console.log(localStorage.getItem('id_Sec'));
+      }
+    }
+
     setFormData(update);
-  }, [formData]);
+  }, [formData, secretaries]);
 
   return (
       <div className="container-fluid text-center my-3">
@@ -61,4 +66,4 @@ const CreateGekPage = () => {
     );
   };
 
-  export default CreateGekPage;
+export default CreateGekPage;

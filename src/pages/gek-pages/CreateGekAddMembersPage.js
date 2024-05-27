@@ -66,7 +66,10 @@ const CreateGekAddMemberPage = () => {
             
             const id_G = Math.max(...gecsResponse.data.map(item => item.id_G));
             const memberIds = membersGek.map(m => m.id_U);
-            const secretaryId = 8;
+    
+            const secretaryId = localStorage.getItem('id_Sec');
+            console.log(secretaryId);
+            localStorage.removeItem('id_Sec');
             
             const gecCompositionResponse = await axios.put(`http://localhost:5000/gecComposition/${id_G}`, { memberIds, secretaryId }, {
                 headers: {
