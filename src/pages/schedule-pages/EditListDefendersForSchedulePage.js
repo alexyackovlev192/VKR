@@ -5,7 +5,7 @@ import { Button, Card, ListGroup } from 'react-bootstrap';
 import geksData from '../../data/geksData.json';
 
 const EditListDefendersForSchedulePage = () => {
-    const { gekId } = useParams(); // Получаем параметр маршрута
+    const { id_DS } = useParams(); // Получаем параметр маршрута
     const [membersGek, setMembersGek] = useState([]);
     const [secretariesGek, setSecretariesGek] = useState([]);
     const [allMembersGek, setAllMembersGek] = useState([]);
@@ -13,7 +13,7 @@ const EditListDefendersForSchedulePage = () => {
 
     useEffect(() => {
         // Находим данные выбранной ГЭК по идентификатору из параметра маршрута
-        const gek = geksData.find(gek => gek.id === parseInt(gekId));
+        const gek = geksData.find(gek => gek.id === parseInt(id_DS));
         if (gek) {
             setMembersGek(gek.members || []);
             setSecretariesGek(gek.secretaries || []);

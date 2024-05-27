@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 import './style-components/Navigation.css';
 import { Nav } from 'react-bootstrap';
 
+// Список ссылок для каждой роли
 const navigationItems = {
   1: [
     { href: "/", text: "Главная" },
@@ -33,18 +34,38 @@ const navigationItems = {
 };
 
 const Navigation = () => {
-  const [userRole, setUserRole] = useState(null);
+  const [userRoles, setUserRoles] = useState([]);
   const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken = jwtDecode(token);
-      setUserRole(decodedToken.roles); // Предполагается, что роли хранятся в поле 'roles'
+      setUserRoles(decodedToken.roles);
     }
   }, []);
 
-  if (!userRole) return null; // Или можно отобразить лоадер
+  if (!userRoles.length) return null;
+
+  // Собираем ссылки для всех ролей пользователя
+  const allUserItems = [];
+  userRoles.forEach(role => {
+    const roleItems = navigationItems[role] || [];
+    roleItems.forEach(item => {
+      if (!allUserItems.find(existingItem => existingItem.href === item.href)) {
+        allUserItems.push(item);
+      }
+    });
+  });
+
+  // Перемещаем "Главная" на первое место, а "Выход" на последнее
+  const sortedNavigationItems = [
+    ...allUserItems.filter(item => item.href === "/"),
+    ...allUserItems.filter(item => item.href === "/my-schedule"),
+    ...allUserItems.filter(item => item.href === "/my-gek"),
+    ...allUserItems.filter(item => item.href !== "/" && item.href !== "/logout" && item.href !== "/my-schedule" && item.href !== "/my-gek"),
+    ...allUserItems.filter(item => item.href === "/logout")
+  ];
 
   return (
     <Nav
@@ -53,7 +74,7 @@ const Navigation = () => {
       activeKey={location.pathname}
       className="d-flex bd-highlight navigation-list py-2 px-3 fs-5 justify-content-between align-items-center"
     >
-      {navigationItems[userRole].map((item, index) => (
+      {sortedNavigationItems.map((item, index) => (
         <Nav.Item key={index} className="ml-auto">
           <Nav.Link
             as={NavLink}

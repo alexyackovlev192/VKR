@@ -47,7 +47,7 @@ const App = () => {
                 <Route path="/gek" element={<PageLayout><GekPage /></PageLayout>} />
                 <Route path="/create-gek" element={<PageLayout><CreateGekPage /></PageLayout>} />
                 <Route path="/create-gek/add-member" element={<PageLayout><CreateGekAddMemberPage /></PageLayout>} />
-                <Route path="/edit-gek/:gekId" element={<PageLayout><EditGekPage /></PageLayout>} />
+                <Route path="/edit-gek/:id_G" element={<PageLayout><EditGekPage /></PageLayout>} />
                 <Route path="/defenders" element={<PageLayout><DefendersPage /></PageLayout>} />
             </Routes>
         </Router>

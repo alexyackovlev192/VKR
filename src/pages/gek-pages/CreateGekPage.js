@@ -5,8 +5,8 @@ import { Button } from 'react-bootstrap';
 import CreateGekForm from '../../forms/GekForm';
 
 const CreateGekPage = () => {
-  const [directories, setDirectories] = useState([]); // Директории
-  const [secretaries, setSecretaries] = useState([]); // Директории
+  const [directories, setDirectories] = useState([]);
+  const [secretaries, setSecretaries] = useState([]);
   const [formData, setFormData] = useState(() => {
     // Извлечение данных из localStorage при первой загрузке страницы
     const savedFormData = localStorage.getItem('formData');

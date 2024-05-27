@@ -118,7 +118,7 @@ const CreateGekAddMemberPage = () => {
                 </Card>
 
                 <Card style={{ minWidth: '500px', width: '40%', height: '70vh', overflowY: 'auto' }} className="my-2 text-center bg-light">
-                    <Card.Header className="fs-4 bg-light">Члены ГЭК</Card.Header>
+                    <Card.Header className="fs-4 bg-light">Список членов ГЭК</Card.Header>
                     <Card.Body>
                         <ListGroup className="container">
                             {sortedAllMembersGek.map((member, index) => (
