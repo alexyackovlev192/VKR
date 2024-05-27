@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import ScheduleForm from '../forms/ScheduleForm';
 
 const UpdateSchedule = ({
@@ -9,12 +10,11 @@ const UpdateSchedule = ({
   handleSaveChanges,
   formData,
   geks
-  //handleDeleteSchedule
 }) => {
   return (
     <Modal show={showModal} onHide={handleCloseModal}>
       <Modal.Header closeButton>
-        <Modal.Title>Редактировать защиту</Modal.Title>
+        <Modal.Title>Редактирование защиты</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>

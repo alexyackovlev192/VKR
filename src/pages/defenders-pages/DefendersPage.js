@@ -2,11 +2,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
-import UpdateDefender from '../modal-windows/UpdateDefender';
-import AddDefender from '../modal-windows/AddDefender';
-import SearchStud from '../components/SearchDefender';
+import { Link } from 'react-router-dom';
+import UpdateDefender from '../../modal-windows/UpdateDefender';
+import AddDefender from '../../modal-windows/AddDefender';
+import SearchStud from '../../components/SearchDefender';
 
-import './style-pages/DefendersPage.css';
+import '../style-pages/DefendersPage.css';
 
 const DefendersPage = () => {
   const [defenders, setDefenders] = useState([]);
@@ -95,7 +96,6 @@ const DefendersPage = () => {
 
   const handleRowClick = (defender) => {
     setActiveRow(defender);
-    console.log('Выбран студент:', defender.id_S);
   };
 
   const handleCloseModal = () => {
@@ -174,6 +174,7 @@ const DefendersPage = () => {
 
   return (
     <div className="my-5 px-5">
+      <div className="">
         <SearchStud filters={filters} handleFilterChange={handleFilterChange} /> 
         <Button variant="primary" className="mx-3" onClick={handleEditDefender} disabled={!activeRow}>
           Редактировать
@@ -181,6 +182,10 @@ const DefendersPage = () => {
         <Button variant="primary" className="mx-3" onClick={handleAddDefender}>
           Добавить
         </Button>
+        <Link to={`/test`} className="mx-3 ">
+          <Button variant="primary" className="">Составы защищающихся</Button>
+        </Link>
+      </div>
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
           <thead className="table-dark">

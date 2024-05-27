@@ -62,7 +62,13 @@ const ListDefendersForSchedulePage = () => {
 
 
   return (
-    <div className="container-fluid text-center my-3">
+    <div className="container-fluid text-center my-3">            
+      <div className="row my-3">
+        <Link to={`/defenders`} className="col-1">
+            <Button variant="primary" className="">Назад</Button>
+        </Link>
+        <h4 className="col-10">Составы защищающихся</h4>
+      </div>
       <div className="row justify-content-evenly">
         {schedules && schedules.map(data => (
           <Card key={data.id_DS} style={{ minWidth: '400px', width: '30%' }} className="col-4 my-4 text-center bg-light">
