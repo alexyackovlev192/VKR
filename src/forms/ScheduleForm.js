@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import axios from 'axios';
@@ -18,9 +17,9 @@ const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
   };
 
   useEffect(() => {
-    if (selectGek && selectGek.id_D) {
+    const fetchDirection = (id_D) => {
       const token = localStorage.getItem('token');
-      axios.get(`http://localhost:5000/directions/${selectGek.id_D}`, {
+      axios.get(`http://localhost:5000/directions/${id_D}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -31,8 +30,20 @@ const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
       .catch(error => {
         console.error('Ошибка при получении направления:', error);
       });
+    };
+
+    if (isEditMode && id_G) {
+      const selectedGek = geks.find(g => g.id_G === id_G);
+      if (selectedGek) {
+        setSelectGek(selectedGek);
+        if (selectedGek.id_D) {
+          fetchDirection(selectedGek.id_D);
+        }
+      }
+    } else if (selectGek && selectGek.id_D) {
+      fetchDirection(selectGek.id_D);
     }
-  }, [selectGek]);
+  }, [selectGek, isEditMode, id_G, geks]);
 
   return (
     <Form>
@@ -43,7 +54,7 @@ const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
             type="text"
             name="id_G"
             value={id_G || ""}
-            disabled={true} // поле недоступно для редактирования в режиме редактирования
+            disabled={true}
           />
         ) : (
           <Form.Select
@@ -52,7 +63,7 @@ const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
             onChange={handleGekChange}
             value={id_G || ""}
           >
-            {!id_G && <option value="Name_direction">{Name_direction}</option>}
+            {!id_G && <option value="">Выберите ГЭК</option>}
             {geks.map((g, index) => (
               <option key={index} value={g.id_G}>{g.id_G}</option>
             ))}
@@ -69,7 +80,7 @@ const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
               setStartDate(d);
               handleInputChange({ target: { name: 'date', value: d } });
             }}
-            dateFormat="dd-MM"
+            dateFormat="dd-MM-yyyy"
             className="form-control"
           />
         </div>

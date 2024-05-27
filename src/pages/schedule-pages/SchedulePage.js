@@ -382,7 +382,7 @@ const CardView = ({ schedules, handleEditSchedule }) => {
                 <div>
                   <p>ГЭК №{item.id_G}</p>
                   <p>Время: {item.time}</p>
-                  <p>Направление: {item.Name_direction}</p>
+                  <p>Направление: {item.direction.Name_direction}</p>
                   <p>Аудитория: {item.classroom}</p>
                 </div>
               </Card.Text>
