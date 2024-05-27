@@ -80,7 +80,7 @@ const EditGekPage = () => {
         }
     };
 
-    const filterAndSortAllMembersGek = (allMembers, members, secretarie) => {
+    const filterAndSortAllMembersGek = (allMembers, members) => {
         const memberIds = members.map(member => member.id_U);
         return allMembers
             .filter(member => !memberIds.includes(member.id_U))
@@ -148,7 +148,7 @@ const EditGekPage = () => {
                 <Link to={`/gek`} className="col-1">
                     <Button variant="primary" className="">Назад</Button>
                 </Link>
-                <h4 className="col-10">Редактирование состава ГЭК</h4>
+                <h4 className="col-10">Редактирование ГЭК</h4>
             </div>
             <div className="row justify-content-evenly">
                 <Card style={{ minWidth: '500px', width: '40%', height: '70vh', overflowY: 'auto' }} className="my-2 text-center bg-light">

@@ -82,10 +82,9 @@ const ListDefendersForSchedulePage = () => {
               </ListGroup>
             </Card.Body>
             <Card.Footer className="text-left bg-light">
-              <Link to={`/edit-gek/${data.id_DS}`}>
+              <Link to={`/test-edit/${data.id_DS}`}>
                 <Button variant="primary" className="mx-3">Редактировать</Button>
               </Link>
-              {/* <Button variant="danger" className="mx-3" onClick={() => handleDeleteGek(data.id_DS)}>Удалить</Button> */}
             </Card.Footer>
           </Card>
         ))}
