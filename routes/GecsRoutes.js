@@ -14,5 +14,9 @@ router.get('/', authMiddleware, roleMiddleware([3]), controller.getAllGecs)
 router.get('/UserGecs/:id', authMiddleware, roleMiddleware([4]), controller.getGecIdsByUserId)
 router.get('/SecretaryId/:id', authMiddleware, roleMiddleware([3]), controller.getSecretaryIdByGecId)
 router.get('/:id', authMiddleware, roleMiddleware([2,3,4]), controller.getGecById)
+router.put('/:id', [
+    check('Name_direction').optional().notEmpty().withMessage('Направление не может быть пустым'),
+    check('Year').optional().notEmpty().withMessage('Год не может быть пустым')
+], authMiddleware, roleMiddleware([3]), controller.updateGec);
 
 module.exports = router
