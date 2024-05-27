@@ -18,5 +18,9 @@ router.put('/:id', [
     check('Name_direction').optional().notEmpty().withMessage('Направление не может быть пустым'),
     check('Year').optional().notEmpty().withMessage('Год не может быть пустым')
 ], authMiddleware, roleMiddleware([3]), controller.updateGec);
+router.put('/EndWork/:id', [
+    check('Status',"Статус работы ГЭК не может быть пустым").notEmpty()
+], authMiddleware, roleMiddleware([3]), controller.updateStatusGec);
+
 
 module.exports = router
