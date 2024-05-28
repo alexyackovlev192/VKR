@@ -53,8 +53,8 @@ const DefenderSchedulePage = () => {
             id_DSS: id_DSS,
             id_U: id_U,
             scores: Object.values(ratings),
-            RecMagistracy: defenderData.magRec ? 'Да' : 'Нет',
-            RecPublication: defenderData.publRec ? 'Да' : 'Нет'
+            RecMagistracy: defenderData.magRec ? 'Да' : null,
+            RecPublication: defenderData.publRec ? 'Да' : null
         };
 
         try {

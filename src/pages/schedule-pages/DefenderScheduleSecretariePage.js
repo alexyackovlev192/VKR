@@ -53,8 +53,8 @@ const DefenderScheduleSecretariePage = () => {
             id_DSS: id_DSS,
             id_U: id_U,
             Result: formData.Result,
-            RecMagistracy: formData.RecMag ? 'Да' : 'Нет',
-            RecPublication: formData.RecPub ? 'Да' : 'Нет',
+            RecMagistracy: formData.RecMag ? 'Да' : null,
+            RecPublication: formData.RecPub ? 'Да' : null,
             NumberProtocol: formData.NumberProtocol
         };
 

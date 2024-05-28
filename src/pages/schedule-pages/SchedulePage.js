@@ -1,265 +1,250 @@
-  import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-  import Button from 'react-bootstrap/Button';
-  import Card from 'react-bootstrap/Card';
-  import axios from 'axios';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import Button from 'react-bootstrap/Button';
+import Card from 'react-bootstrap/Card';
+import axios from 'axios';
 
-  import UpdateSchedule from '../../modal-windows/UpdateSchedule';
-  import AddSchedule from '../../modal-windows/AddSchedule';
+import UpdateSchedule from '../../modal-windows/UpdateSchedule';
+import AddSchedule from '../../modal-windows/AddSchedule';
 
-  import '../style-pages/SchedulePage.css';
+import '../style-pages/SchedulePage.css';
 
-  const SchedulePage = () => {
-    const [schedules, setSchedules] = useState([]);
-    const [geks, setGeks] = useState([]);
-    const [directions, setDirections] = useState([])
+const SchedulePage = () => {
+  const [schedules, setSchedules] = useState([]);
+  const [geks, setGeks] = useState([]);
+  const [directions, setDirections] = useState([]);
 
-    const [uniqueDates, setUniqueDates] = useState([]);
-    const [uniqueDirections, setUniqueDirections] = useState([]);
+  const [uniqueDates, setUniqueDates] = useState([]);
+  const [uniqueDirections, setUniqueDirections] = useState([]);
 
-    const [showUpdateModal, setShowUpdateModal] = useState(false);
-    const [showAddModal, setShowAddModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
 
-    const [formData, setFormData] = useState(null);
-    const [activeCell, setActiveCell] = useState(null);
+  const [formData, setFormData] = useState(null);
+  const [activeCell, setActiveCell] = useState(null);
 
-    const [isTableView, setIsTableView] = useState(true);
+  const [isTableView, setIsTableView] = useState(true);
 
-    const tableRef = useRef(null);
+  const tableRef = useRef(null);
 
-    useEffect(() => {
-      const token = localStorage.getItem('token');
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    axios.get('http://localhost:5000/defenseSchedule/thisYear', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => {
+      const fetchDirectionsPromises = response.data.map(sched => {
+        return axios.get(`http://localhost:5000/directions/${sched.id_D}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+        .then(response => response.data)
+        .catch(error => {
+          console.error('Ошибка при получении направления:', error);
+          return null;
+        });
+      });
+
+      Promise.all(fetchDirectionsPromises)
+      .then(directionsData => {
+        const updatedSchedules = response.data.map((schedule, index) => ({
+          ...schedule,
+          direction: directionsData[index]
+        }));
+        setSchedules(updatedSchedules);
+        updateUniqueValues(updatedSchedules);
+        setDirections(directionsData);
+      });
+    })
+    .catch(error => console.error('Ошибка при загрузке данных:', error));
+
+    axios.get('http://localhost:5000/gecs', {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(response => setGeks(response.data))
+    .catch(error => console.error('Ошибка при загрузке данных:', error));
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutsideTable = (event) => {
+      if (tableRef.current && !tableRef.current.contains(event.target)) {
+        setActiveCell(null);
+      }
+    };
+    document.addEventListener('click', handleClickOutsideTable);
+    return () => {
+      document.removeEventListener('click', handleClickOutsideTable);
+    };
+  }, []);
+
+  const updateUniqueValues = (data) => {
+    const dates = Array.from(new Set(data.map(item => item.date))).sort((a, b) => new Date(a) - new Date(b));
+    const directionMap = new Map();
+    data.forEach(item => {
+      if (!directionMap.has(item.id_D)) {
+        directionMap.set(item.id_D, item.direction.Name_direction);
+      }
+    });
+
+    const directions = Array.from(directionMap.entries()).sort((a, b) => a[1].localeCompare(b[1]));
+
+    setUniqueDates(dates);
+    setUniqueDirections(directions);
+  };
+
+  const handleSelectedClick = useCallback((item) => {
+    setActiveCell(item.event ?? null);
+  }, []);
+
+  const handleCloseModal = () => {
+    setShowUpdateModal(false);
+    setShowAddModal(false);
+    setFormData(null);
+  };
+
+  const handleEditSchedule = (selectedItem) => {
+    setActiveCell(selectedItem);
+    setFormData(selectedItem);
+    setShowUpdateModal(true);
+  };
+
+  const handleAddSchedule = () => {
+    setShowAddModal(true);
+    setFormData(null);
+  };
+
+  const handleSaveUpdate = useCallback((formData) => {
+    const token = localStorage.getItem('token');
+    const data = {
+      id_G: formData.id_G,
+      Name_direction: formData.Name_direction,
+      Date: formatDate(formData.date),
+      Time: formData.time,
+      Classroom: formData.classroom
+    };
+
+    axios.put(`http://localhost:5000/defenseSchedule/${formData.id_DS}`, data, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(() => {
+      setSchedules(prevSchedules => {
+        const updatedSchedules = prevSchedules.map(schedule =>
+          schedule.id_DS === formData.id_DS ? { ...schedule, ...formData } : schedule
+        );
+        updateUniqueValues(updatedSchedules);
+        return updatedSchedules;
+      });
+      handleCloseModal();
+    })
+    .catch(error => console.error('Ошибка при сохранении изменении информации о защите:', error));
+  }, [updateUniqueValues, handleCloseModal]);
+
+  const handleSaveAdd = useCallback((formData) => {
+    const token = localStorage.getItem('token');
+    const data = {
+      GecId: formData.id_G,
+      NameDirection: formData.Name_direction,
+      Date: formatDate(formData.date),
+      Time: formData.time,
+      Classroom: formData.classroom
+    };
+
+    axios.post('http://localhost:5000/defenseSchedule/create', data, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(() => {
       axios.get('http://localhost:5000/defenseSchedule/thisYear', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       })
       .then(response => {
-        // Получение данных о направлениях для каждого элемента расписания
         const fetchDirectionsPromises = response.data.map(sched => {
           return axios.get(`http://localhost:5000/directions/${sched.id_D}`, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
           })
-          .then(response => {
-            return response.data;
-          })
+          .then(response => response.data)
           .catch(error => {
             console.error('Ошибка при получении направления:', error);
             return null;
           });
         });
-    
-        // Обработка всех промисов получения данных о направлениях
+
         Promise.all(fetchDirectionsPromises)
-          .then(directionsData => {
-            // Объединение данных о расписании с полученными данными о направлениях
-            const updatedSchedules = response.data.map((schedule, index) => ({
-              ...schedule,
-              direction: directionsData[index] // Предполагается, что данные о направлениях возвращаются в виде объекта
-            }));
-            setSchedules(updatedSchedules);
-            updateUniqueValues(updatedSchedules);
-            setDirections(directionsData); // Обновляем directions
-          });
-      })
-      .catch(error => console.error('Ошибка при загрузке данных:', error));
-    
-      axios.get('http://localhost:5000/gecs', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      .then(response => {
-        setGeks(response.data);
-      })
-      .catch(error => console.error('Ошибка при загрузке данных:', error));
-    }, []);
-
-    useEffect(() => {
-      const handleClickOutsideTable = (event) => {
-        if (tableRef.current && !tableRef.current.contains(event.target)) {
-          setActiveCell(null);
-        }
-      };
-      document.addEventListener('click', handleClickOutsideTable);
-      return () => {
-        document.removeEventListener('click', handleClickOutsideTable);
-      };
-    }, []);
-
-    const updateUniqueValues = (data) => {
-      const dates = Array.from(new Set(data.map(item => item.date))).sort((a, b) => new Date(a) - new Date(b));
-      const directionMap = new Map();
-      data.forEach(item => {
-        if (!directionMap.has(item.id_D)) {
-          directionMap.set(item.id_D, item.direction.Name_direction);
-        }
-      });
-    
-      const directions = Array.from(directionMap.entries()).sort((a, b) => a[1].localeCompare(b[1]));
-    
-      setUniqueDates(dates);
-      setUniqueDirections(directions);
-    };
-
-    const handleSelectedClick = useCallback((item) => {
-      setActiveCell(item.event ?? null);
-    }, []);
-
-    const handleCloseModal = () => {
-      setShowUpdateModal(false);
-      setShowAddModal(false);
-      setFormData(null);
-    };
-
-    const handleEditSchedule = (selectedItem) => {
-      setActiveCell(selectedItem);
-      setFormData(selectedItem);
-      setShowUpdateModal(true);
-    };
-
-    const handleAddSchedule = () => {
-      setShowAddModal(true);
-      setFormData(null);
-    };
-
-    const handleSaveUpdate = useCallback((formData) => {
-      const token = localStorage.getItem('token');
-      const data = {
-        id_G: formData.id_G,
-        Name_direction: formData.Name_direction,
-        Date: formatDate(formData.date),
-        Time: formData.time,
-        Classroom: formData.classroom
-      };
-
-      axios.put(`http://localhost:5000/defenseSchedule/${formData.id_DS}`, data, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      .then(() => {
-        setSchedules(prevSchedules => {
-          const updatedSchedules = prevSchedules.map(schedule =>
-            schedule.id_DS === formData.id_DS ? { ...schedule, ...formData } : schedule
-          );
+        .then(directionsData => {
+          const updatedSchedules = response.data.map((schedule, index) => ({
+            ...schedule,
+            direction: directionsData[index]
+          }));
+          setSchedules(updatedSchedules);
           updateUniqueValues(updatedSchedules);
-          return updatedSchedules;
+          setDirections(directionsData);
         });
-        handleCloseModal();
       })
-      .catch(error => console.error('Ошибка при сохранении изменении информации о защите:', error));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [updateUniqueValues, handleCloseModal]);
-
-    const handleSaveAdd = useCallback((formData) => {
-      const token = localStorage.getItem('token');
-      const data = {
-        GecId: formData.id_G,
-        NameDirection: formData.Name_direction,
-        Date: formatDate(formData.date),
-        Time: formData.time,
-        Classroom: formData.classroom
-      };
-    
-      axios.post('http://localhost:5000/defenseSchedule/create', data, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      .then(() => {
-        axios.get('http://localhost:5000/defenseSchedule/thisYear', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        .then(response => {
-          // Получение данных о направлениях для каждого элемента расписания
-          const fetchDirectionsPromises = response.data.map(sched => {
-            return axios.get(`http://localhost:5000/directions/${sched.id_D}`, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            })
-            .then(response => {
-              return response.data;
-            })
-            .catch(error => {
-              console.error('Ошибка при получении направления:', error);
-              return null;
-            });
-          });
-    
-          // Обработка всех промисов получения данных о направлениях
-          Promise.all(fetchDirectionsPromises)
-            .then(directionsData => {
-              // Объединение данных о расписании с полученными данными о направлениях
-              const updatedSchedules = response.data.map((schedule, index) => ({
-                ...schedule,
-                direction: directionsData[index] // Предполагается, что данные о направлениях возвращаются в виде объекта
-              }));
-              setSchedules(updatedSchedules);
-              updateUniqueValues(updatedSchedules);
-              setDirections(directionsData); // Обновляем directions
-            });
-        })
-        .catch(error => console.error('Ошибка при загрузке данных:', error));
-        handleCloseModal();
-      })
-      .catch(error => console.error('Ошибка при сохранении новой защиты:', error));
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [updateUniqueValues, handleCloseModal]);
-
-    const handleInputChange = (e) => {
-      const { name, value } = e.target;
-      const newValue = value instanceof Date ? formatDate(value) : value;
-    
-      setFormData(prevFormData => ({
-        ...prevFormData,
-        [name]: newValue
-      }));
-    };
-
-    const formatDate = useCallback((date) => {
-      const d = new Date(date);
-      if (isNaN(d)) {
-        throw new Error('Некорректный формат даты');
-      }
-      const month = `${d.getMonth() + 1}`.padStart(2, '0');
-      const day = `${d.getDate()}`.padStart(2, '0');
-      const year = d.getFullYear();
-      return `${year}-${month}-${day}`;
-    }, []);
-
-    const handleDeleteSchedule = (item) => {
-      console.log('Удаление защиты:', item);
-      setActiveCell(null);
+      .catch(error => console.error('Ошибка при загрузке данных:', error));
       handleCloseModal();
-    };
+    })
+    .catch(error => console.error('Ошибка при сохранении новой защиты:', error));
+  }, [updateUniqueValues, handleCloseModal]);
 
-    const toggleView = useCallback(() => {
-      setIsTableView(prevState => !prevState);
-      setActiveCell(null);
-    }, []);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    const newValue = value instanceof Date ? formatDate(value) : value;
 
-    const filteredSchedules = useMemo(() => {
-      const schedulesByDate = uniqueDates.map(date => ({
-        date,
-        schedules: uniqueDirections.map(direction => {
-          const directionObject = directions.find(dir => dir.id_D === direction[0]);
-          
-          
-          const schedule = directionObject 
-          ? schedules.find(s => s.date === date && s.id_D === directionObject.id_D) 
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      [name]: newValue
+    }));
+  };
+
+  const formatDate = useCallback((date) => {
+    const d = new Date(date);
+    if (isNaN(d)) {
+      throw new Error('Некорректный формат даты');
+    }
+    const month = `${d.getMonth() + 1}`.padStart(2, '0');
+    const day = `${d.getDate()}`.padStart(2, '0');
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
+  }, []);
+
+  const handleDeleteSchedule = (item) => {
+    console.log('Удаление защиты:', item);
+    setActiveCell(null);
+    handleCloseModal();
+  };
+
+  const toggleView = useCallback(() => {
+    setIsTableView(prevState => !prevState);
+    setActiveCell(null);
+  }, []);
+
+  const filteredSchedules = useMemo(() => {
+    const schedulesByDate = uniqueDates.map(date => ({
+      date,
+      schedules: uniqueDirections.map(direction => {
+        const directionObject = directions.find(dir => dir.id_D === direction[0]);
+
+        const schedule = directionObject
+          ? schedules.find(s => s.date === date && s.id_D === directionObject.id_D)
           : null;
-          
-          return schedule ? { ...schedule, Name_direction: directionObject.Name_direction } : null;
-        })
-      }));
-      return schedulesByDate;
-    }, [uniqueDates, uniqueDirections, directions, schedules]);
-  
+
+        return schedule ? { ...schedule, Name_direction: directionObject.Name_direction } : null;
+      })
+    }));
+    return schedulesByDate;
+  }, [uniqueDates, uniqueDirections, directions, schedules]);
+
   return (
     <div className="schedule-container my-5 px-5">
       <div className="row">
@@ -333,7 +318,7 @@ const TableView = ({ uniqueDates, uniqueDirections, filteredSchedules, handleSel
           <thead className="table-dark">
             <tr>
               {uniqueDirections.map((direction, index) => (
-                <th className="px-5 py-3" key={index}>{direction[1]}</th>
+                <th className="px-5 py-3" key={index}>{"Направление: " + direction[1]}</th>
               ))}
             </tr>
           </thead>
@@ -342,7 +327,6 @@ const TableView = ({ uniqueDates, uniqueDirections, filteredSchedules, handleSel
               <tr key={dateIndex}>
                 {schedules.map((sched, directionIndex) => {
                   const isActive = activeCell && sched && activeCell.date === sched.date && activeCell.Name_direction === sched.Name_direction;
-
                   return (
                     <td 
                       key={directionIndex}
@@ -357,7 +341,7 @@ const TableView = ({ uniqueDates, uniqueDirections, filteredSchedules, handleSel
                           <p>Направление: {sched.Name_direction}</p>
                           <p>Аудитория: {sched.classroom}</p>
                         </span>
-                      ) : ("")}
+                      ) : ""}
                     </td>
                   );
                 })}
@@ -377,7 +361,7 @@ const CardView = ({ schedules, handleEditSchedule }) => {
         {schedules.map((item, index) => (
           <Card key={index} className="col-2 mx-2 my-4 text-center bg-light">
             <Card.Body>
-              <Card.Title>{new Date(item.date).toLocaleDateString('ru', { day: '2-digit', month: '2-digit' })}</Card.Title>
+              <Card.Title>Защита №{item.id_DS} <br></br> {new Date(item.date).toLocaleDateString('ru', { day: '2-digit', month: '2-digit' })}</Card.Title>
               <Card.Text>
                 <div>
                   <p>ГЭК №{item.id_G}</p>

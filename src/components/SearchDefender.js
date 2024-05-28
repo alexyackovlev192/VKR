@@ -21,7 +21,7 @@ const SearchDefender = ({ filters, handleFilterChange }) => {
           onChange={handleFilterChange}
         />
       </div>
-      <div className="col-2 my-2">
+      <div className="col-1 my-2">
         <label htmlFor="group" className="my-2">Группа</label>
         <input
           type="text"
@@ -54,7 +54,7 @@ const SearchDefender = ({ filters, handleFilterChange }) => {
           onChange={handleFilterChange}
         />
       </div>
-      <div className="col-2 my-2">
+      <div className="col-1 my-2">
         <label htmlFor="avgMark" className="my-2">Средний балл</label>
         <input
           type="text"
@@ -62,6 +62,17 @@ const SearchDefender = ({ filters, handleFilterChange }) => {
           id="avgMark"
           name="avgMark"
           value={filters.avgMark}
+          onChange={handleFilterChange}
+        />
+      </div>
+      <div className="col-1 my-2">
+        <label htmlFor="name_direction" className="my-2">Направление</label>
+        <input
+          type="text"
+          className="form-control mx-2"
+          id="name_direction"
+          name="name_direction"
+          value={filters.name_direction}
           onChange={handleFilterChange}
         />
       </div>

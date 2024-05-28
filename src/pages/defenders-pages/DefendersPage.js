@@ -28,23 +28,41 @@ const DefendersPage = () => {
     topic: '',
     scientificAdviser: '',
     avgMark: '',
-    redDiplom: ''
+    redDiplom: '',
+    name_direction: ''
   });
 
   const tableRef = useRef(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    axios.get('http://localhost:5000/students/thisYear', {
-      headers: {
-        'Authorization': `Bearer ${token}`
+    const fetchStudentsAndDirections = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const studentsResponse = await axios.get('http://localhost:5000/students/thisYear', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+  
+        const studentsWithDirections = await Promise.all(
+          studentsResponse.data.map(async student => {
+            const directionsResponse = await axios.get(`http://localhost:5000/directions/${student.id_D}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            return { ...student, Name_direction: directionsResponse.data.Name_direction };
+          })
+        );
+  
+        setDefenders(studentsWithDirections);
+        setSortedDefenders(studentsWithDirections);
+      } catch (error) {
+        console.error('Ошибка при загрузке данных:', error);
       }
-    })
-    .then(response => {
-      setDefenders(response.data);
-      setSortedDefenders(response.data);
-    })
-    .catch(error => console.error('Ошибка при загрузке данных:', error));
+    };
+  
+    fetchStudentsAndDirections();
   }, []);
 
   useEffect(() => {
@@ -107,9 +125,26 @@ const DefendersPage = () => {
     setFormData(null);
   };
 
-  const handleEditDefender = () => {
-    setFormData(activeRow);
-    setShowUpdateModal(true);
+  const handleEditDefender = async () => {
+    if (activeRow) {
+      const token = localStorage.getItem('token');
+      try {
+        const directionResponse = await axios.get(`http://localhost:5000/directions/${activeRow.id_D}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const directionName = directionResponse.data.Name_direction;
+
+        setFormData({
+          ...activeRow,
+          Name_direction: directionName
+        });
+        setShowUpdateModal(true);
+      } catch (error) {
+        console.error('Ошибка при получении направления:', error);
+      }
+    }
   };
 
   const handleAddDefender = () => {
@@ -117,20 +152,26 @@ const DefendersPage = () => {
     setFormData(null);
   };
 
-  const handleSaveAddDefender = (formData) => {
+  const handleSaveAddDefender = async (formData) => {
     const token = localStorage.getItem('token');
-    axios.post('http://localhost:5000/students/create', formData, {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-      .then(response => {
-        console.log('Новый студент успешно добавлен:', response.data);
-        setDefenders(prevDefenders => [...prevDefenders, response.data]);
-        handleCloseModal();
-      })
-      .catch(error => console.error('Ошибка при добавлении студента:', error));
+    try {
+      const response = await axios.post('http://localhost:5000/students/create', formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+  
+      const newStudent = formData;
+      console.log(newStudent);
+  
+      setDefenders(prevDefenders => [...prevDefenders, newStudent]);
+      setSortedDefenders(prevSorted => [...prevSorted, newStudent]);
+      handleCloseModal();
+    } catch (error) {
+      console.error('Ошибка при добавлении студента:', error);
+    }
   };
+
 
   const handleSaveUpdateDefender = (formData) => {
     const token = localStorage.getItem('token');
@@ -146,6 +187,11 @@ const DefendersPage = () => {
             defender.id_S === formData.id_S ? { ...defender, ...formData } : defender
           )
         );
+        setSortedDefenders(prevSorted =>
+          prevSorted.map(defender =>
+            defender.id_S === formData.id_S ? { ...defender, ...formData } : defender
+          )
+        );
         handleCloseModal();
       })
       .catch(error => console.error('Ошибка при сохранении изменений студента:', error));
@@ -153,8 +199,12 @@ const DefendersPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value, checked, type } = e.target;
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: type === 'checkbox' ? checked : value }));
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
+
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -162,60 +212,84 @@ const DefendersPage = () => {
   };
 
   const handleSearch = () => {
-    const { fullname, group, topic, scientificAdviser, avgMark, redDiplom } = filters;
+    const { fullname, group, topic, scientificAdviser, avgMark, redDiplom, name_direction } = filters;
     const filteredData = defenders.filter((defender) => {
       const fullnameMatch = defender.Fullname ? defender.Fullname.toLowerCase().includes(fullname.toLowerCase()) : true;
       const groupMatch = defender.Group ? defender.Group.toLowerCase().includes(group.toLowerCase()) : true;
       const topicMatch = defender.Topic ? defender.Topic.toLowerCase().includes(topic.toLowerCase()) : true;
       const scientificAdviserMatch = defender.ScientificAdviser ? defender.ScientificAdviser.toLowerCase().includes(scientificAdviser.toLowerCase()) : true;
+      const nameDirectionMatch = defender.Name_direction ? defender.Name_direction.toLowerCase().includes(name_direction.toLowerCase()) : true;
       const avgMarkMatch = avgMark ? defender.Avg_Mark === parseFloat(avgMark) : true;
       const redDiplomMatch = redDiplom === '' ? true : (defender.Red_Diplom ? 'Да' : 'Нет') === redDiplom;
-      return fullnameMatch && groupMatch && topicMatch && scientificAdviserMatch && avgMarkMatch && redDiplomMatch;
+      return fullnameMatch && groupMatch && topicMatch && scientificAdviserMatch && avgMarkMatch && redDiplomMatch && nameDirectionMatch;
     });
     setSortedDefenders(filteredData);
   };
 
   const handleExport = () => {
-    const headers = ['ФИО', 'Группа', 'Тема', 'Руководитель', 'Средний балл', 'С отличием'];
+    const headers = ['ФИО', 'Группа', 'Тема', 'Руководитель', 'Средний балл', 'С отличием', 'Год поступления', 'Направление'];
     const data = sortedDefenders.map(defender => [
       defender.Fullname,
       defender.Group,
       defender.Topic,
       defender.ScientificAdviser,
       defender.Avg_Mark,
-      defender.Red_Diplom ? 'Да' : 'Нет'
+      defender.Red_Diplom ? 'Да' : 'Нет',
+      defender.YearOfDefense,
+      defender.Name_direction
     ]);
 
     const worksheet = utils.aoa_to_sheet([headers, ...data]);
     const workbook = utils.book_new();
     utils.book_append_sheet(workbook, worksheet, 'Defenders');
-    writeFile(workbook, 'defenders.xlsx');
+    writeFile(workbook, 'Defenders.xlsx');
   };
 
-const handleFileUpload = (data) => {
-  const token = localStorage.getItem('token');
-  console.log(data);
+  const isValidRow = (row) => {
+    return (
+      row[0] !== undefined && row[0].trim() !== '' &&
+      row[1] !== undefined && row[1].trim() !== '' &&
+      row[2] !== undefined && row[2].trim() !== '' &&
+      row[3] !== undefined && row[3].trim() !== '' &&
+      row[4] !== undefined && !isNaN(parseFloat(row[4])) &&
+      row[6] !== undefined && row[6].trim() !== '' &&
+      row[7] !== undefined && row[7].trim() !== ''
+    );
+  };
   
-  const formattedData = data.map(row => ({
-    Fullname: row[0],
-    Group: row[1],
-    Topic: row[2],
-    ScientificAdviser: row[3],
-    Avg_Mark: row[4],
-    Red_Diplom: row[5] === 'Да'
-  }));
-
-  axios.post('http://localhost:5000/students/create', formattedData, {
-    headers: {
-      'Authorization': `Bearer ${token}`
+  const handleFileUpload = async (data) => {
+    const token = localStorage.getItem('token');
+  
+    const filteredData = data.filter(isValidRow);
+  
+    const formattedData = filteredData.map(row => ({
+      Fullname: row[0],
+      Group: row[1],
+      Topic: row[2],
+      ScientificAdviser: row[3],
+      Avg_Mark: parseFloat(row[4]),
+      Red_Diplom: row[5] === 'Да',
+      YearOfDefense: row[6],
+      Name_direction: row[7]
+    }));
+  
+    console.log(formattedData);
+  
+    try {
+      const response = await axios.post('http://localhost:5000/students/create', formattedData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+  
+      const newStudents = response.data;
+      setDefenders(prevDefenders => [...prevDefenders, ...newStudents]);
+      setSortedDefenders(prevSorted => [...prevSorted, ...newStudents]);
+    } catch (error) {
+      console.error('Ошибка при импорте данных:', error);
     }
-  })
-  .then(response => {
-    setDefenders(response.data);
-    setSortedDefenders(response.data);
-  })
-  .catch(error => console.error('Ошибка при импорте данных:', error));
-};
+  };
+
 
   return (
     <div className="my-5 px-5">
@@ -230,7 +304,7 @@ const handleFileUpload = (data) => {
         <Link to={`/list-defenders`} className="mx-3 ">
           <Button variant="primary" className="">Составы защищающихся</Button>
         </Link>
-        <Button variant="secondary" className="mx-3" onClick={() => setShowImportModal(true)}>
+        <Button variant="secondary" className="mx-3" disabled onClick={() => setShowImportModal(true)}>
           Импортировать
         </Button>
         <Button variant="secondary" className="mx-3" onClick={handleExport}>
@@ -248,6 +322,7 @@ const handleFileUpload = (data) => {
               <th onClick={() => sortData('ScientificAdviser')}>Руководитель{renderSortArrow('ScientificAdviser')}</th>
               <th onClick={() => sortData('Avg_Mark')}>Средний балл{renderSortArrow('Avg_Mark')}</th>
               <th onClick={() => sortData('Red_Diplom')}>С отличием{renderSortArrow('Red_Diplom')}</th>
+              <th onClick={() => sortData('Name_direction')}>Направление{renderSortArrow('Name_direction')}</th>
             </tr>
           </thead>
           <tbody>
@@ -264,6 +339,7 @@ const handleFileUpload = (data) => {
                 <td>{defender.ScientificAdviser}</td>
                 <td>{defender.Avg_Mark}</td>
                 <td>{defender.Red_Diplom ? 'Да' : 'Нет'}</td>
+                <td>{defender.Name_direction}</td>
               </tr>
             ))}
           </tbody>

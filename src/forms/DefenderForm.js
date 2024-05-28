@@ -74,7 +74,7 @@ const DefenderForm = ({ formData, handleInputChange }) => {
             type="checkbox"
             label="Красный диплом"
             name="Red_Diplom"
-            checked={Red_Diplom || ""}
+            checked={Red_Diplom || false}
             onChange={handleInputChange}
             />
         </Form.Group>
