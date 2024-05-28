@@ -182,7 +182,7 @@ const DefendersPage = () => {
         <Button variant="primary" className="mx-3" onClick={handleAddDefender}>
           Добавить
         </Button>
-        <Link to={`/test`} className="mx-3 ">
+        <Link to={`/list-defenders`} className="mx-3 ">
           <Button variant="primary" className="">Составы защищающихся</Button>
         </Link>
       </div>

@@ -99,7 +99,7 @@ const EditListDefendersForSchedulePage = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            navigate('/test');
+            navigate('/list-defenders');
             console.log(gecCompositionResponse.data);
         } catch (error) {
             console.error('Ошибка:', error);
@@ -109,7 +109,7 @@ const EditListDefendersForSchedulePage = () => {
     return (
         <div className="container-fluid text-center my-3">
             <div className="row my-3">
-                <Link to={`/test`} className="col-1">
+                <Link to={`/list-defenders`} className="col-1">
                     <Button variant="primary" className="">Назад</Button>
                 </Link>
                 <h4 className="col-10">Редактирование состава защищающихся для защиты №{id_DS}</h4>

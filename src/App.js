@@ -45,8 +45,8 @@ const App = () => {
                 <Route path="/my-schedule" element={<PageLayout><MySchedulePage /></PageLayout>} />
                 <Route path="/my-schedule-sec" element={<PageLayout><MyScheduleSecretariePage /></PageLayout>} />
                 <Route path="/my-schedule/:id_DS" element={<PageLayout><OpenMySchedulePage /></PageLayout>} />
-                <Route path="/test" element={<PageLayout><ListDefendersForSchedulePage /></PageLayout>} />
-                <Route path="/test-edit/:id_DS" element={<PageLayout><EditListDefendersForSchedulePage /></PageLayout>} />
+                <Route path="/list-defenders" element={<PageLayout><ListDefendersForSchedulePage /></PageLayout>} />
+                <Route path="/list-defenders-edit/:id_DS" element={<PageLayout><EditListDefendersForSchedulePage /></PageLayout>} />
                 <Route path="/defender-schedule/:id_S" element={<PageLayout><DefenderSchedulePage /></PageLayout>} />
                 <Route path="/my-gek" element={<PageLayout><MyGekPage /></PageLayout>} />
                 <Route path="/my-gek-sec" element={<PageLayout><MyGekSecretariePage /></PageLayout>} />

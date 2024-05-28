@@ -88,7 +88,7 @@ const ListDefendersForSchedulePage = () => {
               </ListGroup>
             </Card.Body>
             <Card.Footer className="text-left bg-light">
-              <Link to={`/test-edit/${data.id_DS}`}>
+              <Link to={`/list-defenders-edit/${data.id_DS}`}>
                 <Button variant="primary" className="mx-3">Редактировать</Button>
               </Link>
             </Card.Footer>
