@@ -53,7 +53,6 @@ const MySchedulePage = () => {
                 const flattenedScheduleDetails = schedulesWithDetails.flat().sort((a, b) => new Date(a.date) - new Date(b.date));
 
                 setScheduleDetails(flattenedScheduleDetails);
-                localStorage.setItem('id_DS', flattenedScheduleDetails.id_DS);
             } catch (error) {
                 console.error('Error loading schedules:', error);
             }

@@ -7,7 +7,8 @@ import axios from 'axios';
 const DefenderScheduleSecretariePage = () => {
     const { id_S } = useParams();
     const [defenderData, setDefenderData] = useState(null);
-    const [ratings, setRatings] = useState({});
+    const [scoresData, setScoresData] = useState({});
+    const [result, setResult] = useState({});
 
     const id_U = localStorage.getItem('id_U');
     const id_DSS = localStorage.getItem('id_DSS');
@@ -26,6 +27,13 @@ const DefenderScheduleSecretariePage = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            const resultResponse = await axios.get(`http://localhost:5000/resultComissionMember/GecResult/${id_DSS}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            console.log(resultResponse.data);
+            setScoresData(resultResponse.data);
             setDefenderData(studentResponse.data);
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -44,7 +52,7 @@ const DefenderScheduleSecretariePage = () => {
         const dataToSave = {
             id_DSS: id_DSS,
             id_U: id_U,
-            scores: Object.values(ratings),
+            //Result: Object.values(resultData),
             RecMagistracy: defenderData?.magRec ? 'Да' : 'Нет',
             RecPublication: defenderData?.publRec ? 'Да' : 'Нет'
         };
@@ -125,6 +133,28 @@ const DefenderScheduleSecretariePage = () => {
                         )}
                     </tbody>
                 </table>
+
+                <div className="my-5 mx-5 text-center">
+                    <h4 className="">Оценки и рекомендации от членов ГЭК</h4>
+                    <table className="table table-striped table-bordered table-light table-hover text-center">
+                        <thead className="table-dark">
+                            <tr>
+                                <th>Оценка</th>
+                                <th>Рекомендация в магистратуру</th>
+                                <th>Рекомендация к публикации</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {scoresData && (
+                                <tr key={scoresData.id}>
+                                    <td>{scoresData.averageResult}</td>
+                                    <td>{scoresData.RecMagistracy}</td>
+                                    <td>{scoresData.RecPublication}</td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>  
                 <Button onClick={handleSave} className="mt-3" variant="primary">Сохранить</Button>
             </div>
         </div>

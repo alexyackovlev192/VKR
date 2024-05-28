@@ -14,6 +14,7 @@ const DefenderSchedulePage = () => {
     const id_DS = localStorage.getItem('id_DS');
     const navigate = useNavigate();
 
+    console.log(id_DS);
     useEffect(() => {
         fetchData();
     }, [id_S]);
@@ -64,11 +65,12 @@ const DefenderSchedulePage = () => {
             });
             navigate(`/my-schedule/${id_DS}`);
             localStorage.removeItem('id_DSS');
-            localStorage.removeItem('id_DS');
         } catch (error) {
             console.error('Error saving data:', error);
         }
     };
+    // Необходимо добавить функцию handleBack для возврата на предыдущую страницу и обнулением localStorage
+    //localStorage.removeItem('id_DS'); 
 
     const RatingCriteria = ({ criteria }) => {
         const ratingOptions = [5, 4, 3, 2];

@@ -20,7 +20,6 @@ const OpenMyScheduleSecretariePage = () => {
 
     const fetchData = async () => {
         const token = localStorage.getItem('token');
-        const id_U = localStorage.getItem('id_U');
     
         try {
             const scheduleResponse = await axios.get(`http://localhost:5000/defenseScheduleStudents/${id_DS}`, {
@@ -40,7 +39,7 @@ const OpenMyScheduleSecretariePage = () => {
                 const studentData = studentDataResponse.data;
                 let resultData = null;
                 try {
-                    const resultResponse = await axios.get(`http://localhost:5000/resultComissionSecretary/${s.id_DSS}/${id_U}`, {
+                    const resultResponse = await axios.get(`http://localhost:5000/resultComissionSecretary/${s.id_DSS}`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
