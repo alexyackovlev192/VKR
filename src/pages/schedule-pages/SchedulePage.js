@@ -4,6 +4,7 @@ import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 
 import UpdateSchedule from '../../modal-windows/UpdateSchedule';
+import ListDefenders from '../../modal-windows/ListDefenders';
 import AddSchedule from '../../modal-windows/AddSchedule';
 
 import '../style-pages/SchedulePage.css';
@@ -110,6 +111,10 @@ const SchedulePage = () => {
     setActiveCell(selectedItem);
     setFormData(selectedItem);
     setShowUpdateModal(true);
+  };
+
+  const handleEditDefenderSchedule = (selectedItem) => {
+    setShowListModal(true);
   };
 
   const handleAddSchedule = () => {
@@ -268,6 +273,7 @@ const SchedulePage = () => {
           <CardView
             schedules={schedules}
             handleEditSchedule={handleEditSchedule}
+            handleEditDefenderSchedule={handleEditDefenderSchedule}
           />
         )}
       </div>
@@ -354,7 +360,7 @@ const TableView = ({ uniqueDates, uniqueDirections, filteredSchedules, handleSel
   );
 };
 
-const CardView = ({ schedules, handleEditSchedule }) => {
+const CardView = ({ schedules, handleEditSchedule, handleEditDefenderSchedule }) => {
   return (
     <div className="container-fluid text-center my-3">
       <div className="row justify-content-evenly">
@@ -371,6 +377,7 @@ const CardView = ({ schedules, handleEditSchedule }) => {
                 </div>
               </Card.Text>
               <Button variant="primary" onClick={() => handleEditSchedule(item)}>Редактировать</Button>
+              <Button variant="primary" onClick={() => handleEditDefenderSchedule(item)}>Список защищающихся</Button>
             </Card.Body>
           </Card>
         ))}
