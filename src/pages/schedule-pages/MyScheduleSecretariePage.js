@@ -62,7 +62,7 @@ const MySchedulePage = () => {
     }, []);
 
     const handleOpen = (i) => {
-        navigate(`/my-schedule/${i.id_DS}`);
+        navigate(`/my-schedule-sec/${i.id_DS}`);
         localStorage.setItem('id_DS', i.id_DS);
     }
 

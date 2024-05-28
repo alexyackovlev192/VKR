@@ -6,7 +6,9 @@ import SchedulePage from './pages/schedule-pages/SchedulePage';
 import MySchedulePage from './pages/schedule-pages/MySchedulePage';
 import MyScheduleSecretariePage from './pages/schedule-pages/MyScheduleSecretariePage';
 import OpenMySchedulePage from './pages/schedule-pages/OpenMySchedulePage';
-import DefenderSchedulePage from './pages/schedule-pages/DefenderSchedulePage';
+import OpenMyScheduleSecretariePage from './pages/schedule-pages/OpenMyScheduleSecretariePage';
+import DefenderSchedulePage from './pages/schedule-pages/DefenderSchedulePage'; 
+import DefenderScheduleSecretariePage from './pages/schedule-pages/DefenderScheduleSecretariePage'; 
 import GekPage from './pages/gek-pages/GekPage';
 import MyGekPage from './pages/gek-pages/MyGekPage';
 import MyGekSecretariePage from './pages/gek-pages/MyGekSecretariePage';
@@ -45,9 +47,11 @@ const App = () => {
                 <Route path="/my-schedule" element={<PageLayout><MySchedulePage /></PageLayout>} />
                 <Route path="/my-schedule-sec" element={<PageLayout><MyScheduleSecretariePage /></PageLayout>} />
                 <Route path="/my-schedule/:id_DS" element={<PageLayout><OpenMySchedulePage /></PageLayout>} />
+                <Route path="/my-schedule-sec/:id_DS" element={<PageLayout><OpenMyScheduleSecretariePage /></PageLayout>} />
                 <Route path="/list-defenders" element={<PageLayout><ListDefendersForSchedulePage /></PageLayout>} />
                 <Route path="/list-defenders-edit/:id_DS" element={<PageLayout><EditListDefendersForSchedulePage /></PageLayout>} />
                 <Route path="/defender-schedule/:id_S" element={<PageLayout><DefenderSchedulePage /></PageLayout>} />
+                <Route path="/defender-schedule-sec/:id_S" element={<PageLayout><DefenderScheduleSecretariePage /></PageLayout>} />
                 <Route path="/my-gek" element={<PageLayout><MyGekPage /></PageLayout>} />
                 <Route path="/my-gek-sec" element={<PageLayout><MyGekSecretariePage /></PageLayout>} />
                 <Route path="/gek" element={<PageLayout><GekPage /></PageLayout>} />

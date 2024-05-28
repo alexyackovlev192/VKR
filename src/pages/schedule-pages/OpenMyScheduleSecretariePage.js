@@ -40,7 +40,7 @@ const OpenMyScheduleSecretariePage = () => {
                 const studentData = studentDataResponse.data;
                 let resultData = null;
                 try {
-                    const resultResponse = await axios.get(`http://localhost:5000/resultComissionMember/${s.id_DSS}/${id_U}`, {
+                    const resultResponse = await axios.get(`http://localhost:5000/resultComissionSecretary/${s.id_DSS}/${id_U}`, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
@@ -107,13 +107,13 @@ const OpenMyScheduleSecretariePage = () => {
 
     const handleClickButton = (d) => {
         localStorage.setItem('id_DSS', d.id_DSS);
-        navigate(`/defender-schedule/${d.id_S}`);
+        navigate(`/defender-schedule-sec/${d.id_S}`);
     };
 
     return (
         <div className="container-fluid text-center my-3">
             <div className="row my-3">
-                <Link to={`/my-schedule`} className="col-1">
+                <Link to={`/my-schedule-sec`} className="col-1">
                     <Button variant="primary" className="">Назад</Button>
                 </Link>
                 <h4 className="col-10">Мои защиты</h4>
