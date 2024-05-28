@@ -1,11 +1,12 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { writeFile, utils } from 'xlsx';
 import UpdateDefender from '../../modal-windows/UpdateDefender';
 import AddDefender from '../../modal-windows/AddDefender';
 import SearchStud from '../../components/SearchDefender';
+import ImportDefendersModal from '../../modal-windows/ImportDefenders';
 
 import '../style-pages/DefendersPage.css';
 
@@ -13,6 +14,7 @@ const DefendersPage = () => {
   const [defenders, setDefenders] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [formData, setFormData] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
 
@@ -26,7 +28,7 @@ const DefendersPage = () => {
     topic: '',
     scientificAdviser: '',
     avgMark: '',
-    redDiplom: '' 
+    redDiplom: ''
   });
 
   const tableRef = useRef(null);
@@ -48,7 +50,7 @@ const DefendersPage = () => {
   useEffect(() => {
     handleSearch();
   }, [defenders, filters]);
-  
+
   useEffect(() => {
     const handleClickOutsideTable = (event) => {
       if (tableRef.current && !tableRef.current.contains(event.target)) {
@@ -101,6 +103,7 @@ const DefendersPage = () => {
   const handleCloseModal = () => {
     setShowUpdateModal(false);
     setShowAddModal(false);
+    setShowImportModal(false);
     setFormData(null);
   };
 
@@ -172,10 +175,52 @@ const DefendersPage = () => {
     setSortedDefenders(filteredData);
   };
 
+  const handleExport = () => {
+    const headers = ['ФИО', 'Группа', 'Тема', 'Руководитель', 'Средний балл', 'С отличием'];
+    const data = sortedDefenders.map(defender => [
+      defender.Fullname,
+      defender.Group,
+      defender.Topic,
+      defender.ScientificAdviser,
+      defender.Avg_Mark,
+      defender.Red_Diplom ? 'Да' : 'Нет'
+    ]);
+
+    const worksheet = utils.aoa_to_sheet([headers, ...data]);
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, 'Defenders');
+    writeFile(workbook, 'defenders.xlsx');
+  };
+
+const handleFileUpload = (data) => {
+  const token = localStorage.getItem('token');
+  console.log(data);
+  
+  const formattedData = data.map(row => ({
+    Fullname: row[0],
+    Group: row[1],
+    Topic: row[2],
+    ScientificAdviser: row[3],
+    Avg_Mark: row[4],
+    Red_Diplom: row[5] === 'Да'
+  }));
+
+  axios.post('http://localhost:5000/students/create', formattedData, {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  .then(response => {
+    setDefenders(response.data);
+    setSortedDefenders(response.data);
+  })
+  .catch(error => console.error('Ошибка при импорте данных:', error));
+};
+
   return (
     <div className="my-5 px-5">
       <div className="">
-        <SearchStud filters={filters} handleFilterChange={handleFilterChange} /> 
+        <SearchStud filters={filters} handleFilterChange={handleFilterChange} />
         <Button variant="primary" className="mx-3" onClick={handleEditDefender} disabled={!activeRow}>
           Редактировать
         </Button>
@@ -185,6 +230,12 @@ const DefendersPage = () => {
         <Link to={`/list-defenders`} className="mx-3 ">
           <Button variant="primary" className="">Составы защищающихся</Button>
         </Link>
+        <Button variant="secondary" className="mx-3" onClick={() => setShowImportModal(true)}>
+          Импортировать
+        </Button>
+        <Button variant="secondary" className="mx-3" onClick={handleExport}>
+          Экспортировать
+        </Button>
       </div>
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
@@ -234,6 +285,13 @@ const DefendersPage = () => {
           handleSaveChanges={handleSaveAddDefender}
           formData={formData}
           handleInputChange={handleInputChange}
+        />
+      )}
+      {showImportModal && (
+        <ImportDefendersModal
+          showModal={showImportModal}
+          handleCloseModal={handleCloseModal}
+          handleFileUpload={handleFileUpload}
         />
       )}
     </div>
