@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 
 import HomePage from './pages/HomePage';
 import MembersPage from './pages/MembersPage';
+import SecretariesPage from './pages/SecretariesPage';
 import SchedulePage from './pages/schedule-pages/SchedulePage';
 import MySchedulePage from './pages/schedule-pages/MySchedulePage';
 import MyScheduleSecretariePage from './pages/schedule-pages/MyScheduleSecretariePage';
@@ -44,6 +45,7 @@ const App = () => {
                 <Route path="/users" element={<PageLayout><UsersPage /></PageLayout>} />
                 <Route path="/main" element={<PageLayout><HomePage /></PageLayout>} />
                 <Route path="/members" element={<PageLayout><MembersPage /></PageLayout>} />
+                <Route path="/secretaries" element={<PageLayout><SecretariesPage /></PageLayout>} />
                 <Route path="/schedule" element={<PageLayout><SchedulePage /></PageLayout>} />
                 <Route path="/my-schedule" element={<PageLayout><MySchedulePage /></PageLayout>} />
                 <Route path="/my-schedule-sec" element={<PageLayout><MyScheduleSecretariePage /></PageLayout>} />

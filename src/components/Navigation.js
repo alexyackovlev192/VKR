@@ -20,6 +20,7 @@ const navigationItems = {
   3: [
     { href: "/", text: "Главная" },
     { href: "/members", text: "Список членов ГЭК" },
+    { href: "/secretaries", text: "Список секретарей ГЭК" },
     { href: "/schedule", text: "Расписание защит" },
     { href: "/gek", text: "ГЭК" },
     { href: "/defenders", text: "Список защищающихся" },

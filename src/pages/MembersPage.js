@@ -88,7 +88,6 @@ const MembersPage = () => {
 
   const handleRowClick = (member) => {
     setActiveRow(member);
-    console.log('Выбран ГЭК:', member.id_U);
   };
 
   const handleCloseModal = () => {
