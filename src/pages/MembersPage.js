@@ -2,9 +2,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 import UpdateMember from '../modal-windows/UpdateMember';
-import SearchMem from '../components/SearchMember'; 
+import SearchMem from '../components/SearchMember';
+import { writeFile, utils } from 'xlsx';
 import './style-pages/MembersPage.css';
 
 const MembersPage = () => {
@@ -13,24 +14,21 @@ const MembersPage = () => {
   const [formData, setFormData] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
   const [userRole, setUserRole] = useState(null);
-  
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
   const [sortedMembers, setSortedMembers] = useState([]);
-
   const [filters, setFilters] = useState({
     fullname: '',
     post: '',
     mail: ''
   });
-
   const tableRef = useRef(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       const decodedToken = jwtDecode(token);
-      setUserRole(decodedToken.roles); 
+      setUserRole(decodedToken.roles);
     }
 
     axios.get('http://localhost:5000/gecMembers', {
@@ -40,7 +38,7 @@ const MembersPage = () => {
     })
     .then(response => {
       setMembers(response.data);
-      setSortedMembers(response.data); 
+      setSortedMembers(response.data);
     })
     .catch(error => console.error('Ошибка при загрузке данных:', error));
   }, []);
@@ -70,7 +68,7 @@ const MembersPage = () => {
       return sortOrder === 'asc' ? a[sortColumn].localeCompare(b[sortColumn]) : b[sortColumn].localeCompare(a[sortColumn]);
     });
     setSortedMembers(sortedData);
-  }, [sortColumn, sortOrder]);
+  }, [sortColumn, sortOrder, sortedMembers]);
 
   const sortData = (column) => {
     if (sortColumn === column) {
@@ -87,7 +85,7 @@ const MembersPage = () => {
     }
     return null;
   };
-  
+
   const handleRowClick = (member) => {
     setActiveRow(member);
     console.log('Выбран ГЭК:', member.id_U);
@@ -143,6 +141,22 @@ const MembersPage = () => {
     setSortedMembers(filteredData);
   };
 
+  const handleExportToExcel = () => {
+    const ws = utils.json_to_sheet(
+      sortedMembers.map((member, index) => ({
+        '№': index + 1,
+        'ФИО': member.Fullname,
+        'Должность': member.Post,
+        'Почта': member.Mail
+      }))
+    );
+
+    const wb = utils.book_new();
+    utils.book_append_sheet(wb, ws, 'Members');
+
+    writeFile(wb, 'members.xlsx');
+  };
+
   // Function to render content based on user role
   const renderContentByRole = () => {
     if (!userRole) return null;
@@ -153,6 +167,9 @@ const MembersPage = () => {
         <>
           <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>
             Редактировать
+          </Button>
+          <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>
+            Экспорт в Excel
           </Button>
           <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
             <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
@@ -193,6 +210,9 @@ const MembersPage = () => {
     } else if (userRole.includes(2)) {
       return (
         <>
+          <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>
+            Экспорт в Excel
+          </Button>
           <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
             <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
               <thead className="table-dark">
@@ -228,7 +248,7 @@ const MembersPage = () => {
 
   return (
     <div className="my-5 px-5">
-      <SearchMem filters={filters} handleFilterChange={handleFilterChange} /> 
+      <SearchMem filters={filters} handleFilterChange={handleFilterChange} />
       {renderContentByRole()}
     </div>
   );
