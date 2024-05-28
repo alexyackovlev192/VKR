@@ -114,7 +114,7 @@ const SchedulePage = () => {
   };
 
   const handleEditDefenderSchedule = (selectedItem) => {
-    setShowListModal(true);
+    //setShowListModal(true);
   };
 
   const handleAddSchedule = () => {
@@ -376,8 +376,8 @@ const CardView = ({ schedules, handleEditSchedule, handleEditDefenderSchedule })
                   <p>Аудитория: {item.classroom}</p>
                 </div>
               </Card.Text>
-              <Button variant="primary" onClick={() => handleEditSchedule(item)}>Редактировать</Button>
-              <Button variant="primary" onClick={() => handleEditDefenderSchedule(item)}>Список защищающихся</Button>
+              <Button variant="primary" className="my-2" onClick={() => handleEditSchedule(item)}>Редактировать</Button>
+              <Button variant="primary" className="my-2" onClick={() => handleEditDefenderSchedule(item)}>Список студентов</Button>
             </Card.Body>
           </Card>
         ))}
