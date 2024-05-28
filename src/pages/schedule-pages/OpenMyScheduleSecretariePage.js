@@ -131,6 +131,7 @@ const OpenMyScheduleSecretariePage = () => {
                             <th>Рекомендация в магистратуру</th>
                             <th>Рекомендация к публикации</th>
                             <th>Оценка</th>
+                            <th>№ Протокола</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -147,6 +148,7 @@ const OpenMyScheduleSecretariePage = () => {
                                 <td>{defender.RecMagistracy ? defender.RecMagistracy : ''}</td>
                                 <td>{defender.RecPublication ? defender.RecPublication : ''}</td>
                                 <td>{defender.Result}</td>
+                                <td>{defender.NumberProtocol}</td>
                                 <td>
                                     <Button 
                                         variant="primary" 

@@ -8,7 +8,7 @@ const DefenderScheduleSecretariePage = () => {
     const { id_S } = useParams();
     const [defenderData, setDefenderData] = useState(null);
     const [scoresData, setScoresData] = useState({});
-    const [result, setResult] = useState({});
+    const [formData, setFormData] = useState({});
 
     const id_U = localStorage.getItem('id_U');
     const id_DSS = localStorage.getItem('id_DSS');
@@ -32,7 +32,6 @@ const DefenderScheduleSecretariePage = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            console.log(resultResponse.data);
             setScoresData(resultResponse.data);
             setDefenderData(studentResponse.data);
         } catch (error) {
@@ -40,21 +39,23 @@ const DefenderScheduleSecretariePage = () => {
         }
     };
 
-    const handleRecChange = useCallback((field, value) => {
-        setDefenderData(prevState => ({
-            ...prevState,
-            [field]: value
+    const handleInputChange = (e) => {
+        const { name, value, checked, type } = e.target;
+        setFormData((prevFormData) => ({
+            ...prevFormData,
+            [name]: type === 'checkbox' ? checked : value
         }));
-    }, []);
+    };
 
     const handleSave = async () => {
         const token = localStorage.getItem('token');
         const dataToSave = {
             id_DSS: id_DSS,
             id_U: id_U,
-            //Result: Object.values(resultData),
-            RecMagistracy: defenderData?.magRec ? 'Да' : 'Нет',
-            RecPublication: defenderData?.publRec ? 'Да' : 'Нет'
+            Result: formData.Result,
+            RecMagistracy: formData.RecMag ? 'Да' : 'Нет',
+            RecPublication: formData.RecPub ? 'Да' : 'Нет',
+            NumberProtocol: formData.NumberProtocol
         };
 
         try {
@@ -65,7 +66,6 @@ const DefenderScheduleSecretariePage = () => {
             });
             navigate(`/my-schedule-sec/${id_DS}`);
             localStorage.removeItem('id_DSS');
-            localStorage.removeItem('id_DS');
         } catch (error) {
             console.error('Error saving data:', error);
         }
@@ -90,9 +90,10 @@ const DefenderScheduleSecretariePage = () => {
                             <th>Научрук</th>
                             <th>Средний балл</th>
                             <th>Красный диплом</th>
+                            <th>Оценка</th>
                             <th>Рекомендация в магистратуру</th>
                             <th>Рекомендация к публикации</th>
-                            <th>Оценка</th>
+                            <th>№ Протокола</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -106,28 +107,41 @@ const DefenderScheduleSecretariePage = () => {
                                 <td>{defenderData.Avg_Mark}</td>
                                 <td>{defenderData.Red_Diplom ? 'Да' : 'Нет'}</td>
                                 <td>
+                                    <Form.Select
+                                        type="text"
+                                        name="Result"
+                                        value={formData.Result || ''}
+                                        onChange={handleInputChange}
+                                    >
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </Form.Select>
+                                </td>
+                                <td>
                                     <Form.Check
                                         type="checkbox"
-                                        checked={defenderData.magRec}
-                                        onChange={(e) => handleRecChange('magRec', e.target.checked)}
+                                        name="RecMag"
+                                        checked={formData.RecMag || false}
+                                        onChange={handleInputChange}
                                     />
                                 </td>
                                 <td>
                                     <Form.Check
                                         type="checkbox"
-                                        checked={defenderData.publRec}
-                                        onChange={(e) => handleRecChange('publRec', e.target.checked)}
+                                        name="RecPub"
+                                        checked={formData.RecPub || false}
+                                        onChange={handleInputChange}
                                     />
                                 </td>
                                 <td>
-                                <Form.Select
-                                    type="text"
-                                    name="result">
-                                    <option value="2">2</option>
-                                    <option value="3">3</option>
-                                    <option value="4">4</option>
-                                    <option value="5">5</option>
-                                </Form.Select>
+                                    <Form.Control
+                                        type="text"
+                                        name="NumberProtocol"
+                                        value={formData.NumberProtocol || ''}
+                                        onChange={handleInputChange}
+                                    />
                                 </td>
                             </tr>
                         )}
