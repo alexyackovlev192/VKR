@@ -3,13 +3,11 @@ import { Modal, Button } from 'react-bootstrap';
 import MemberForm from '../forms/MemberForm';
 
 const UpdateMember = ({
-  members,
   showModal,
   handleCloseModal,
   formData,
   handleInputChange,
   handleSaveChanges,
-  //handleDeleteMember
 }) => {
   return (
     <Modal show={showModal} onHide={handleCloseModal}>
@@ -19,7 +17,7 @@ const UpdateMember = ({
 
       <Modal.Body>
         {formData && (
-          <MemberForm formData={formData} handleInputChange={handleInputChange} members={members} />
+          <MemberForm formData={formData} handleInputChange={handleInputChange} />
         )}
       </Modal.Body>
 
@@ -30,9 +28,6 @@ const UpdateMember = ({
         <Button variant="secondary" onClick={handleCloseModal}>
           Отмена
         </Button>
-        {/* <Button variant="danger" onClick={() => handleDeleteMember(formData)}>
-          Удалить
-        </Button> */}
       </Modal.Footer>
     </Modal>
   );

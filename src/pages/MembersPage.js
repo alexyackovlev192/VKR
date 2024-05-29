@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
 import UpdateMember from '../modal-windows/UpdateMember';
+import WarningModal from '../modal-windows/WarningModal';
 import SearchMem from '../components/SearchMember';
 import { writeFile, utils } from 'xlsx';
 import './style-pages/MembersPage.css';
@@ -11,8 +12,10 @@ import './style-pages/MembersPage.css';
 const MembersPage = () => {
   const [members, setMembers] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showWarningModal, setShowWarningModal] = useState(false);
   const [formData, setFormData] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
+  const [changes, setChanges] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
@@ -94,6 +97,9 @@ const MembersPage = () => {
     setShowUpdateModal(false);
     setFormData(null);
   };
+  const handleCloseWarningModal = () => {
+    setShowWarningModal(false);
+  };
 
   const handleEditMember = () => {
     setFormData(activeRow);
@@ -102,6 +108,11 @@ const MembersPage = () => {
 
   const handleSaveUpdateMembers = (formData) => {
     const token = localStorage.getItem('token');
+    if (!changes) {
+      setShowWarningModal(true);
+      return;
+    }
+  
     axios.put(`http://localhost:5000/gecMembers/${formData.id_U}`, formData, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -117,11 +128,14 @@ const MembersPage = () => {
       handleCloseModal();
     })
     .catch(error => console.error('Ошибка при сохранении изменении информации о члене ГЭК:', error));
+
+    setChanges(false);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    setChanges(true);
   };
 
   const handleFilterChange = (e) => {
@@ -195,13 +209,13 @@ const MembersPage = () => {
             </table>
           </div>
           <UpdateMember
-            members={members}
             showModal={showUpdateModal}
             handleCloseModal={handleCloseModal}
             formData={formData}
             handleInputChange={handleInputChange}
             handleSaveChanges={handleSaveUpdateMembers}
           />
+          <WarningModal show={showWarningModal} handleClose={handleCloseWarningModal} />
         </>
       );
     } else if (userRole.includes(2)) {

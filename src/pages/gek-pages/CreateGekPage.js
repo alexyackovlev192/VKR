@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from 'react-bootstrap';
 import CreateGekForm from '../../forms/GekForm';
 
 const CreateGekPage = () => {
+  const navigate = useNavigate();
   const [directories, setDirectories] = useState([]);
   const [secretaries, setSecretaries] = useState([]);
   const [formData, setFormData] = useState(() => {
@@ -42,19 +43,23 @@ const CreateGekPage = () => {
       const selectedSecretary = secretaries.find(sec => sec.Fullname === value);
       if (selectedSecretary) {
         localStorage.setItem('id_Sec', selectedSecretary.id_U); 
-        console.log(localStorage.getItem('id_Sec'));
       }
     }
 
     setFormData(update);
   }, [formData, secretaries]);
 
+  const handleBack = () => {
+    navigate(`/gek`);
+    localStorage.removeItem('formData');
+  }
+
   return (
       <div className="container-fluid text-center my-3">
         <div className="row my-3">
-            <Link to={`/gek`} className="col-1">
-              <Button variant="primary" className="">Назад</Button>
-            </Link>
+            <div className="col-1">
+              <Button variant="primary" onClick={() => handleBack()}>Назад</Button>
+            </div>
             <h4 className="col-10">Создание ГЭК</h4>
         </div>
         <div className="d-flex justify-content-center">
