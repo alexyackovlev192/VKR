@@ -9,27 +9,26 @@ const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
   const { id_G, date, Name_direction, time, classroom } = formData || {};
   const [startDate, setStartDate] = useState(date);
   const [selectGek, setSelectGek] = useState(null);
+  const [localDirection, setLocalDirection] = useState(Name_direction);
 
   const handleGekChange = (e) => {
     const { value } = e.target;
-    handleInputChange(e);
     setSelectGek(geks.find(g => g.id_G === parseInt(value)));
+    handleInputChange(e);
   };
+  
 
   useEffect(() => {
-    const fetchDirection = (id_D) => {
-      const token = localStorage.getItem('token');
-      axios.get(`http://localhost:5000/directions/${id_D}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      .then(response => {
-        handleInputChange({ target: { name: 'Name_direction', value: response.data.Name_direction } });
-      })
-      .catch(error => {
+    const fetchDirection = async (id_D) => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`http://localhost:5000/directions/${id_D}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        setLocalDirection(response.data.Name_direction);
+      } catch (error) {
         console.error('Ошибка при получении направления:', error);
-      });
+      }
     };
 
     if (isEditMode && id_G) {
@@ -43,7 +42,17 @@ const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
     } else if (selectGek && selectGek.id_D) {
       fetchDirection(selectGek.id_D);
     }
+
+    return () => {
+      setSelectGek(null);
+    };
   }, [selectGek, isEditMode, id_G, geks]);
+
+  useEffect(() => {
+    if (localDirection !== Name_direction && !isEditMode) {
+      handleInputChange({ target: { name: 'Name_direction', value: localDirection } });
+    }
+  }, [localDirection, Name_direction, handleInputChange, isEditMode]);
 
   return (
     <Form>
@@ -90,10 +99,9 @@ const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
         <Form.Control
           type="text"
           name="Name_direction"
-          value={Name_direction || ""}
+          value={localDirection || ""}
           onChange={handleInputChange}
-          disabled={true} // поле недоступно для редактирования, так как заполняется автоматически
-        />
+          disabled={true} />
       </Form.Group>
       <Form.Group controlId="formTime">
         <Form.Label>Время</Form.Label>

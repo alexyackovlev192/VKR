@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
 
-const WarningModal = ({ show, handleClose }) => {
+const WarningWindow = ({ show, handleClose, errorMessage }) => {
   return (
     <Modal 
         show={show} 
@@ -14,7 +14,7 @@ const WarningModal = ({ show, handleClose }) => {
         <Modal.Title>Предупреждение</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        Нет изменений для сохранения.
+        {errorMessage}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose}>
@@ -25,4 +25,4 @@ const WarningModal = ({ show, handleClose }) => {
   );
 };
 
-export default WarningModal;
+export default WarningWindow;

@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
 import UpdateMember from '../modal-windows/UpdateMember';
-import WarningModal from '../modal-windows/WarningModal';
+import WarningWindow from '../components/WarningWindow';
 import SearchMem from '../components/SearchMember';
 import { writeFile, utils } from 'xlsx';
 import './style-pages/MembersPage.css';
@@ -12,7 +12,7 @@ import './style-pages/MembersPage.css';
 const MembersPage = () => {
   const [members, setMembers] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [showWarningWindow, setShowWarningWindow] = useState(false);
   const [formData, setFormData] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
   const [changes, setChanges] = useState(false);
@@ -25,6 +25,7 @@ const MembersPage = () => {
     post: '',
     mail: ''
   });
+  const [errorMessage, setErrorMessage] = useState('');
   const tableRef = useRef(null);
 
   useEffect(() => {
@@ -43,7 +44,11 @@ const MembersPage = () => {
       setMembers(response.data);
       setSortedMembers(response.data);
     })
-    .catch(error => console.error('Ошибка при загрузке данных:', error));
+    .catch(error => {
+      console.error('Ошибка при загрузке данных:', error);
+      setErrorMessage('Ошибка при загрузке данных.');
+      setShowWarningWindow(true);
+    });
   }, []);
 
   useEffect(() => {
@@ -97,8 +102,8 @@ const MembersPage = () => {
     setShowUpdateModal(false);
     setFormData(null);
   };
-  const handleCloseWarningModal = () => {
-    setShowWarningModal(false);
+  const handleCloseWarningWindow = () => {
+    setShowWarningWindow(false);
   };
 
   const handleEditMember = () => {
@@ -109,7 +114,8 @@ const MembersPage = () => {
   const handleSaveUpdateMembers = (formData) => {
     const token = localStorage.getItem('token');
     if (!changes) {
-      setShowWarningModal(true);
+      setErrorMessage('Нет изменений для сохранения.');
+      setShowWarningWindow(true);
       return;
     }
   
@@ -127,7 +133,11 @@ const MembersPage = () => {
       );
       handleCloseModal();
     })
-    .catch(error => console.error('Ошибка при сохранении изменении информации о члене ГЭК:', error));
+    .catch(error => {
+      console.error('Ошибка при сохранении изменении информации о члене ГЭК:', error);
+      setErrorMessage('Ошибка при сохранении изменении информации о члене ГЭК.');
+      setShowWarningWindow(true);
+    });
 
     setChanges(false);
   };
@@ -215,7 +225,10 @@ const MembersPage = () => {
             handleInputChange={handleInputChange}
             handleSaveChanges={handleSaveUpdateMembers}
           />
-          <WarningModal show={showWarningModal} handleClose={handleCloseWarningModal} />
+          <WarningWindow 
+            show={showWarningWindow} 
+            handleClose={handleCloseWarningWindow} 
+            errorMessage={errorMessage} />
         </>
       );
     } else if (userRole.includes(2)) {

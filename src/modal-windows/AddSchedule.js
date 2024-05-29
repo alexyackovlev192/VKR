@@ -21,7 +21,7 @@ const AddSchedule = ({
           formData={formData} 
           handleInputChange={handleInputChange} 
           geks={geks} 
-          isEditMode={false} // режим создания
+          isEditMode={false} 
         />
       </Modal.Body>
 

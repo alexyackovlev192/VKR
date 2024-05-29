@@ -1,6 +1,5 @@
 import React from 'react';
 import { Modal, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
 import ScheduleForm from '../forms/ScheduleForm';
 
 const UpdateSchedule = ({
@@ -33,9 +32,6 @@ const UpdateSchedule = ({
         <Button variant="secondary" onClick={handleCloseModal}>
           Отмена
         </Button>
-        {/* <Button variant="danger" onClick={() => handleDeleteSchedule(formData)}>
-          Удалить
-        </Button> */}
       </Modal.Footer>
     </Modal>
   );

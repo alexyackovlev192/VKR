@@ -4,14 +4,17 @@ import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
 import UpdateSecretarie from '../modal-windows/UpdateSecretarie';
+import WarningWindow from '../components/WarningWindow'; // Импортируем WarningWindow
 import SearchMem from '../components/SearchMember';
 import { writeFile, utils } from 'xlsx';
 
 const SecretariesPage = () => {
   const [secretaries, setSecretaries] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showWarningWindow , setShowWarningWindow ] = useState(false);
   const [formData, setFormData] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
+  const [changes, setChanges] = useState(false);
   const [userRole, setUserRole] = useState(null);
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
@@ -21,6 +24,7 @@ const SecretariesPage = () => {
     post: '',
     mail: ''
   });
+  const [errorMessage, setErrorMessage] = useState('');
   const tableRef = useRef(null);
 
   useEffect(() => {
@@ -94,6 +98,10 @@ const SecretariesPage = () => {
     setFormData(null);
   };
 
+  const handleCloseWarningWindow = () => {
+    setShowWarningWindow (false);
+  };
+
   const handleEditSecretarie = () => {
     setFormData(activeRow);
     setShowUpdateModal(true);
@@ -101,6 +109,11 @@ const SecretariesPage = () => {
 
   const handleSaveUpdateSecretaries = (formData) => {
     const token = localStorage.getItem('token');
+    if (!changes) {
+      setErrorMessage('Нет изменений для сохранения.');
+      setShowWarningWindow (true);
+      return;
+    }
     axios.put(`http://localhost:5000/secretariesGec/${formData.id_U}`, formData, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -115,12 +128,19 @@ const SecretariesPage = () => {
       );
       handleCloseModal();
     })
-    .catch(error => console.error('Ошибка при сохранении изменении информации о секретаре:', error));
+    .catch(error => {
+      console.error('Ошибка при сохранении изменении информации о секретаре:', error);
+      setErrorMessage('Ошибка при сохранении изменении информации о секретаре.');
+      setShowWarningWindow(true);
+    });
+
+    setChanges(false);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    setChanges(true);
   };
 
   const handleFilterChange = (e) => {
@@ -200,6 +220,11 @@ const SecretariesPage = () => {
             formData={formData}
             handleInputChange={handleInputChange}
             handleSaveChanges={handleSaveUpdateSecretaries}
+          />
+          <WarningWindow 
+            show={showWarningWindow } 
+            handleClose={handleCloseWarningWindow } 
+            errorMessage={errorMessage} 
           />
         </>
       );
