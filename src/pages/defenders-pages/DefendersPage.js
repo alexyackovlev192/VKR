@@ -295,10 +295,10 @@ const DefendersPage = () => {
           <Button variant="primary" className="">Составы защищающихся</Button>
         </Link>
         <Button variant="secondary" className="mx-3" onClick={() => setShowImportModal(true)}>
-          Импортировать
+          Загрузить
         </Button>
         <Button variant="secondary" className="mx-3" onClick={handleExport}>
-          Экспортировать
+          Скачать
         </Button>
       </div>
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>

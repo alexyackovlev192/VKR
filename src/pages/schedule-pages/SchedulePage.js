@@ -113,10 +113,6 @@ const SchedulePage = () => {
     setShowUpdateModal(true);
   };
 
-  const handleEditDefenderSchedule = (selectedItem) => {
-    //setShowListModal(true);
-  };
-
   const handleAddSchedule = () => {
     setShowAddModal(true);
     setFormData(null);
@@ -273,7 +269,6 @@ const SchedulePage = () => {
           <CardView
             schedules={schedules}
             handleEditSchedule={handleEditSchedule}
-            handleEditDefenderSchedule={handleEditDefenderSchedule}
           />
         )}
       </div>
@@ -324,7 +319,7 @@ const TableView = ({ uniqueDates, uniqueDirections, filteredSchedules, handleSel
           <thead className="table-dark">
             <tr>
               {uniqueDirections.map((direction, index) => (
-                <th className="px-5 py-3" key={index}>{"Направление: " + direction[1]}</th>
+                <th className="px-5 py-3" key={index}>{direction[1]}</th>
               ))}
             </tr>
           </thead>
