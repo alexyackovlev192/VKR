@@ -102,6 +102,7 @@ const MembersPage = () => {
     setShowUpdateModal(false);
     setFormData(null);
   };
+
   const handleCloseWarningWindow = () => {
     setShowWarningWindow(false);
   };
@@ -114,7 +115,7 @@ const MembersPage = () => {
   const handleSaveUpdateMembers = (formData) => {
     const token = localStorage.getItem('token');
     if (!changes) {
-      setErrorMessage('Нет изменений для сохранения.');
+      setErrorMessage('Нет изменений для сохранения');
       setShowWarningWindow(true);
       return;
     }

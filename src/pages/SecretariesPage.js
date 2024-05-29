@@ -110,7 +110,7 @@ const SecretariesPage = () => {
   const handleSaveUpdateSecretaries = (formData) => {
     const token = localStorage.getItem('token');
     if (!changes) {
-      setErrorMessage('Нет изменений для сохранения.');
+      setErrorMessage('Нет изменений для сохранения');
       setShowWarningWindow (true);
       return;
     }

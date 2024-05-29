@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { writeFile, utils } from 'xlsx';
 import UpdateDefender from '../../modal-windows/UpdateDefender';
+import WarningWindow from '../../components/WarningWindow';
 import AddDefender from '../../modal-windows/AddDefender';
 import SearchStud from '../../components/SearchDefender';
 import ImportDefendersModal from '../../modal-windows/ImportDefenders';
@@ -14,15 +15,17 @@ import '../style-pages/DefendersPage.css';
 const DefendersPage = () => {
   const [defenders, setDefenders] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showWarningWindow, setShowWarningWindow] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [formData, setFormData] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
+  const [changes, setChanges] = useState(false);
 
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
   const [sortedDefenders, setSortedDefenders] = useState([]);
-
+  
   const [filters, setFilters] = useState({
     fullname: '',
     group: '',
@@ -32,7 +35,8 @@ const DefendersPage = () => {
     redDiplom: '',
     name_direction: ''
   });
-
+  
+  const [errorMessage, setErrorMessage] = useState('');
   const tableRef = useRef(null);
 
   useEffect(() => {
@@ -60,6 +64,8 @@ const DefendersPage = () => {
         setSortedDefenders(studentsWithDirections);
       } catch (error) {
         console.error('Ошибка при загрузке данных:', error);
+        setErrorMessage('Ошибка при загрузке данных');
+        setShowWarningWindow(true);
       }
     };
   
@@ -126,6 +132,10 @@ const DefendersPage = () => {
     setFormData(null);
   };
 
+  const handleCloseWarningWindow = () => {
+    setShowWarningWindow(false);
+  };
+
   const handleEditDefender = async () => {
     if (activeRow) {
       const token = localStorage.getItem('token');
@@ -144,6 +154,8 @@ const DefendersPage = () => {
         setShowUpdateModal(true);
       } catch (error) {
         console.error('Ошибка при получении направления:', error);
+        setErrorMessage('Ошибка при получении направления');
+        setShowWarningWindow(true);
       }
     }
   };
@@ -170,12 +182,20 @@ const DefendersPage = () => {
       handleCloseModal();
     } catch (error) {
       console.error('Ошибка при добавлении студента:', error);
+      setErrorMessage('Ошибка при добавлении студента');
+      setShowWarningWindow(true);
     }
   };
 
 
   const handleSaveUpdateDefender = (formData) => {
     const token = localStorage.getItem('token');
+    if (!changes) {
+      setErrorMessage('Нет изменений для сохранения');
+      setShowWarningWindow(true);
+      return;
+    }
+
     axios.put(`http://localhost:5000/students/${formData.id_S}`, formData, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -195,7 +215,12 @@ const DefendersPage = () => {
         );
         handleCloseModal();
       })
-      .catch(error => console.error('Ошибка при сохранении изменений студента:', error));
+      .catch(error => {
+        console.error('Ошибка при сохранении изменений студента:', error)
+        setErrorMessage('Ошибка при сохранении изменений студента');
+        setShowWarningWindow(true);
+      });
+      setChanges(false);
   };
 
   const handleInputChange = (e) => {
@@ -204,6 +229,7 @@ const DefendersPage = () => {
       ...prevFormData,
       [name]: type === 'checkbox' ? checked : value
     }));
+    setChanges(true);
   };
 
 
@@ -360,7 +386,11 @@ const DefendersPage = () => {
           handleCloseModal={handleCloseModal}
           handleFileUpload={handleFileUpload}
         />
-      )}
+      )}          
+      <WarningWindow 
+        show={showWarningWindow} 
+        handleClose={handleCloseWarningWindow} 
+        errorMessage={errorMessage} />
     </div>
   );
 };
