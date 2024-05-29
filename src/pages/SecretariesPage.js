@@ -165,7 +165,7 @@ const SecretariesPage = () => {
             Редактировать
           </Button>
           <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>
-            Экспорт в Excel
+            Скачать таблицу
           </Button>
           <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
             <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
@@ -207,7 +207,7 @@ const SecretariesPage = () => {
       return (
         <>
           <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>
-            Экспорт в Excel
+            Скачать таблицу
           </Button>
           <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
             <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>

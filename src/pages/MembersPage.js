@@ -156,11 +156,9 @@ const MembersPage = () => {
     writeFile(wb, 'members.xlsx');
   };
 
-  // Function to render content based on user role
   const renderContentByRole = () => {
     if (!userRole) return null;
 
-    // Assuming userRole is an array of roles
     if (userRole.includes(3)) {
       return (
         <>
@@ -168,7 +166,7 @@ const MembersPage = () => {
             Редактировать
           </Button>
           <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>
-            Экспорт в Excel
+            Скачать таблицу
           </Button>
           <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
             <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
@@ -210,7 +208,7 @@ const MembersPage = () => {
       return (
         <>
           <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>
-            Экспорт в Excel
+            Скачать таблицу
           </Button>
           <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
             <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
