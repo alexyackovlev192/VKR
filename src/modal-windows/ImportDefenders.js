@@ -35,7 +35,9 @@ const ImportDefendersModal = ({ showModal, handleCloseModal, handleFileUpload })
               Topic: row[headers[2]],
               ScientificAdviser: row[headers[3]],
               Avg_Mark: row[headers[4]],
-              Red_Diplom: row[headers[5]] === 'Да'
+              Red_Diplom: row[headers[5]] === 'Да',
+              YearOfDefense: row[headers[6]],
+              Name_direction: row[headers[7]]
             }));
       
             handleFileUpload(formattedData);

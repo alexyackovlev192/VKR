@@ -1,10 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
 
 import UpdateSchedule from '../../modal-windows/UpdateSchedule';
-import ListDefenders from '../../modal-windows/ListDefenders';
 import AddSchedule from '../../modal-windows/AddSchedule';
 
 import '../style-pages/SchedulePage.css';
@@ -377,7 +377,6 @@ const CardView = ({ schedules, handleEditSchedule, handleEditDefenderSchedule })
                 </div>
               </Card.Text>
               <Button variant="primary" className="my-2" onClick={() => handleEditSchedule(item)}>Редактировать</Button>
-              <Button variant="primary" className="my-2" onClick={() => handleEditDefenderSchedule(item)}>Список студентов</Button>
             </Card.Body>
           </Card>
         ))}

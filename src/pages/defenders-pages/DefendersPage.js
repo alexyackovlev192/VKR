@@ -160,9 +160,9 @@ const DefendersPage = () => {
           'Authorization': `Bearer ${token}`
         }
       });
+      console.log(response.data);
   
       const newStudent = formData;
-      console.log(newStudent);
   
       setDefenders(prevDefenders => [...prevDefenders, newStudent]);
       setSortedDefenders(prevSorted => [...prevSorted, newStudent]);
@@ -213,16 +213,19 @@ const DefendersPage = () => {
 
   const handleSearch = () => {
     const { fullname, group, topic, scientificAdviser, avgMark, redDiplom, name_direction } = filters;
+    
     const filteredData = defenders.filter((defender) => {
-      const fullnameMatch = defender.Fullname ? defender.Fullname.toLowerCase().includes(fullname.toLowerCase()) : true;
-      const groupMatch = defender.Group ? defender.Group.toLowerCase().includes(group.toLowerCase()) : true;
-      const topicMatch = defender.Topic ? defender.Topic.toLowerCase().includes(topic.toLowerCase()) : true;
-      const scientificAdviserMatch = defender.ScientificAdviser ? defender.ScientificAdviser.toLowerCase().includes(scientificAdviser.toLowerCase()) : true;
-      const nameDirectionMatch = defender.Name_direction ? defender.Name_direction.toLowerCase().includes(name_direction.toLowerCase()) : true;
+      const fullnameMatch = fullname ? defender.Fullname && defender.Fullname.toLowerCase().includes(fullname.toLowerCase()) : true;
+      const groupMatch = group ? defender.Group && defender.Group.toLowerCase().includes(group.toLowerCase()) : true;
+      const topicMatch = topic ? defender.Topic && defender.Topic.toLowerCase().includes(topic.toLowerCase()) : true;
+      const scientificAdviserMatch = scientificAdviser ? defender.ScientificAdviser && defender.ScientificAdviser.toLowerCase().includes(scientificAdviser.toLowerCase()) : true;
+      const nameDirectionMatch = name_direction ? defender.Name_direction && defender.Name_direction.toLowerCase().includes(name_direction.toLowerCase()) : true;
       const avgMarkMatch = avgMark ? defender.Avg_Mark === parseFloat(avgMark) : true;
-      const redDiplomMatch = redDiplom === '' ? true : (defender.Red_Diplom ? 'Да' : 'Нет') === redDiplom;
+      const redDiplomMatch = redDiplom ? (defender.Red_Diplom ? 'Да' : 'Нет') === redDiplom : true;
+      
       return fullnameMatch && groupMatch && topicMatch && scientificAdviserMatch && avgMarkMatch && redDiplomMatch && nameDirectionMatch;
     });
+  
     setSortedDefenders(filteredData);
   };
 
@@ -244,49 +247,36 @@ const DefendersPage = () => {
     utils.book_append_sheet(workbook, worksheet, 'Defenders');
     writeFile(workbook, 'Defenders.xlsx');
   };
-
-  const isValidRow = (row) => {
-    return (
-      row[0] !== undefined && row[0].trim() !== '' &&
-      row[1] !== undefined && row[1].trim() !== '' &&
-      row[2] !== undefined && row[2].trim() !== '' &&
-      row[3] !== undefined && row[3].trim() !== '' &&
-      row[4] !== undefined && !isNaN(parseFloat(row[4])) &&
-      row[6] !== undefined && row[6].trim() !== '' &&
-      row[7] !== undefined && row[7].trim() !== ''
-    );
-  };
   
   const handleFileUpload = async (data) => {
     const token = localStorage.getItem('token');
   
-    const filteredData = data.filter(isValidRow);
+    for (let row of data) {
+      const formattedData = {
+        Fullname: row.Fullname,
+        Group: row.Group,
+        Topic: row.Topic,
+        ScientificAdviser: row.ScientificAdviser,
+        Avg_Mark: parseFloat(row.Avg_Mark),
+        Red_Diplom: row.Red_Diplom === 'Да' ? row.Red_Diplom : null,
+        YearOfDefense: row.YearOfDefense,
+        Name_direction: row.Name_direction
+      };
   
-    const formattedData = filteredData.map(row => ({
-      Fullname: row[0],
-      Group: row[1],
-      Topic: row[2],
-      ScientificAdviser: row[3],
-      Avg_Mark: parseFloat(row[4]),
-      Red_Diplom: row[5] === 'Да',
-      YearOfDefense: row[6],
-      Name_direction: row[7]
-    }));
-  
-    console.log(formattedData);
-  
-    try {
-      const response = await axios.post('http://localhost:5000/students/create', formattedData, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-  
-      const newStudents = response.data;
-      setDefenders(prevDefenders => [...prevDefenders, ...newStudents]);
-      setSortedDefenders(prevSorted => [...prevSorted, ...newStudents]);
-    } catch (error) {
-      console.error('Ошибка при импорте данных:', error);
+      try {
+        const response = await axios.post('http://localhost:5000/students/create', formattedData, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        console.log(response.data);
+
+        setDefenders(prevDefenders => [...prevDefenders, formattedData]);
+        setSortedDefenders(prevSorted => [...prevSorted, formattedData]);
+        handleCloseModal();
+      } catch (error) {
+        console.error('Ошибка при импорте данных:', error);
+      }
     }
   };
 
@@ -304,7 +294,7 @@ const DefendersPage = () => {
         <Link to={`/list-defenders`} className="mx-3 ">
           <Button variant="primary" className="">Составы защищающихся</Button>
         </Link>
-        <Button variant="secondary" className="mx-3" disabled onClick={() => setShowImportModal(true)}>
+        <Button variant="secondary" className="mx-3" onClick={() => setShowImportModal(true)}>
           Импортировать
         </Button>
         <Button variant="secondary" className="mx-3" onClick={handleExport}>
