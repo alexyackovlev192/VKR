@@ -130,8 +130,9 @@ const SchedulePage = () => {
     const token = localStorage.getItem('token');
 
     if (!changes) {
-      setErrorMessage('Нет изменений для сохранения.');
+      setErrorMessage('Нет изменений для сохранения');
       setShowWarningWindow(true);
+      setChanges(false);
       return;
     }
 
@@ -160,75 +161,78 @@ const SchedulePage = () => {
     })
     .catch(error => {
       console.error('Ошибка при сохранении изменении информации о защите:', error);
-      setErrorMessage('Ошибка при сохранении изменении информации о защите.');
+      setErrorMessage('Ошибка при сохранении изменении информации о защите');
+      setShowWarningWindow(true);
+    });
+
+    setChanges(false);
+  }, [changes, updateUniqueValues, handleCloseModal]);
+
+  const handleSaveAdd = useCallback((formData) => {
+    const token = localStorage.getItem('token');
+  
+    if (!formData.id_G || !formData.Name_direction || !formData.date || !formData.time || !formData.classroom) {
+      setErrorMessage('Не все поля заполнены');
+      setShowWarningWindow(true);
+      setChanges(false);
+      return;
+    }
+  
+    const data = {
+      GecId: formData.id_G,
+      NameDirection: formData.Name_direction,
+      Date: formatDate(formData.date),
+      Time: formData.time,
+      Classroom: formData.classroom
+    };
+
+    axios.post('http://localhost:5000/defenseSchedule/create', data, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
+    .then(() => {
+      axios.get('http://localhost:5000/defenseSchedule/thisYear', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => {
+        const fetchDirectionsPromises = response.data.map(sched => {
+          return axios.get(`http://localhost:5000/directions/${sched.id_D}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+          .then(response => response.data)
+          .catch(error => {
+            console.error('Ошибка при получении направления:', error);
+            return null;
+          });
+        });
+
+        Promise.all(fetchDirectionsPromises)
+        .then(directionsData => {
+          const updatedSchedules = response.data.map((schedule, index) => ({
+            ...schedule,
+            direction: directionsData[index]
+          }));
+          setSchedules(updatedSchedules);
+          updateUniqueValues(updatedSchedules);
+          setDirections(directionsData);
+        });
+      })
+      .catch(error => console.error('Ошибка при загрузке данных:', error));
+      handleCloseModal();
+    })
+    .catch(error => {
+      console.error('Ошибка при сохранении новой защиты:', error);
+      setErrorMessage('Ошибка при сохранении новой защиты');
       setShowWarningWindow(true);
     });
 
     setChanges(false);
   }, [updateUniqueValues, handleCloseModal]);
-
-  const handleSaveAdd = useCallback((formData) => {
-  const token = localStorage.getItem('token');
-  
-  if (!formData.id_G || !formData.Name_direction || !formData.date || !formData.time || !formData.classroom) {
-    setErrorMessage('Не все поля заполнены.');
-    setShowWarningWindow(true);
-    return;
-  }
-  
-  const data = {
-    GecId: formData.id_G,
-    NameDirection: formData.Name_direction,
-    Date: formatDate(formData.date),
-    Time: formData.time,
-    Classroom: formData.classroom
-  };
-
-  axios.post('http://localhost:5000/defenseSchedule/create', data, {
-    headers: {
-      'Authorization': `Bearer ${token}`
-    }
-  })
-  .then(() => {
-    axios.get('http://localhost:5000/defenseSchedule/thisYear', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(response => {
-      const fetchDirectionsPromises = response.data.map(sched => {
-        return axios.get(`http://localhost:5000/directions/${sched.id_D}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        })
-        .then(response => response.data)
-        .catch(error => {
-          console.error('Ошибка при получении направления:', error);
-          return null;
-        });
-      });
-
-      Promise.all(fetchDirectionsPromises)
-      .then(directionsData => {
-        const updatedSchedules = response.data.map((schedule, index) => ({
-          ...schedule,
-          direction: directionsData[index]
-        }));
-        setSchedules(updatedSchedules);
-        updateUniqueValues(updatedSchedules);
-        setDirections(directionsData);
-      });
-    })
-    .catch(error => console.error('Ошибка при загрузке данных:', error));
-    handleCloseModal();
-  })
-  .catch(error => {
-    console.error('Ошибка при сохранении новой защиты:', error);
-    setErrorMessage('Ошибка при сохранении новой защиты.');
-    setShowWarningWindow(true);
-  });
-}, [updateUniqueValues, handleCloseModal]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -238,7 +242,6 @@ const SchedulePage = () => {
       ...prevFormData,
       [name]: newValue
     }));
-  
     setChanges(true);
   };
 

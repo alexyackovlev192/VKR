@@ -7,16 +7,15 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
   const { id_G, date, Name_direction, time, classroom } = formData || {};
-  const [startDate, setStartDate] = useState(date);
+  const [startDate, setStartDate] = useState(date || new Date());
   const [selectGek, setSelectGek] = useState(null);
-  const [localDirection, setLocalDirection] = useState(Name_direction);
+  const [localDirection, setLocalDirection] = useState(Name_direction || "");
 
   const handleGekChange = (e) => {
     const { value } = e.target;
     setSelectGek(geks.find(g => g.id_G === parseInt(value)));
     handleInputChange(e);
   };
-  
 
   useEffect(() => {
     const fetchDirection = async (id_D) => {
@@ -31,7 +30,7 @@ const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
       }
     };
 
-    if (isEditMode && id_G) {
+    if (isEditMode) {
       const selectedGek = geks.find(g => g.id_G === id_G);
       if (selectedGek) {
         setSelectGek(selectedGek);
