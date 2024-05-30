@@ -2,7 +2,18 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
+import {jwtDecode} from 'jwt-decode';
 import './style-components/Login.css';
+
+function getFirstPageForRole(role) {
+  const rolePages = {
+    1: "/users",
+    2: "/my-schedule",
+    3: "/members",
+    4: "/my-schedule-sec"
+  };
+  return rolePages[role[0]] || "/auth";
+}
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -16,8 +27,12 @@ const LoginPage = () => {
         Password: password
       });
       const token = response.data.token;
+      const decoded = jwtDecode(token);
+
       localStorage.setItem('token', token);
-      navigate('/main');
+
+      const firstPage = getFirstPageForRole(decoded.roles);
+      navigate(firstPage);
     } catch (error) {
       console.error('Ошибка при авторизации:', error);
     }

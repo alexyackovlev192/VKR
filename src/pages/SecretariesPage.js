@@ -4,14 +4,14 @@ import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
 import UpdateSecretarie from '../modal-windows/UpdateSecretarie';
-import WarningWindow from '../components/WarningWindow'; // Импортируем WarningWindow
+import WarningWindow from '../components/WarningWindow';
 import SearchMem from '../components/SearchMember';
 import { writeFile, utils } from 'xlsx';
 
 const SecretariesPage = () => {
   const [secretaries, setSecretaries] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [showWarningWindow , setShowWarningWindow ] = useState(false);
+  const [showWarningWindow, setShowWarningWindow] = useState(false);
   const [formData, setFormData] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
   const [changes, setChanges] = useState(false);
@@ -47,7 +47,6 @@ const SecretariesPage = () => {
   }, []);
 
   useEffect(() => {
-    setSortedSecretaries(secretaries);
     handleSearch();
   }, [secretaries, filters]);
 
@@ -67,11 +66,11 @@ const SecretariesPage = () => {
   useEffect(() => {
     if (!sortColumn) return;
 
-    const sortedData = sortedSecretaries.slice().sort((a, b) => {
+    const sortedData = secretaries.slice().sort((a, b) => {
       return sortOrder === 'asc' ? a[sortColumn].localeCompare(b[sortColumn]) : b[sortColumn].localeCompare(a[sortColumn]);
     });
     setSortedSecretaries(sortedData);
-  }, [sortColumn, sortOrder, sortedSecretaries]);
+  }, [sortColumn, sortOrder, secretaries]);
 
   const sortData = (column) => {
     if (sortColumn === column) {
@@ -99,7 +98,7 @@ const SecretariesPage = () => {
   };
 
   const handleCloseWarningWindow = () => {
-    setShowWarningWindow (false);
+    setShowWarningWindow(false);
   };
 
   const handleEditSecretarie = () => {
@@ -111,7 +110,7 @@ const SecretariesPage = () => {
     const token = localStorage.getItem('token');
     if (!changes) {
       setErrorMessage('Нет изменений для сохранения');
-      setShowWarningWindow (true);
+      setShowWarningWindow(true);
       return;
     }
     axios.put(`http://localhost:5000/secretariesGec/${formData.id_U}`, formData, {
@@ -122,7 +121,7 @@ const SecretariesPage = () => {
     .then(response => {
       console.log('Изменения информации о секретаре обновлена:', response.data);
       setSecretaries(prevSecretaries =>
-        prevSecretaries.map( secretarie =>
+        prevSecretaries.map(secretarie =>
             secretarie.id_U === formData.id_U ? { ...secretarie, ...formData } : secretarie
         )
       );
@@ -222,8 +221,8 @@ const SecretariesPage = () => {
             handleSaveChanges={handleSaveUpdateSecretaries}
           />
           <WarningWindow 
-            show={showWarningWindow } 
-            handleClose={handleCloseWarningWindow } 
+            show={showWarningWindow} 
+            handleClose={handleCloseWarningWindow} 
             errorMessage={errorMessage} 
           />
         </>

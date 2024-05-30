@@ -1,7 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import HomePage from './pages/HomePage';
 import MembersPage from './pages/MembersPage';
 import SecretariesPage from './pages/SecretariesPage';
 import SchedulePage from './pages/schedule-pages/SchedulePage';
@@ -22,46 +21,112 @@ import EditListDefendersForSchedulePage from './pages/defenders-pages/EditListDe
 import CreateGekAddMemberPage from './pages/gek-pages/CreateGekAddMembersPage';
 import DefendersPage from './pages/defenders-pages/DefendersPage';
 import LoginForm from './components/LoginForm';
-import Navigation from './components/Navigation';
-import Footer from './components/Footer';
+
+import ProtectedPageLayout from './components/ProtectedPageLayout'; 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
 const App = () => {
-    const PageLayout = ({ children }) => (
-        <div>
-            <Navigation />
-              {children}
-            <Footer />
-        </div>
-    );
-
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<Navigate to="/auth" />} />
                 <Route path="/auth" element={<LoginForm />} />
-                <Route path="/users" element={<PageLayout><UsersPage /></PageLayout>} />
-                <Route path="/main" element={<PageLayout><HomePage /></PageLayout>} />
-                <Route path="/members" element={<PageLayout><MembersPage /></PageLayout>} />
-                <Route path="/secretaries" element={<PageLayout><SecretariesPage /></PageLayout>} />
-                <Route path="/schedule" element={<PageLayout><SchedulePage /></PageLayout>} />
-                <Route path="/my-schedule" element={<PageLayout><MySchedulePage /></PageLayout>} />
-                <Route path="/my-schedule-sec" element={<PageLayout><MyScheduleSecretariePage /></PageLayout>} />
-                <Route path="/my-schedule/:id_DS" element={<PageLayout><OpenMySchedulePage /></PageLayout>} />
-                <Route path="/my-schedule-sec/:id_DS" element={<PageLayout><OpenMyScheduleSecretariePage /></PageLayout>} />
-                <Route path="/list-defenders" element={<PageLayout><ListDefendersForSchedulePage /></PageLayout>} />
-                <Route path="/list-defenders-edit/:id_DS" element={<PageLayout><EditListDefendersForSchedulePage /></PageLayout>} />
-                <Route path="/defender-schedule/:id_S" element={<PageLayout><DefenderSchedulePage /></PageLayout>} />
-                <Route path="/defender-schedule-sec/:id_S" element={<PageLayout><DefenderScheduleSecretariePage /></PageLayout>} />
-                <Route path="/my-gek" element={<PageLayout><MyGekPage /></PageLayout>} />
-                <Route path="/my-gek-sec" element={<PageLayout><MyGekSecretariePage /></PageLayout>} />
-                <Route path="/gek" element={<PageLayout><GekPage /></PageLayout>} />
-                <Route path="/create-gek" element={<PageLayout><CreateGekPage /></PageLayout>} />
-                <Route path="/create-gek/add-member" element={<PageLayout><CreateGekAddMemberPage /></PageLayout>} />
-                <Route path="/edit-gek/:id_G" element={<PageLayout><EditGekPage /></PageLayout>} />
-                <Route path="/defenders" element={<PageLayout><DefendersPage /></PageLayout>} />
+                <Route path="/users" element={
+                    <ProtectedPageLayout roles={[1]}>
+                        <UsersPage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/members" element={
+                    <ProtectedPageLayout roles={[3]}>
+                        <MembersPage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/secretaries" element={
+                    <ProtectedPageLayout roles={[3]}>
+                        <SecretariesPage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/schedule" element={
+                    <ProtectedPageLayout roles={[3]}>
+                        <SchedulePage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/my-schedule" element={
+                    <ProtectedPageLayout roles={[2]}>
+                        <MySchedulePage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/my-schedule-sec" element={
+                    <ProtectedPageLayout roles={[4]}>
+                        <MyScheduleSecretariePage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/my-schedule/:id_DS" element={
+                    <ProtectedPageLayout roles={[2]}>
+                        <OpenMySchedulePage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/my-schedule-sec/:id_DS" element={
+                    <ProtectedPageLayout roles={[4]}>
+                        <OpenMyScheduleSecretariePage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/list-defenders" element={
+                    <ProtectedPageLayout roles={[3]}>
+                        <ListDefendersForSchedulePage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/list-defenders-edit/:id_DS" element={
+                    <ProtectedPageLayout roles={[3]}>
+                        <EditListDefendersForSchedulePage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/defender-schedule/:id_S" element={
+                    <ProtectedPageLayout roles={[2]}>
+                        <DefenderSchedulePage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/defender-schedule-sec/:id_S" element={
+                    <ProtectedPageLayout roles={[4]}>
+                        <DefenderScheduleSecretariePage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/my-gek" element={
+                    <ProtectedPageLayout roles={[2]}>
+                        <MyGekPage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/my-gek-sec" element={
+                    <ProtectedPageLayout roles={[4]}>
+                        <MyGekSecretariePage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/gek" element={
+                    <ProtectedPageLayout roles={[3]}>
+                        <GekPage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/create-gek" element={
+                    <ProtectedPageLayout roles={[3]}>
+                        <CreateGekPage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/create-gek/add-member" element={
+                    <ProtectedPageLayout roles={[3]}>
+                        <CreateGekAddMemberPage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/edit-gek/:id_G" element={
+                    <ProtectedPageLayout roles={[3]}>
+                        <EditGekPage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/defenders" element={
+                    <ProtectedPageLayout roles={[3]}>
+                        <DefendersPage />
+                    </ProtectedPageLayout>
+                } />
             </Routes>
         </Router>
     );

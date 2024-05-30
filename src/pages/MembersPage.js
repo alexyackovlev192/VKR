@@ -1,8 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
-import {jwtDecode} from 'jwt-decode';
 import UpdateMember from '../modal-windows/UpdateMember';
 import WarningWindow from '../components/WarningWindow';
 import SearchMem from '../components/SearchMember';
@@ -16,10 +14,8 @@ const MembersPage = () => {
   const [formData, setFormData] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
   const [changes, setChanges] = useState(false);
-  const [userRole, setUserRole] = useState(null);
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
-  const [sortedMembers, setSortedMembers] = useState([]);
   const [filters, setFilters] = useState({
     fullname: '',
     post: '',
@@ -30,53 +26,35 @@ const MembersPage = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
-      const decodedToken = jwtDecode(token);
-      setUserRole(decodedToken.roles);
-    }
-
     axios.get('http://localhost:5000/gecMembers', {
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    })
-    .then(response => {
-      setMembers(response.data);
-      setSortedMembers(response.data);
-    })
-    .catch(error => {
-      console.error('Ошибка при загрузке данных:', error);
-      setErrorMessage('Ошибка при загрузке данных.');
-      setShowWarningWindow(true);
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(response => {
+        setMembers(response.data);
+      })
+      .catch(error => {
+        console.error('Ошибка при загрузке данных:', error);
+        setErrorMessage('Ошибка при загрузке данных.');
+        setShowWarningWindow(true);
+      });
+  }, []);
+
+  const sortedMembers = useMemo(() => {
+    const filteredData = members.filter((member) => {
+      const fullnameMatch = member.Fullname ? member.Fullname.toLowerCase().includes(filters.fullname.toLowerCase()) : false;
+      const postMatch = member.Post ? member.Post.toLowerCase().includes(filters.post.toLowerCase()) : false;
+      const mailMatch = member.Mail ? member.Mail.toLowerCase().includes(filters.mail.toLowerCase()) : false;
+      return fullnameMatch && postMatch && mailMatch;
     });
-  }, []);
 
-  useEffect(() => {
-    setSortedMembers(members);
-    handleSearch();
-  }, [members, filters]);
+    if (!sortColumn) return filteredData;
 
-  useEffect(() => {
-    const handleClickOutsideTable = (event) => {
-      if (tableRef.current && !tableRef.current.contains(event.target)) {
-        setActiveRow(null);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutsideTable);
-    return () => {
-      document.removeEventListener('click', handleClickOutsideTable);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!sortColumn) return;
-
-    const sortedData = sortedMembers.slice().sort((a, b) => {
+    return filteredData.slice().sort((a, b) => {
       return sortOrder === 'asc' ? a[sortColumn].localeCompare(b[sortColumn]) : b[sortColumn].localeCompare(a[sortColumn]);
     });
-    setSortedMembers(sortedData);
-  }, [sortColumn, sortOrder, sortedMembers]);
+  }, [members, filters, sortColumn, sortOrder]);
 
   const sortData = (column) => {
     if (sortColumn === column) {
@@ -154,17 +132,6 @@ const MembersPage = () => {
     setFilters({ ...filters, [name]: value });
   };
 
-  const handleSearch = () => {
-    const { fullname, post, mail } = filters;
-    const filteredData = members.filter((member) => {
-      const fullnameMatch = member.Fullname ? member.Fullname.toLowerCase().includes(fullname.toLowerCase()) : false;
-      const postMatch = member.Post ? member.Post.toLowerCase().includes(post.toLowerCase()) : false;
-      const mailMatch = member.Mail ? member.Mail.toLowerCase().includes(mail.toLowerCase()) : false;
-      return fullnameMatch && postMatch && mailMatch;
-    });
-    setSortedMembers(filteredData);
-  };
-
   const handleExportToExcel = () => {
     const ws = utils.json_to_sheet(
       sortedMembers.map((member, index) => ({
@@ -181,13 +148,10 @@ const MembersPage = () => {
     writeFile(wb, 'members.xlsx');
   };
 
-  const renderContentByRole = () => {
-    if (!userRole) return null;
-
-    if (userRole.includes(3)) {
-      return (
-        <>
-          <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>
+  return (
+    <div className="my-5 px-5">
+      <SearchMem filters={filters} handleFilterChange={handleFilterChange} />
+      <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>
             Редактировать
           </Button>
           <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>
@@ -230,51 +194,6 @@ const MembersPage = () => {
             show={showWarningWindow} 
             handleClose={handleCloseWarningWindow} 
             errorMessage={errorMessage} />
-        </>
-      );
-    } else if (userRole.includes(2)) {
-      return (
-        <>
-          <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>
-            Скачать таблицу
-          </Button>
-          <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-            <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
-              <thead className="table-dark">
-                <tr>
-                  <th>№</th>
-                  <th onClick={() => sortData('Fullname')}>ФИО{renderSortArrow('Fullname')}</th>
-                  <th onClick={() => sortData('Post')}>Должность{renderSortArrow('Post')}</th>
-                  <th onClick={() => sortData('Mail')}>Почта{renderSortArrow('Mail')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedMembers.map((member, index) => (
-                  <tr
-                    key={member.id}
-                    className={activeRow === member ? 'table-info' : 'table-light'}
-                    onClick={() => handleRowClick(member)}
-                  >
-                    <td>{index + 1}</td>
-                    <td>{member.Fullname}</td>
-                    <td>{member.Post}</td>
-                    <td>{member.Mail}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
-      );
-    } else {
-      return <div>У вас нет доступа к этой странице</div>;
-    }
-  };
-
-  return (
-    <div className="my-5 px-5">
-      <SearchMem filters={filters} handleFilterChange={handleFilterChange} />
-      {renderContentByRole()}
     </div>
   );
 };
