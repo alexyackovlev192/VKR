@@ -55,7 +55,6 @@ const MyGekPage = () => {
                 'Authorization': `Bearer ${token}`
               }
             });
-            console.log(secretariesResponse.data);
             return { 
               ...detailedGek, 
               compositions, 
