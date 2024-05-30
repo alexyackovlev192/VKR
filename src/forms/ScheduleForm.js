@@ -7,7 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
   const { id_G, date, Name_direction, time, classroom } = formData || {};
-  const [startDate, setStartDate] = useState(date || new Date());
+  const [startDate, setStartDate] = useState(date ? new Date(date) : null);
   const [selectGek, setSelectGek] = useState(null);
   const [localDirection, setLocalDirection] = useState(Name_direction || "");
 
@@ -90,6 +90,7 @@ const ScheduleForm = ({ formData, handleInputChange, geks, isEditMode }) => {
             }}
             dateFormat="dd-MM-yyyy"
             className="form-control"
+            placeholderText="Выберите дату"
           />
         </div>
       </Form.Group>

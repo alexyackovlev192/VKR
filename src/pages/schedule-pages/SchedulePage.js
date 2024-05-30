@@ -109,21 +109,25 @@ const SchedulePage = () => {
     setShowUpdateModal(false);
     setShowAddModal(false);
     setFormData(null);
+    setChanges(false);
   };
 
   const handleCloseWarningWindow = () => {
     setShowWarningWindow(false);
+    setChanges(false);
   };
 
   const handleEditSchedule = (selectedItem) => {
     setActiveCell(selectedItem);
     setFormData(selectedItem);
     setShowUpdateModal(true);
+    setChanges(false);
   };
 
   const handleAddSchedule = () => {
     setShowAddModal(true);
     setFormData(null);
+    setChanges(false);
   };
 
   const handleSaveUpdate = useCallback((formData) => {
@@ -132,7 +136,6 @@ const SchedulePage = () => {
     if (!changes) {
       setErrorMessage('Нет изменений для сохранения');
       setShowWarningWindow(true);
-      setChanges(false);
       return;
     }
 
@@ -174,7 +177,6 @@ const SchedulePage = () => {
     if (!formData.id_G || !formData.Name_direction || !formData.date || !formData.time || !formData.classroom) {
       setErrorMessage('Не все поля заполнены');
       setShowWarningWindow(true);
-      setChanges(false);
       return;
     }
   
