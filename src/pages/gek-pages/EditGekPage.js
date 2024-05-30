@@ -3,13 +3,16 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Button, Card, ListGroup, Form } from 'react-bootstrap';
+import WarningWindow from '../../components/WarningWindow';
 
 const EditGekPage = () => {
     const { id_G } = useParams(); 
     const [membersGek, setMembersGek] = useState([]);
     const [allMembersGek, setAllMembersGek] = useState([]);
     const [secretarieData, setSecretarieData] = useState({});
-    const [secretariesData, setSecretariesData] = useState([]);  // Инициализация как массива
+    const [secretariesData, setSecretariesData] = useState([]); 
+    const [showWarningWindow, setShowWarningWindow] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const navigate = useNavigate();
 
     const fetchAllMembersData = async () => {
@@ -123,10 +126,21 @@ const EditGekPage = () => {
     };
 
     const handleSaveGek = async () => {
+        if (membersGek.length < 1) {
+            setErrorMessage('Состав не сформирован');
+            setShowWarningWindow(true);
+            return;
+          }
+        const memberIds = membersGek.map(m => m.id_U);
+        const secretaryId = secretarieData.id_U;
+
+        if (memberIds.includes(secretaryId)) {
+            setErrorMessage('Секретарь не должен входить в состав комиссии');
+            setShowWarningWindow(true);
+            return;
+        }
         const token = localStorage.getItem('token');
         try { 
-            const memberIds = membersGek.map(m => m.id_U);
-            const secretaryId = secretarieData.id_U;
             const gecCompositionResponse = await axios.put(`http://localhost:5000/gecComposition/${id_G}`, { memberIds, secretaryId }, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -143,6 +157,10 @@ const EditGekPage = () => {
         const selectedSecretary = secretariesData.find(sec => sec.Fullname === e.target.value);
         setSecretarieData(selectedSecretary);
     };
+
+    const handleCloseWarningWindow = () => {
+        setShowWarningWindow(false);
+      };
 
     return (
         <div className="container-fluid text-center my-3">
@@ -206,6 +224,7 @@ const EditGekPage = () => {
                 </Card>
             </div>
             <Button variant="primary" className="col-2 my-4" onClick={handleSaveGek}>Сохранить ГЭК</Button>
+            <WarningWindow show={showWarningWindow} handleClose={handleCloseWarningWindow} errorMessage={errorMessage} />
         </div>
     );
 };

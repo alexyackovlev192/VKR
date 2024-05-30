@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from 'react-bootstrap';
-import CreateGekForm from '../../forms/GekForm';
+import CreateGekForm from '../../forms/GekForm'; 
+import WarningWindow from '../../components/WarningWindow';
 
 const CreateGekPage = () => {
   const navigate = useNavigate();
@@ -10,9 +11,11 @@ const CreateGekPage = () => {
   const [secretaries, setSecretaries] = useState([]);
   const [formData, setFormData] = useState(() => {
     const savedFormData = localStorage.getItem('formData');
-    return savedFormData ? JSON.parse(savedFormData) : null;
+    return savedFormData ? JSON.parse(savedFormData) : {};
   });
-  
+  const [showWarningWindow, setShowWarningWindow] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     axios.get('http://localhost:5000/directions', {
@@ -24,6 +27,7 @@ const CreateGekPage = () => {
       setDirectories(response.data);
     })
     .catch(error => console.error('Ошибка при загрузке данных:', error));
+
     axios.get('http://localhost:5000/secretariesGec', {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -35,6 +39,10 @@ const CreateGekPage = () => {
     .catch(error => console.error('Ошибка при загрузке данных:', error));
   }, []);
 
+  useEffect(() => {
+    localStorage.setItem('formData', JSON.stringify(formData));
+  }, [formData]);
+
   const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     let update = { ...formData, [name]: value };
@@ -42,7 +50,7 @@ const CreateGekPage = () => {
     if (name === "Fullname") {
       const selectedSecretary = secretaries.find(sec => sec.Fullname === value);
       if (selectedSecretary) {
-        localStorage.setItem('id_Sec', selectedSecretary.id_U); 
+        localStorage.setItem('id_Sec', selectedSecretary.id_U);
       }
     }
 
@@ -54,21 +62,46 @@ const CreateGekPage = () => {
     localStorage.removeItem('formData');
   }
 
+  const handleNext = () => {
+    const requiredFields = ['Name_direction', 'Fullname', 'Year'];
+    const emptyFields = requiredFields.filter(field => !formData[field]);
+
+    if (emptyFields.length > 0) {
+      setErrorMessage(`Не все поля заполнены`);
+      setShowWarningWindow(true);
+    } else {
+      navigate(`/create-gek/add-member`);
+    }
+  }
+
+  const handleCloseWarningWindow = () => {
+    setShowWarningWindow(false);
+  }
+
   return (
-      <div className="container-fluid text-center my-3">
-        <div className="row my-3">
-            <div className="col-1">
-              <Button variant="primary" onClick={() => handleBack()}>Назад</Button>
-            </div>
-            <h4 className="col-10">Создание ГЭК</h4>
+    <div className="container-fluid text-center my-3">
+      <div className="row my-3">
+        <div className="col-1">
+          <Button variant="primary" onClick={handleBack}>Назад</Button>
         </div>
-        <div className="d-flex justify-content-center">
-          <div className="row justify-content-evenly col-6">
-            <CreateGekForm formData={formData} handleInputChange={handleInputChange} directories={directories} secretaries={secretaries}/>
-          </div>
+        <h4 className="col-10">Создание ГЭК</h4>
+      </div>
+      <div className="d-flex justify-content-center">
+        <div className="row justify-content-evenly col-5">
+          <CreateGekForm 
+            formData={formData} 
+            handleInputChange={handleInputChange} 
+            directories={directories} 
+            secretaries={secretaries} 
+          />
         </div>
       </div>
-    );
-  };
+      <div className="my-4">
+        <Button variant="primary" className="px-5" onClick={handleNext}>Далее</Button>
+      </div>
+      <WarningWindow show={showWarningWindow} handleClose={handleCloseWarningWindow} errorMessage={errorMessage} />
+    </div>
+  );
+};
 
 export default CreateGekPage;

@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Form, Button } from 'react-bootstrap';
+import React from 'react';
+import { Form } from 'react-bootstrap';
 
 const CreateGekForm = ({ 
   formData, 
@@ -9,10 +8,6 @@ const CreateGekForm = ({
   secretaries,
 }) => {
   const { Name_direction, Fullname, Year } = formData || {};
-  
-  useEffect(() => {
-    localStorage.setItem('formData', JSON.stringify(formData));
-  }, [formData]);
 
   return (
     <Form>
@@ -21,9 +16,10 @@ const CreateGekForm = ({
         <Form.Select
           type="text"
           name="Name_direction"
-          onChange={handleInputChange}>
-          <option value="Name_direction">{Name_direction}</option>
-          {directories.map((dir, index) => ( dir.Name_direction !== Name_direction &&
+          onChange={handleInputChange}
+          value={Name_direction || ""}>
+          <option value="">Выберите направление</option>
+          {directories.map((dir, index) => (
             <option key={index} value={dir.Name_direction}>{dir.Name_direction}</option>
           ))} 
         </Form.Select>
@@ -33,9 +29,10 @@ const CreateGekForm = ({
         <Form.Select
           type="text"
           name="Fullname"
-          onChange={handleInputChange}>
-          <option value="Fullname">{Fullname}</option>
-          {secretaries.map((sec, index) => ( sec.Fullname !== Fullname &&
+          onChange={handleInputChange}
+          value={Fullname || ""}>
+          <option value="">Выберите секретаря</option>
+          {secretaries.map((sec, index) => (
             <option key={index} value={sec.Fullname}>{sec.Fullname}</option>
           ))}
         </Form.Select>
@@ -49,9 +46,6 @@ const CreateGekForm = ({
           onChange={handleInputChange}
         />
       </Form.Group>
-      <Link to={ `/create-gek/add-member` }>
-        <Button variant="primary" className="col-2 my-4">Далее</Button>
-      </Link>
     </Form>
   );
 };

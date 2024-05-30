@@ -167,6 +167,19 @@ const DefendersPage = () => {
 
   const handleSaveAddDefender = async (formData) => {
     const token = localStorage.getItem('token');
+
+    if (!formData || !formData.Fullname || 
+      !formData.Group || 
+      !formData.Topic || 
+      !formData.ScientificAdviser || 
+      !formData.Avg_Mark || 
+      !formData.YearOfDefense || 
+      !formData.Name_direction) {
+      setErrorMessage('Не все поля заполнены');
+      setShowWarningWindow(true);
+      return;
+    }
+
     try {
       const response = await axios.post('http://localhost:5000/students/create', formData, {
         headers: {
@@ -185,6 +198,7 @@ const DefendersPage = () => {
       setErrorMessage('Ошибка при добавлении студента');
       setShowWarningWindow(true);
     }
+    setChanges(false);
   };
 
 
@@ -195,6 +209,7 @@ const DefendersPage = () => {
       setShowWarningWindow(true);
       return;
     }
+
 
     axios.put(`http://localhost:5000/students/${formData.id_S}`, formData, {
       headers: {
@@ -328,7 +343,7 @@ const DefendersPage = () => {
           Скачать таблицу
         </Button>
       </div>
-      <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+      <div className="my-4" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
         <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
           <thead className="table-dark">
             <tr>

@@ -3,10 +3,11 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import axios from 'axios';
+import { utils, writeFile } from 'xlsx';
 
 import UpdateSchedule from '../../modal-windows/UpdateSchedule';
 import AddSchedule from '../../modal-windows/AddSchedule';
-import WarningWindow from '../../components/WarningWindow'; // Импортируем WarningWindow
+import WarningWindow from '../../components/WarningWindow'; 
 
 import '../style-pages/SchedulePage.css';
 
@@ -285,6 +286,48 @@ const SchedulePage = () => {
     return schedulesByDate;
   }, [uniqueDates, uniqueDirections, directions, schedules]);
 
+  const handleExportToExcel = useCallback(() => {
+    // Собираем наименования направлений из уникальных направлений
+    const directionNames = uniqueDirections.map(direction => direction[1]);
+  
+    // Формируем заголовки для столбцов
+    const headers = [
+      { label: 'Дата', key: 'Дата' }, // Используем ключ "Дата" вместо "date"
+      ...directionNames.map(name => ({ label: name, key: name })),
+    ];
+  
+    // Формируем данные для таблицы
+    const dataToExport = uniqueDates.map(date => {
+      const rowData = { Дата: date }; // Используем ключ "Дата" вместо "date"
+  
+      // Заполняем ячейки для направлений данными о защите
+      directionNames.forEach(name => {
+        const schedule = schedules.find(schedule => schedule.date === date && schedule.direction.Name_direction === name);
+        rowData[name] = schedule ? `Время: ${schedule.time} | Аудитория: ${schedule.classroom} | ГЭК: ${schedule.id_G}` : '';
+      });
+  
+      return rowData;
+    });
+  
+    // Создаем лист Excel
+    const worksheet = utils.json_to_sheet(dataToExport, {
+      header: headers.map(h => h.label)
+    });
+  
+    // Устанавливаем ширину и высоту ячеек
+    worksheet['!cols'] = [
+      { wch: 15 }, // Ширина первого столбца (Дата)
+      ...directionNames.map(() => ({ wch: 50 })) // Ширина остальных столбцов (направления)
+    ];
+    worksheet['!rows'] = [{ hpt: 20 }]; // Высота строк
+  
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, 'Расписание');
+  
+    // Сохраняем файл
+    writeFile(workbook, 'schedule.xlsx');
+  }, [uniqueDates, uniqueDirections, schedules, geks]);
+
   return (
     <div className="schedule-container my-5 px-5">
       <div className="row">
@@ -294,6 +337,7 @@ const SchedulePage = () => {
           )}
           <Button variant="primary" className="mx-3" onClick={handleAddSchedule}>Добавить</Button>
           <Button variant="primary" className="mx-3" onClick={toggleView}>{isTableView ? 'Карточки' : 'Таблица'}</Button>
+          <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>Экспорт в Excel</Button>
         </div>
         {isTableView ? (
           <TableView
