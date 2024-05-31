@@ -109,7 +109,9 @@ const CreateGekAddMemberPage = () => {
         <Link to={`/create-gek`} className="col-1">
           <Button variant="primary" className="">Назад</Button>
         </Link>
-        <h4 className="col-10">Создание ГЭК</h4>
+        <div className="col-10 text-center my-4">
+          <h3>Создание новой ГЭК</h3>
+        </div>
       </div>
       <div className="row justify-content-evenly">
         <Card style={{ minWidth: '500px', width: '40%', height: '70vh', overflowY: 'auto' }} className="my-2 text-center bg-light">

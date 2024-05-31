@@ -64,8 +64,6 @@ const DefendersPage = () => {
         setSortedDefenders(studentsWithDirections);
       } catch (error) {
         console.error('Ошибка при загрузке данных:', error);
-        setErrorMessage('Ошибка при загрузке данных');
-        setShowWarningWindow(true);
       }
     };
   
@@ -324,59 +322,72 @@ const DefendersPage = () => {
 
 
   return (
-    <div className="my-5 px-5">
-      <div className="">
-        <SearchStud filters={filters} handleFilterChange={handleFilterChange} />
-        <Button variant="primary" className="mx-3" onClick={handleEditDefender} disabled={!activeRow}>
-          Редактировать
-        </Button>
-        <Button variant="primary" className="mx-3" onClick={handleAddDefender}>
-          Добавить
-        </Button>
-        <Link to={`/list-defenders`} className="mx-3 ">
-          <Button variant="primary" className="">Составы защищающихся</Button>
-        </Link>
-        <Button variant="secondary" className="mx-3" onClick={() => setShowImportModal(true)}>
-          Загрузить данные
-        </Button>
-        <Button variant="secondary" className="mx-3" onClick={handleExport}>
-          Скачать таблицу
-        </Button>
+    <div className="px-5">
+      <div className="text-center my-4">
+        <h3>Список студентов</h3>
       </div>
-      <div className="my-4" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
-        <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
-          <thead className="table-dark">
-            <tr>
-              <th>№</th>
-              <th onClick={() => sortData('Fullname')}>ФИО{renderSortArrow('Fullname')}</th>
-              <th onClick={() => sortData('Group')}>Группа{renderSortArrow('Group')}</th>
-              <th onClick={() => sortData('Topic')}>Тема{renderSortArrow('Topic')}</th>
-              <th onClick={() => sortData('ScientificAdviser')}>Руководитель{renderSortArrow('ScientificAdviser')}</th>
-              <th onClick={() => sortData('Avg_Mark')}>Средний балл{renderSortArrow('Avg_Mark')}</th>
-              <th onClick={() => sortData('Red_Diplom')}>С отличием{renderSortArrow('Red_Diplom')}</th>
-              <th onClick={() => sortData('Name_direction')}>Направление{renderSortArrow('Name_direction')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedDefenders.map((defender, index) => (
-              <tr
-                key={defender.id_S}
-                className={activeRow && activeRow.id_S === defender.id_S ? 'table-primary' : ''}
-                onClick={() => handleRowClick(defender)}
-              >
-                <td>{index + 1}</td>
-                <td>{defender.Fullname}</td>
-                <td>{defender.Group}</td>
-                <td>{defender.Topic}</td>
-                <td>{defender.ScientificAdviser}</td>
-                <td>{defender.Avg_Mark}</td>
-                <td>{defender.Red_Diplom ? 'Да' : 'Нет'}</td>
-                <td>{defender.Name_direction}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {sortedDefenders.length > 0 && (
+        <>
+          <SearchStud filters={filters} handleFilterChange={handleFilterChange} />
+          <Button variant="primary" className="mx-3" onClick={handleEditDefender} disabled={!activeRow}>Редактировать</Button>
+        </>
+      )}
+      <Button variant="primary" className="mx-3" onClick={handleAddDefender}>
+        Добавить
+      </Button>
+      {sortedDefenders.length > 0 && (
+        <>
+          <Link to={`/list-defenders`} className="mx-3 ">
+            <Button variant="primary" className="">Составы защищающихся</Button>
+          </Link>
+          <Button variant="secondary" className="mx-3" onClick={handleExport}>
+            Скачать таблицу
+          </Button>
+        </>
+      )}
+      <Button variant="secondary" className="mx-3" onClick={() => setShowImportModal(true)}>
+        Загрузить данные
+      </Button>
+      {sortedDefenders.length > 0 ? (
+        <>
+          <div className="my-4" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+            <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
+              <thead className="table-dark">
+                <tr>
+                  <th>№</th>
+                  <th onClick={() => sortData('Fullname')}>ФИО{renderSortArrow('Fullname')}</th>
+                  <th onClick={() => sortData('Group')}>Группа{renderSortArrow('Group')}</th>
+                  <th onClick={() => sortData('Topic')}>Тема{renderSortArrow('Topic')}</th>
+                  <th onClick={() => sortData('ScientificAdviser')}>Руководитель{renderSortArrow('ScientificAdviser')}</th>
+                  <th onClick={() => sortData('Avg_Mark')}>Средний балл{renderSortArrow('Avg_Mark')}</th>
+                  <th onClick={() => sortData('Red_Diplom')}>С отличием{renderSortArrow('Red_Diplom')}</th>
+                  <th onClick={() => sortData('Name_direction')}>Направление{renderSortArrow('Name_direction')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedDefenders.map((defender, index) => (
+                  <tr
+                    key={defender.id_S}
+                    className={activeRow && activeRow.id_S === defender.id_S ? 'table-primary' : ''}
+                    onClick={() => handleRowClick(defender)}
+                  >
+                    <td>{index + 1}</td>
+                    <td>{defender.Fullname}</td>
+                    <td>{defender.Group}</td>
+                    <td>{defender.Topic}</td>
+                    <td>{defender.ScientificAdviser}</td>
+                    <td>{defender.Avg_Mark}</td>
+                    <td>{defender.Red_Diplom ? 'Да' : 'Нет'}</td>
+                    <td>{defender.Name_direction}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : (
+        <p>Данных нет</p>
+      )} 
       {showUpdateModal && (
         <UpdateDefender
           showModal={showUpdateModal}

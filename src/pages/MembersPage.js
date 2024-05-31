@@ -27,17 +27,15 @@ const MembersPage = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     axios.get('http://localhost:5000/gecMembers', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    })
       .then(response => {
         setMembers(response.data);
       })
       .catch(error => {
         console.error('Ошибка при загрузке данных:', error);
-        setErrorMessage('Ошибка при загрузке данных.');
-        setShowWarningWindow(true);
       });
   }, []);
 
@@ -97,26 +95,26 @@ const MembersPage = () => {
       setShowWarningWindow(true);
       return;
     }
-  
+
     axios.put(`http://localhost:5000/gecMembers/${formData.id_U}`, formData, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     })
-    .then(response => {
-      console.log('Изменения информации о члене ГЭК успешно:', response.data);
-      setMembers(prevMembers =>
-        prevMembers.map(member =>
-          member.id_U === formData.id_U ? { ...member, ...formData } : member
-        )
-      );
-      handleCloseModal();
-    })
-    .catch(error => {
-      console.error('Ошибка при сохранении изменении информации о члене ГЭК:', error);
-      setErrorMessage('Ошибка при сохранении изменении информации о члене ГЭК.');
-      setShowWarningWindow(true);
-    });
+      .then(response => {
+        console.log('Изменения информации о члене ГЭК успешно:', response.data);
+        setMembers(prevMembers =>
+          prevMembers.map(member =>
+            member.id_U === formData.id_U ? { ...member, ...formData } : member
+          )
+        );
+        handleCloseModal();
+      })
+      .catch(error => {
+        console.error('Ошибка при сохранении изменении информации о члене ГЭК:', error);
+        setErrorMessage('Ошибка при сохранении изменении информации о члене ГЭК.');
+        setShowWarningWindow(true);
+      });
 
     setChanges(false);
   };
@@ -149,9 +147,14 @@ const MembersPage = () => {
   };
 
   return (
-    <div className="my-5 px-5">
-      <SearchMem filters={filters} handleFilterChange={handleFilterChange} />
-      <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>
+    <div className="px-5">
+      <div className="text-center my-4">
+        <h3>Список членов комиссии</h3>
+      </div>
+      {members.length > 0 ? (
+        <>
+          <SearchMem filters={filters} handleFilterChange={handleFilterChange} />
+          <Button variant="primary" className="mx-3" onClick={handleEditMember} disabled={!activeRow}>
             Редактировать
           </Button>
           <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>
@@ -183,17 +186,21 @@ const MembersPage = () => {
               </tbody>
             </table>
           </div>
-          <UpdateMember
-            showModal={showUpdateModal}
-            handleCloseModal={handleCloseModal}
-            formData={formData}
-            handleInputChange={handleInputChange}
-            handleSaveChanges={handleSaveUpdateMembers}
-          />
-          <WarningWindow 
-            show={showWarningWindow} 
-            handleClose={handleCloseWarningWindow} 
-            errorMessage={errorMessage} />
+        </>
+      ) : (
+        <p>Данных нет</p>
+      )}          
+        <UpdateMember
+        showModal={showUpdateModal}
+        handleCloseModal={handleCloseModal}
+        formData={formData}
+        handleInputChange={handleInputChange}
+        handleSaveChanges={handleSaveUpdateMembers}
+      />
+      <WarningWindow 
+        show={showWarningWindow} 
+        handleClose={handleCloseWarningWindow} 
+        errorMessage={errorMessage} />
     </div>
   );
 };

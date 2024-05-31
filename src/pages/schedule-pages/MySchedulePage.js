@@ -66,26 +66,34 @@ const MySchedulePage = () => {
     }
 
     return (
-        <div className="container-fluid text-center my-3">
-            <h4 className="col-12">Мои защиты</h4>
-            <div className="row justify-content-evenly col-12 mx-3">
-                {scheduleDetails.map((item, index) => (
-                    <Card key={index} className="col-2 mx-2 my-4 text-center bg-light">
-                        <Card.Body>
-                            <Card.Title>{new Date(item.date).toLocaleDateString('ru', { day: '2-digit', month: '2-digit' })}</Card.Title>
-                            <Card.Text>
-                                <span>
-                                    <p>ГЭК №{item.id_G}</p>
-                                    <p>Время: {item.time}</p>
-                                    <p>Направление: {item.Name_direction}</p>
-                                    <p>Аудитория: {item.classroom}</p>
-                                </span>
-                            </Card.Text>
-                            <Button onClick={() => handleOpen(item)} className="mt-3" variant="primary">Открыть</Button>
-                        </Card.Body>
-                    </Card>
-                ))}
+        <div className="container-fluid px-5">
+            <div className="text-center my-4">
+                <h3>Защиты члена комиссии</h3>
             </div>
+            {scheduleDetails.length > 0 ? (
+            <>
+                <div className="row justify-content-evenly col-12 mx-3">
+                    {scheduleDetails.map((item, index) => (
+                        <Card key={index} className="col-2 mx-2 my-4 text-center bg-light">
+                            <Card.Body>
+                                <Card.Title>Защита №{item.id_DS} <br></br> {new Date(item.date).toLocaleDateString('ru', { day: '2-digit', month: '2-digit' })}</Card.Title>
+                                <Card.Text>
+                                    <span>
+                                        <p>ГЭК №{item.id_G}</p>
+                                        <p>Время: {item.time}</p>
+                                        <p>Направление: {item.Name_direction}</p>
+                                        <p>Аудитория: {item.classroom}</p>
+                                    </span>
+                                </Card.Text>
+                                <Button onClick={() => handleOpen(item)} className="mt-3" variant="primary">Открыть</Button>
+                            </Card.Body>
+                        </Card>
+                    ))}
+                </div>
+            </>
+            ) : (
+                <p>Данных нет</p>
+            )}    
         </div>
     );
 };

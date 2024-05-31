@@ -309,12 +309,10 @@ const SchedulePage = () => {
       return rowData;
     });
   
-    // Создаем лист Excel
     const worksheet = utils.json_to_sheet(dataToExport, {
       header: headers.map(h => h.label)
     });
   
-    // Устанавливаем ширину и высоту ячеек
     worksheet['!cols'] = [
       { wch: 15 }, // Ширина первого столбца (Дата)
       ...directionNames.map(() => ({ wch: 50 })) // Ширина остальных столбцов (направления)
@@ -324,36 +322,41 @@ const SchedulePage = () => {
     const workbook = utils.book_new();
     utils.book_append_sheet(workbook, worksheet, 'Расписание');
   
-    // Сохраняем файл
     writeFile(workbook, 'schedule.xlsx');
   }, [uniqueDates, uniqueDirections, schedules, geks]);
 
   return (
-    <div className="schedule-container my-5 px-5">
-      <div className="row">
-        <div>
-          {isTableView && (
-            <Button variant="primary" className="mx-3" onClick={() => handleEditSchedule(activeCell)} disabled={!activeCell}>Редактировать</Button>
-          )}
-          <Button variant="primary" className="mx-3" onClick={handleAddSchedule}>Добавить</Button>
-          <Button variant="primary" className="mx-3" onClick={toggleView}>{isTableView ? 'Карточки' : 'Таблица'}</Button>
-          <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>Экспорт в Excel</Button>
-        </div>
-        {isTableView ? (
-          <TableView
-            uniqueDates={uniqueDates}
-            uniqueDirections={uniqueDirections}
-            filteredSchedules={filteredSchedules}
-            handleSelectedClick={handleSelectedClick}
-            activeCell={activeCell}
-            tableRef={tableRef}
-          />
-        ) : (
-          <CardView
-            schedules={schedules}
-            handleEditSchedule={handleEditSchedule}
-          />
+    <div className="schedule-container px-5">
+      <div className="text-center my-4">
+        <h3>Список защит</h3>
+      </div>
+      <div>
+        {schedules.length > 0 && isTableView && (
+          <Button variant="primary" className="mx-3" onClick={() => handleEditSchedule(activeCell)} disabled={!activeCell}>Редактировать</Button>
         )}
+        <Button variant="primary" className="mx-3" onClick={handleAddSchedule}>Добавить</Button>
+        <Button variant="primary" className="mx-3" onClick={toggleView}>{isTableView ? 'Карточки' : 'Таблица'}</Button>
+        {schedules.length > 0 && (
+          <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>Экспорт в Excel</Button>
+        )}
+      </div>
+      <div className="row">
+        {
+          isTableView ? (
+            <TableView
+              uniqueDates={uniqueDates}
+              uniqueDirections={uniqueDirections}
+              filteredSchedules={filteredSchedules}
+              handleSelectedClick={handleSelectedClick}
+              activeCell={activeCell}
+              tableRef={tableRef}
+            />
+          ) : (
+            <CardView
+              schedules={schedules}
+              handleEditSchedule={handleEditSchedule}
+            />
+          )}
       </div>
       <UpdateSchedule
         showModal={showUpdateModal}

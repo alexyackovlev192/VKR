@@ -68,42 +68,47 @@ const GekPage = () => {
     fetchGeks();
   }, []);
 
-
   return (
-    <div className="container-fluid text-center my-3">
-      <Link to={`/create-gek`}>
-        <Button variant="primary" className="col-2 py-2">Создать новую ГЭК</Button>
-      </Link>
+    <div className="container-fluid px-5">
+      <div className="text-center my-4">
+        <h3 className="my-4">Экзаминационные комиссии</h3>
+        <Link to={`/create-gek`}>
+          <Button variant="primary" className="col-2 py-2">Создать новую ГЭК</Button>
+        </Link>
+      </div>
       <div className="row justify-content-evenly">
-        {geks && geks.map(gekData => (
-          <Card key={gekData.id_G} style={{ minWidth: '400px', width: '30%' }} className="col-4 my-4 text-center bg-light">
-            <Card.Header className="fs-4 bg-light">ГЭК №{gekData.id_G}</Card.Header>
-            <Card.Body>
-              <Card.Title className="text-center fs-5">Направление</Card.Title>
-              <ListGroup className="text-center">
-                <ListGroup.Item>{gekData.directs.Name_direction}</ListGroup.Item>
-              </ListGroup>
-              <Card.Title className="text-center fs-5">Состав</Card.Title>
-              <ListGroup className="text-center rounded-3">
-                {gekData.compositions && gekData.compositions.map((comp, compIndex) => (
-                  <div key={compIndex}>
-                    <ListGroup.Item>{comp.member.Fullname} - {comp.member.Post}</ListGroup.Item>
-                  </div>
-                ))}
-              </ListGroup>
-              <Card.Title className="text-center fs-5">Секретарь</Card.Title>
-              <ListGroup className="text-center">
-                <ListGroup.Item>{gekData.secretary.Fullname}</ListGroup.Item>
-              </ListGroup>
-            </Card.Body>
-            <Card.Footer className="text-left bg-light">
-              <Link to={`/edit-gek/${gekData.id_G}`}>
-                <Button variant="primary" className="mx-3">Редактировать</Button>
-              </Link>
-              {/* <Button variant="danger" className="mx-3" onClick={() => handleDeleteGek(gekData.id_G)}>Удалить</Button> */}
-            </Card.Footer>
-          </Card>
-        ))}
+        {geks.length > 0 ? (
+          geks.map(gekData => (
+            <Card key={gekData.id_G} style={{ minWidth: '400px', width: '30%' }} className="col-4 my-4 text-center bg-light">
+              <Card.Header className="fs-4 bg-light">ГЭК №{gekData.id_G}</Card.Header>
+              <Card.Body>
+                <Card.Title className="text-center fs-5">Направление</Card.Title>
+                <ListGroup className="text-center">
+                  <ListGroup.Item>{gekData.directs.Name_direction}</ListGroup.Item>
+                </ListGroup>
+                <Card.Title className="text-center fs-5">Состав</Card.Title>
+                <ListGroup className="text-center rounded-3">
+                  {gekData.compositions && gekData.compositions.map((comp, compIndex) => (
+                    <div key={compIndex}>
+                      <ListGroup.Item>{comp.member.Fullname} - {comp.member.Post}</ListGroup.Item>
+                    </div>
+                  ))}
+                </ListGroup>
+                <Card.Title className="text-center fs-5">Секретарь</Card.Title>
+                <ListGroup className="text-center">
+                  <ListGroup.Item>{gekData.secretary.Fullname}</ListGroup.Item>
+                </ListGroup>
+              </Card.Body>
+              <Card.Footer className="text-left bg-light">
+                <Link to={`/edit-gek/${gekData.id_G}`}>
+                  <Button variant="primary" className="mx-3">Редактировать</Button>
+                </Link>
+              </Card.Footer>
+            </Card>
+          ))
+        ) : (
+          <p>Данных нет</p>
+        )}
       </div>
     </div>
   );

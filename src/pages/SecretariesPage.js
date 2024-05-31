@@ -2,7 +2,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
-import {jwtDecode} from 'jwt-decode';
 import UpdateSecretarie from '../modal-windows/UpdateSecretarie';
 import WarningWindow from '../components/WarningWindow';
 import SearchMem from '../components/SearchMember';
@@ -15,7 +14,6 @@ const SecretariesPage = () => {
   const [formData, setFormData] = useState(null);
   const [activeRow, setActiveRow] = useState(null);
   const [changes, setChanges] = useState(false);
-  const [userRole, setUserRole] = useState(null);
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
   const [sortedSecretaries, setSortedSecretaries] = useState([]);
@@ -29,11 +27,7 @@ const SecretariesPage = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
-      const decodedToken = jwtDecode(token);
-      setUserRole(decodedToken.roles);
-    }
-
+    
     axios.get('http://localhost:5000/secretariesGec', {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -43,7 +37,9 @@ const SecretariesPage = () => {
       setSecretaries(response.data);
       setSortedSecretaries(response.data);
     })
-    .catch(error => console.error('Ошибка при загрузке данных:', error));
+    .catch(error => {
+      console.error('Ошибка при загрузке данных:', error);
+    });
   }, []);
 
   useEffect(() => {
@@ -174,12 +170,14 @@ const SecretariesPage = () => {
     writeFile(wb, 'Secretaries.xlsx');
   };
 
-  const renderContentByRole = () => {
-    if (!userRole) return null;
-
-    if (userRole.includes(3)) {
-      return (
+  return (
+    <div className="px-5">
+      <div className="text-center my-4">
+        <h3>Список секретарей комиссии</h3>
+      </div>
+      {sortedSecretaries.length > 0 ? (
         <>
+          <SearchMem filters={filters} handleFilterChange={handleFilterChange} />
           <Button variant="primary" className="mx-3" onClick={handleEditSecretarie} disabled={!activeRow}>
             Редактировать
           </Button>
@@ -212,64 +210,23 @@ const SecretariesPage = () => {
               </tbody>
             </table>
           </div>
-          <UpdateSecretarie
-            secretaries={secretaries}
-            showModal={showUpdateModal}
-            handleCloseModal={handleCloseModal}
-            formData={formData}
-            handleInputChange={handleInputChange}
-            handleSaveChanges={handleSaveUpdateSecretaries}
-          />
-          <WarningWindow 
-            show={showWarningWindow} 
-            handleClose={handleCloseWarningWindow} 
-            errorMessage={errorMessage} 
-          />
         </>
-      );
-    } else if (userRole.includes(2)) {
-      return (
-        <>
-          <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>
-            Скачать таблицу
-          </Button>
-          <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-            <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
-              <thead className="table-dark">
-                <tr>
-                  <th>№</th>
-                  <th onClick={() => sortData('Fullname')}>ФИО{renderSortArrow('Fullname')}</th>
-                  <th onClick={() => sortData('Post')}>Должность{renderSortArrow('Post')}</th>
-                  <th onClick={() => sortData('Mail')}>Почта{renderSortArrow('Mail')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedSecretaries.map((sec, index) => (
-                  <tr
-                    key={sec.id}
-                    className={activeRow === sec ? 'table-info' : 'table-light'}
-                    onClick={() => handleRowClick(sec)}
-                  >
-                    <td>{index + 1}</td>
-                    <td>{sec.Fullname}</td>
-                    <td>{sec.Post}</td>
-                    <td>{sec.Mail}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
-      );
-    } else {
-      return <div>У вас нет доступа к этой странице</div>;
-    }
-  };
-
-  return (
-    <div className="my-5 px-5">
-      <SearchMem filters={filters} handleFilterChange={handleFilterChange} />
-      {renderContentByRole()}
+      ) : (
+        <p>Данных нет</p>
+      )}          
+        <UpdateSecretarie
+        secretaries={secretaries}
+        showModal={showUpdateModal}
+        handleCloseModal={handleCloseModal}
+        formData={formData}
+        handleInputChange={handleInputChange}
+        handleSaveChanges={handleSaveUpdateSecretaries}
+      />
+      <WarningWindow 
+        show={showWarningWindow} 
+        handleClose={handleCloseWarningWindow} 
+        errorMessage={errorMessage} 
+      />
     </div>
   );
 };

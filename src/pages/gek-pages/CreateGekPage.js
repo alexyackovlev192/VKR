@@ -84,7 +84,9 @@ const CreateGekPage = () => {
         <div className="col-1">
           <Button variant="primary" onClick={handleBack}>Назад</Button>
         </div>
-        <h4 className="col-10">Создание ГЭК</h4>
+        <div className="col-10 text-center my-4">
+          <h3>Создание новой ГЭК</h3>
+        </div>
       </div>
       <div className="d-flex justify-content-center">
         <div className="row justify-content-evenly col-5">

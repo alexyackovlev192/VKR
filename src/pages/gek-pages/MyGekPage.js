@@ -82,33 +82,41 @@ const MyGekPage = () => {
   }, []);
 
   return (
-    <div className="container-fluid text-center my-3">
-      <h4 className="col-12">Мои ГЭК</h4>
-      <div className="row justify-content-evenly">
-        {geks.map((gek, index) => (
-          <Card key={index} style={{ minWidth: '400px', width: '30%' }} className="col-4 my-4 text-center bg-light">
-            <Card.Header className="fs-4 bg-light">ГЭК №{gek.id_G}</Card.Header>
-            <Card.Body>
-              <Card.Title className="text-center fs-5">Направление</Card.Title>
-              <ListGroup className="text-center">
-                <ListGroup.Item>{gek.directs.Name_direction || ''}</ListGroup.Item>
-              </ListGroup>
-              <Card.Title className="text-center fs-5">Состав</Card.Title>
-              <ListGroup className="text-center">
-                {gek.compositions.map((comp, compIndex) => (
-                  <ListGroup.Item key={compIndex}>
-                    {comp.member.Fullname || ''} - {comp.member.Post || ''}
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-              <Card.Title className="text-center fs-5">Секретари</Card.Title>
-              <ListGroup className="text-center">
-                <ListGroup.Item>{gek.secretary.Fullname || ''}</ListGroup.Item>
-              </ListGroup>
-            </Card.Body>
-          </Card>
-        ))}
+    <div className="container-fluid px-5">
+      <div className="text-center my-4">
+          <h3>ГЭК члена комиссии</h3>
       </div>
+      {geks.length > 0 ? (
+        <>
+          <div className="row justify-content-evenly">
+            {geks.map((gek, index) => (
+              <Card key={index} style={{ minWidth: '400px', width: '30%' }} className="col-4 my-4 text-center bg-light">
+                <Card.Header className="fs-4 bg-light">ГЭК №{gek.id_G}</Card.Header>
+                <Card.Body>
+                  <Card.Title className="text-center fs-5">Направление</Card.Title>
+                  <ListGroup className="text-center">
+                    <ListGroup.Item>{gek.directs.Name_direction || ''}</ListGroup.Item>
+                  </ListGroup>
+                  <Card.Title className="text-center fs-5">Состав</Card.Title>
+                  <ListGroup className="text-center">
+                    {gek.compositions.map((comp, compIndex) => (
+                      <ListGroup.Item key={compIndex}>
+                        {comp.member.Fullname || ''} - {comp.member.Post || ''}
+                      </ListGroup.Item>
+                    ))}
+                  </ListGroup>
+                  <Card.Title className="text-center fs-5">Секретари</Card.Title>
+                  <ListGroup className="text-center">
+                    <ListGroup.Item>{gek.secretary.Fullname || ''}</ListGroup.Item>
+                  </ListGroup>
+                </Card.Body>
+              </Card>
+            ))}
+          </div>
+        </>
+        ) : (
+          <p>Данных нет</p>
+        )}    
     </div>
   );
 };
