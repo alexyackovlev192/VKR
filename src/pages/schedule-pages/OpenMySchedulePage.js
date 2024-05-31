@@ -159,9 +159,9 @@ const OpenMySchedulePage = () => {
                                             <Button 
                                                 variant="primary" 
                                                 onClick={() => handleClickButton(defender)} 
-                                                disabled={defender.RecMagistracy && defender.RecPublication && defender.Result}
+                                                disabled={defender.Result}
                                             >
-                                                {defender.RecMagistracy && defender.RecPublication && defender.Result ? 'Проведена' : 'Начать'}
+                                                {defender.Result ? 'Редактировать' : 'Начать'}
                                             </Button>
                                         </td>
                                     </tr>

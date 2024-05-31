@@ -20,6 +20,7 @@ import ListDefendersForSchedulePage from './pages/defenders-pages/ListDefendersF
 import EditListDefendersForSchedulePage from './pages/defenders-pages/EditListDefendersForSchedulePage';
 import CreateGekAddMemberPage from './pages/gek-pages/CreateGekAddMembersPage';
 import DefendersPage from './pages/defenders-pages/DefendersPage';
+import ResultSchedulesPage from './pages/schedule-pages/ResultSchedulesPage';
 import LoginForm from './components/LoginForm';
 
 import ProtectedPageLayout from './components/ProtectedPageLayout'; 
@@ -31,6 +32,13 @@ const App = () => {
     return (
         <Router>
             <Routes>
+                <Route path="/test" element={
+                    <ProtectedPageLayout roles={[3]}>
+                        <ResultSchedulesPage />
+                    </ProtectedPageLayout>
+                } />
+
+
                 <Route path="/auth" element={<LoginForm />} />
                 <Route path="/users" element={
                     <ProtectedPageLayout roles={[1]}>

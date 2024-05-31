@@ -428,9 +428,9 @@ const TableView = ({ uniqueDates, uniqueDirections, filteredSchedules, handleSel
                     >
                       {sched ? (
                         <span>
+                          <h5>Защита №{sched.id_DS}</h5>
                           <p>ГЭК №{sched.id_G}</p>
                           <p>Время: {sched.time}</p>
-                          <p>Направление: {sched.Name_direction}</p>
                           <p>Аудитория: {sched.classroom}</p>
                         </span>
                       ) : ""}
