@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -116,9 +116,11 @@ const OpenMySchedulePage = () => {
     };
 
     return (
-        <div className="container-fluid px-5">
-            <div className="row text-center my-4">
-                <Button variant="primary" className="col-1" onClick={handleBackButton}>Назад</Button>
+        <div className="container-fluid text-center px-5">
+            <div className="row my-4">
+                <div className="col-1">
+                    <Button variant="primary" onClick={handleBackButton}>Назад</Button>
+                </div>
                 <h3 className="col-10">Защита №{id_DS}</h3>
             </div>
             {filteredDefenders.length > 0 ? (

@@ -71,15 +71,19 @@ const DefenderScheduleSecretariePage = () => {
         }
     };
 
+    const handleBackButton = () => {
+        navigate(`/my-schedule-sec/${id_DS}`);
+    };
+
     return (
-        <div className="container-fluid text-center my-3">
-            <div className="row my-3">
-                <Link to={`/my-schedule-sec/${id_DS}`} className="col-1">
-                    <Button variant="primary" className="">Назад</Button>
-                </Link>
-                <h4 className="col-10">Мои защиты</h4>
+        <div className="container-fluid px-5">
+            <div className="row text-center my-4">
+                <div className="col-1">
+                    <Button variant="primary" onClick={handleBackButton}>Назад</Button>
+                </div>
+                <h3 className="col-10">Защита №{id_DS}</h3>
             </div>
-            <div className="my-4 mx-5" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+            <div className="my-4 mx-5 text-center" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
                 <table className="table table-striped table-bordered table-light table-hover text-center">
                     <thead className="table-dark">
                         <tr>

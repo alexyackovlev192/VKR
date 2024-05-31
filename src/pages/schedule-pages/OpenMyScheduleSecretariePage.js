@@ -109,60 +109,71 @@ const OpenMyScheduleSecretariePage = () => {
         navigate(`/defender-schedule-sec/${d.id_S}`);
     };
 
+    const handleBackButton = () => {
+        localStorage.removeItem('id_DS');
+        navigate(`/my-schedule-sec`);
+    };
+
     return (
-        <div className="container-fluid text-center my-3">
-            <div className="row my-3">
-                <Link to={`/my-schedule-sec`} className="col-1">
-                    <Button variant="primary" className="">Назад</Button>
-                </Link>
-                <h4 className="col-10">Мои защиты</h4>
+        <div className="container-fluid text-center px-5">
+            <div className="row my-4">
+                <div className="col-1">
+                    <Button variant="primary" onClick={handleBackButton}>Назад</Button>
+                </div>
+                <h3 className="col-10">Защита №{id_DS}</h3>
             </div>
-            <div className="my-4 mx-5" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
-                <Table striped bordered hover>
-                    <thead className="table-dark">
-                        <tr>
-                            <th>№</th>
-                            <th onClick={() => handleColumnClick('Fullname')}>ФИО{renderSortArrow('Fullname')}</th>
-                            <th onClick={() => handleColumnClick('Group')}>Группа{renderSortArrow('Group')}</th>
-                            <th onClick={() => handleColumnClick('Topic')}>Тема{renderSortArrow('Topic')}</th>
-                            <th onClick={() => handleColumnClick('ScientificAdviser')}>Научрук{renderSortArrow('ScientificAdviser')}</th>
-                            <th onClick={() => handleColumnClick('Avg_Mark')}>Средний балл{renderSortArrow('Avg_Mark')}</th>
-                            <th onClick={() => handleColumnClick('Red_Diplom')}>Красный диплом{renderSortArrow('Red_Diplom')}</th>
-                            <th>Рекомендация в магистратуру</th>
-                            <th>Рекомендация к публикации</th>
-                            <th>Оценка</th>
-                            <th>№ Протокола</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredDefenders.map((defender, index) => (
-                            <tr key={defender.id_S}>
-                                <td>{index + 1}</td>
-                                <td>{defender.Fullname}</td>
-                                <td>{defender.Group}</td>
-                                <td>{defender.Topic}</td>
-                                <td>{defender.ScientificAdviser}</td>
-                                <td>{defender.Avg_Mark}</td>
-                                <td>{defender.Red_Diplom ? 'Да' : 'Нет'}</td>
-                                <td>{defender.RecMagistracy ? defender.RecMagistracy : ''}</td>
-                                <td>{defender.RecPublication ? defender.RecPublication : ''}</td>
-                                <td>{defender.Result}</td>
-                                <td>{defender.NumberProtocol}</td>
-                                <td>
-                                    <Button 
-                                        variant="primary" 
-                                        onClick={() => handleClickButton(defender)} 
-                                        disabled={defender.RecMagistracy && defender.RecPublication && defender.Result}
-                                    >
-                                        {defender.RecMagistracy && defender.RecPublication && defender.Result ? 'Проведена' : 'Начать'}
-                                    </Button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </Table>
-            </div>
+            {filteredDefenders.length > 0 ? (
+                <>
+                    <div className="my-4 mx-5" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+                        <Table striped bordered hover>
+                            <thead className="table-dark">
+                                <tr>
+                                    <th>№</th>
+                                    <th onClick={() => handleColumnClick('Fullname')}>ФИО{renderSortArrow('Fullname')}</th>
+                                    <th onClick={() => handleColumnClick('Group')}>Группа{renderSortArrow('Group')}</th>
+                                    <th onClick={() => handleColumnClick('Topic')}>Тема{renderSortArrow('Topic')}</th>
+                                    <th onClick={() => handleColumnClick('ScientificAdviser')}>Научрук{renderSortArrow('ScientificAdviser')}</th>
+                                    <th onClick={() => handleColumnClick('Avg_Mark')}>Средний балл{renderSortArrow('Avg_Mark')}</th>
+                                    <th onClick={() => handleColumnClick('Red_Diplom')}>Красный диплом{renderSortArrow('Red_Diplom')}</th>
+                                    <th>Рекомендация в магистратуру</th>
+                                    <th>Рекомендация к публикации</th>
+                                    <th>Оценка</th>
+                                    <th>№ Протокола</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredDefenders.map((defender, index) => (
+                                    <tr key={defender.id_S}>
+                                        <td>{index + 1}</td>
+                                        <td>{defender.Fullname}</td>
+                                        <td>{defender.Group}</td>
+                                        <td>{defender.Topic}</td>
+                                        <td>{defender.ScientificAdviser}</td>
+                                        <td>{defender.Avg_Mark}</td>
+                                        <td>{defender.Red_Diplom ? 'Да' : 'Нет'}</td>
+                                        <td>{defender.RecMagistracy ? defender.RecMagistracy : ''}</td>
+                                        <td>{defender.RecPublication ? defender.RecPublication : ''}</td>
+                                        <td>{defender.Result}</td>
+                                        <td>{defender.NumberProtocol}</td>
+                                        <td>
+                                            <Button 
+                                                variant="primary" 
+                                                onClick={() => handleClickButton(defender)} 
+                                                disabled={defender.RecMagistracy && defender.RecPublication && defender.Result}
+                                            >
+                                                {defender.RecMagistracy && defender.RecPublication && defender.Result ? 'Проведена' : 'Начать'}
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    </div>
+                </>
+            ) : (
+                <p>Данных нет</p>
+            )}  
         </div>
     );
 };
