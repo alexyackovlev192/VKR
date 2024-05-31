@@ -1,19 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
-import {jwtDecode} from 'jwt-decode';
+import { writeFile, utils } from 'xlsx';
 import UpdateUser from '../modal-windows/UpdateUser';
 import AddUser from '../modal-windows/AddUser';
 import SearchUser from '../components/SearchUser';
 import './style-pages/UsersPage.css';
+import ImportUsersModal from '../modal-windows/ImportUsers';
 
 const UsersPage = () => {
   const [users, setUsers] = useState([]);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [formData, setFormData] = useState({});
+  const [showImportModal, setShowImportModal] = useState(false);
   const [activeRow, setActiveRow] = useState(null);
-  const [userRole, setUserRole] = useState(null);
 
   const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
@@ -34,10 +35,6 @@ const UsersPage = () => {
 
   const fetchUsers = () => {
     const token = localStorage.getItem('token');
-    if (token) {
-      const decodedToken = jwtDecode(token);
-      setUserRole(decodedToken.roles);
-    }
 
     axios.get('http://localhost:5000/admin/users', {
       headers: {
@@ -118,6 +115,7 @@ const UsersPage = () => {
   const handleCloseModal = () => {
     setShowAddModal(false);
     setShowUpdateModal(false);
+    setShowImportModal(false);
     setFormData(null);
   };
 
@@ -169,7 +167,7 @@ const UsersPage = () => {
         )
       );
       handleCloseModal();
-      fetchUsers(); // Обновление данных после успешного сохранения изменений
+      fetchUsers();
     })
     .catch(error => console.error('Ошибка при сохранении изменений информации о пользователе:', error));
   };
@@ -185,6 +183,8 @@ const UsersPage = () => {
       Post: formData.Post,
       Roles: formData.Roles || []
     };
+
+    console.log(sanitizedFormData);
     axios.post('http://localhost:5000/admin/registration', sanitizedFormData, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -192,20 +192,71 @@ const UsersPage = () => {
     })
     .then(response => {
       console.log('Новый пользователь успешно добавлен:', response.data);
-      fetchUsers(); // Обновление данных после успешного добавления пользователя
+      fetchUsers();
       handleCloseModal();
     })
     .catch(error => console.error('Ошибка при создании пользователя:', error));
   };
 
+  const handleExport = () => {
+    const headers = ['Логин', 'Роль', 'ФИО', 'Должность', 'Почта'];
+    const data = sortedUsers.map(user => [
+      user.Login,
+      user.roles.replace(/<br>/g, ', '),  // Заменяем <br> на запятую
+      user.Fullname,
+      user.Post,
+      user.Mail
+    ]);
+
+    const worksheet = utils.aoa_to_sheet([headers, ...data]);
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, 'Users');
+    writeFile(workbook, 'Users.xlsx');
+  };
+  
+  const handleFileUpload = async (data) => {
+    const token = localStorage.getItem('token');
+  
+    for (let row of data) {
+      const formattedData = {
+        Fullname: row.Fullname,
+        Post: row.Post,
+        Roles: row.Roles,
+        Login: row.Login,
+        Password: row.Password,
+        Mail: row.Mail
+      }; 
+      console.log(formattedData);
+      try {
+        const response = await axios.post('http://localhost:5000/admin/registration', formattedData, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        console.log(response.data);
+
+        fetchUsers();
+        handleCloseModal();
+      } catch (error) {
+        console.error('Ошибка при импорте данных:', error);
+      }
+    }
+  };
+
   return (
     <div className="my-5 px-5">
-    {/* <SearchUser filters={filters} handleFilterChange={handleFilterChange} /> */}
+      <SearchUser filters={filters} handleFilterChange={handleFilterChange} />
       <Button variant="primary" className="mx-3" onClick={handleEditUser} disabled={!activeRow}>
         Редактировать
       </Button>
       <Button variant="primary" className="mx-3" onClick={handleAddUser}>
         Добавить
+      </Button>
+      <Button variant="secondary" className="mx-3" onClick={handleExport}>
+        Скачать таблицу
+      </Button>
+      <Button variant="secondary" className="mx-3" onClick={() => setShowImportModal(true)}>
+        Загрузить данные
       </Button>
       <div className="my-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
         <table className="table table-striped table-bordered table-light table-hover text-center" ref={tableRef}>
@@ -243,7 +294,7 @@ const UsersPage = () => {
           </tbody>
         </table>
       </div>
-     {showUpdateModal && (
+      {showUpdateModal && (
         <UpdateUser
           showModal={showUpdateModal}
           handleCloseModal={handleCloseModal}
@@ -259,6 +310,13 @@ const UsersPage = () => {
           handleSaveChanges={handleSaveAddUser}
           formData={formData}
           handleInputChange={handleInputChange}
+        />
+      )}
+      {showImportModal && (
+        <ImportUsersModal
+          showModal={showImportModal}
+          handleCloseModal={handleCloseModal}
+          handleFileUpload={handleFileUpload}
         />
       )}
     </div>
