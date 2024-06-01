@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal, Button, ListGroup, Form } from 'react-bootstrap';
+import {jwtDecode} from 'jwt-decode';
+import Template from '../components/TemplateEmail.txt';
 
 const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
   const [geks, setGeks] = useState([]);
@@ -8,9 +10,16 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
   const [currentPage, setCurrentPage] = useState('info');
   const [subject, setSubject] = useState('');
   const [text, setText] = useState('');
+  const [user, setUser] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    let userId;
+
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      userId = decodedToken.id_U;
+    }
 
     const fetchGeksForSchedule = async (sched) => {
       try {
@@ -39,7 +48,13 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
             'Authorization': `Bearer ${token}`
           }
         });
-    
+
+        const userResponse = await axios.get(`http://localhost:5000/users/${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setUser(userResponse.data);
         return {
           members,
           secretary: secretarieResponse.data
@@ -59,17 +74,42 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
         return [...acc, ...memberEmails, gec.secretary.Mail];
       }, []);
       
-      console.log('Collected emails:', emails);
       setEmails(emails);
     };
   
     if (schedules.length > 0) {
       fetchAllGeks();
     }
+
+    const loadTemplate = async () => {
+      try {
+        const response = await fetch(Template);
+        let templateText = await response.text();
+
+        if (schedules.length > 0) {
+          const schedule = schedules[0]; 
+          templateText = templateText
+            .replace('Name_direction', schedule.Name_direction)
+            .replace('id_DS', schedule.id_D)
+            .replace('date', `${new Date(schedule.date).toLocaleDateString('ru-GB')} в ${schedule.time}`)
+            .replace('classroom', schedule.classroom)
+            .replace('id_G', schedule.id_G)
+            .replace('Name', user.Fullname)
+            .replace('Post', user.Post);
+        }
+
+        setText(templateText);
+      } catch (error) {
+        console.error('Ошибка при загрузке шаблона:', error);
+      }
+    };
+
+    loadTemplate();
   }, [schedules]);
 
   const handleClose = () => {
     setCurrentPage('info');
+    setSubject('');  // Очистка поля "Тема сообщения"
     handleCloseModal();
   };
 
@@ -77,7 +117,7 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
     const token = localStorage.getItem('token');
     const to = emails.join(', ');
     
-    console.log('Emails to send:', to); // Логирование строки email-адресов
+    console.log('Emails to send:', to);
   
     try {
       await axios.post(`http://localhost:5000/mailer/send`, {
@@ -142,7 +182,7 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
           <Form>
             <Form.Group controlId="formTextarea">
               <Form.Label>Текст сообщения</Form.Label>
-              <Form.Control as="textarea" rows={3} value={text} onChange={(e) => setText(e.target.value)} />
+              <Form.Control as="textarea" rows={12} value={text} onChange={(e) => setText(e.target.value)} />
             </Form.Group>
             <Form.Group controlId="formInput1" className="mt-3">
               <Form.Label>Тема сообщения</Form.Label>
