@@ -108,5 +108,61 @@ class resultComissionMemberController {
             return res.status(500).json(e)
         }
     }
+    async updateResultMemberGEC(req, res) {
+        try {
+            const errors = validationResult(req)
+            if (!errors.isEmpty()) {
+                return res.status(400).json({message:"Ошибка при обновлении результата защиты студента членом ГЭК", errors})
+            }
+            const { id } = req.params;
+            const {id_U, scores, RecMagistracy, RecPublication} = req.body
+            const defenseStudent = await DefenseScheduleStudent.findOne({where: {
+                id_DSS: id
+            }})
+
+            if (!defenseStudent) {
+                return res.status(404).json({ message: "Защита данного студента не найдена" });
+            }
+            const MemberOfGec = await User.findOne({where: {
+                id_U: id_U
+            }})
+            if (!MemberOfGec) {
+                return res.status(404).json({ message: "Член ГЭК не найден" });
+            }
+
+            const criteria = await Criterion.findAll();
+            if (criteria.length !== 3) {
+                return res.status(400).json({ message: 'Неверное количество критериев в базе данных' });
+            }
+
+            const weights = criteria.map(criterion => criterion.Value);
+            const weightedScores = [];
+            for (let i = 0; i < weights.length; i++) {
+                const weight = weights[i];
+
+                console.log("Вес", i + 1, ":", weight);
+                
+                const weightedScore = scores[i] * weight;
+                weightedScores.push(weightedScore);
+            }
+            console.log("Взвешенные оценки: ", weightedScores);
+            const Result = weightedScores.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+
+
+            const updatedRowsCount = await ResultComissionMember.update(
+                { Result: Result, RecMagistracy: RecMagistracy, RecPublication: RecPublication },
+                { where: { id_DSS: id, id_U: id_U } }
+            );
+    
+            if (updatedRowsCount[0] === 0) {
+                return res.status(404).json({ message: "Результат защиты для студента, выставленный членом ГЭК, не найден" });
+            } else {
+                return res.json({ message: "Результат защиты для студента, выставленный членом ГЭК, обновлен" });
+            }
+        } catch(e) {
+            console.log(e)
+            res.status(400).json({message: 'Ошибка обновления результата защиты для студента, выставленного членом ГЭК'})
+        }
+    }
 }
 module.exports = new resultComissionMemberController()

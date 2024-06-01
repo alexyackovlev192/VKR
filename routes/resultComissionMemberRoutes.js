@@ -20,5 +20,17 @@ router.post('/create', [
 ], authMiddleware, roleMiddleware([2]), controller.create)
 router.get('/GecResult/:id', authMiddleware, roleMiddleware([4]), controller.getResultsByIdDSS)
 router.get('/:id/:id_U', authMiddleware, roleMiddleware([2]), controller.getResultByUserIdAndIdDSS);
+router.put('/:id', [
+    check('id_U', "Id члена ГЭК не может быть пустым").notEmpty(),
+    check('scores').custom(value => {
+        if (!Array.isArray(value) || value.length === 0) {
+            throw new Error('Оценки защиты по критериям не могут быть пустыми');
+        }
+        if (value.length !== 3) {
+            throw new Error('Оценки защиты должны быть представлены для каждого из трех критериев');
+        }
+        return true;
+    })
+], authMiddleware, roleMiddleware([2]), controller.updateResultMemberGEC);
 
 module.exports = router
