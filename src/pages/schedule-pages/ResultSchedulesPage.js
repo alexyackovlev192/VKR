@@ -27,6 +27,31 @@ const ResultSchedulesPage = () => {
     id_DS: true,
     numberProtocol: true
   });
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortOrder, setSortOrder] = useState('asc');
+
+  const compareValues = (a, b) => {
+    if (typeof a === 'string' && typeof b === 'string') {
+      return a.localeCompare(b);
+    } else if (typeof a === 'number' && typeof b === 'number') {
+      return a - b;
+    } else {
+      return String(a).localeCompare(String(b));
+    }
+  };
+  
+  useEffect(() => {
+    if (sortColumn !== null) {
+      const sortedResults = [...results].sort((a, b) => {
+        if (sortOrder === 'asc') {
+          return compareValues(a[sortColumn], b[sortColumn]);
+        } else {
+          return compareValues(b[sortColumn], a[sortColumn]);
+        }
+      });
+      setResults(sortedResults);
+    }
+  }, [sortColumn, sortOrder]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -52,7 +77,6 @@ const ResultSchedulesPage = () => {
         else if(year) return `Year=${year}&`;
     }
     
-    console.log(direction);
     url += handleParametrs();
   
     axios.get(url, {
@@ -77,7 +101,7 @@ const ResultSchedulesPage = () => {
   const handleFormSubmit = (event) => {
     event.preventDefault();
     setErrorMessage('');
-    setCheckClick(false); // Сброс состояния перед новым запросом
+    setCheckClick(false);
 
     if (year && direction) {
       fetchResults();
@@ -106,7 +130,7 @@ const ResultSchedulesPage = () => {
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, 'Results');
 
-    writeFile(wb, 'results.xlsx');
+    writeFile(wb, 'Results.xlsx');
   };
 
   const handleColumnToggle = (column) => {
@@ -125,7 +149,23 @@ const ResultSchedulesPage = () => {
       return updatedColumns;
     });
   };
-console.log(results);
+
+  const sortData = (column) => {
+    if (sortColumn === column) {
+      setSortOrder(prevOrder => prevOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortOrder('asc');
+    }
+  };
+
+  const renderSortArrow = (column) => {
+    if (sortColumn === column) {
+      return sortOrder === 'asc' ? ' ↑' : ' ↓';
+    }
+    return null;
+  };
+
   return (
     <div className="px-5">
       <div className="text-center my-4">
@@ -224,19 +264,19 @@ console.log(results);
             <thead className="table-dark">
               <tr>
                 <th>№</th>
-                {columns.studentName && <th>ФИО студента</th>}
-                {columns.Group && <th>Номер группы</th>}
-                {columns.Topic && <th>Тема</th>}
-                {columns.ScientificAdviser && <th>Научрук</th>}
-                {columns.Red_Diplom && <th>Красный диплом</th>}
-                {columns.Year && <th>Год защиты</th>}
-                {columns.Name_direction && <th>Направление</th>}
-                {columns.result && <th>Оценка</th>}
-                {columns.recMagistracy && <th>Рекомендация в магистратуру</th>}
-                {columns.recPublication && <th>Рекомендация к публикации</th>}
-                {columns.gec && <th>Номер ГЭК</th>}
-                {columns.id_DS && <th>Номер защиты</th>}
-                {columns.numberProtocol && <th>Номер протокола</th>}
+                {columns.studentName && <th onClick={() => sortData('studentName')}>ФИО студента{renderSortArrow('studentName')}</th>}
+                {columns.Group && <th onClick={() => sortData('Group')}>Группа{renderSortArrow('Group')}</th>}
+                {columns.Topic && <th onClick={() => sortData('Topic')}>Тема{renderSortArrow('Topic')}</th>}
+                {columns.ScientificAdviser && <th onClick={() => sortData('ScientificAdviser')}>Научрук{renderSortArrow('ScientificAdviser')}</th>}
+                {columns.Red_Diplom && <th onClick={() => sortData('Red_Diplom')}>Красный диплом{renderSortArrow('Red_Diplom')}</th>}
+                {columns.Year && <th onClick={() => sortData('Year')}>Год защиты{renderSortArrow('Year')}</th>}
+                {columns.Name_direction && <th onClick={() => sortData('Name_direction')}>Направление{renderSortArrow('Name_direction')}</th>}
+                {columns.result && <th onClick={() => sortData('result')}>Оценка{renderSortArrow('result')}</th>}
+                {columns.recMagistracy && <th onClick={() => sortData('recMagistracy')}>Рекомендация в магистратуру{renderSortArrow('recMagistracy')}</th>}
+                {columns.recPublication && <th onClick={() => sortData('recPublication')}>Рекомендация к публикации{renderSortArrow('recPublication')}</th>}
+                {columns.gec && <th onClick={() => sortData('gec')}>Номер ГЭК{renderSortArrow('gec')}</th>}
+                {columns.id_DS && <th onClick={() => sortData('id_DS')}>Номер защиты{renderSortArrow('id_DS')}</th>}
+                {columns.numberProtocol && <th onClick={() => sortData('numberProtocol')}>Номер протокола{renderSortArrow('numberProtocol')}</th>}
               </tr>
             </thead>
             <tbody>
@@ -247,7 +287,7 @@ console.log(results);
                   {columns.Group && <td>{res.Group}</td>}
                   {columns.Topic && <td>{res.Topic}</td>}
                   {columns.ScientificAdviser && <td>{res.ScientificAdviser}</td>}
-                  {columns.Red_Diplom && <td>{res.Red_Diplom ? 'Да' : 'Нет'}</td>}
+                  {columns.Red_Diplom && <td>{res.Red_Diplom ? 'Да' : null}</td>}
                   {columns.Year && <td>{res.Year}</td>}
                   {columns.Name_direction && <td>{res.Name_direction}</td>}
                   {columns.result && <td>{res.result}</td>}
