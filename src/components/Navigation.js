@@ -20,6 +20,7 @@ const navigationItems = {
     { href: "/schedule", text: "Расписание защит" },
     { href: "/gek", text: "ГЭК" },
     { href: "/defenders", text: "Список защищающихся" },
+    { href: "/result-schedules", text: "Результаты защит" },
     { href: "/logout", text: "Выход" }
   ],
   4: [

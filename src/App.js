@@ -32,13 +32,6 @@ const App = () => {
     return (
         <Router>
             <Routes>
-                <Route path="/test" element={
-                    <ProtectedPageLayout roles={[3]}>
-                        <ResultSchedulesPage />
-                    </ProtectedPageLayout>
-                } />
-
-
                 <Route path="/auth" element={<LoginForm />} />
                 <Route path="/users" element={
                     <ProtectedPageLayout roles={[1]}>
@@ -133,6 +126,11 @@ const App = () => {
                 <Route path="/defenders" element={
                     <ProtectedPageLayout roles={[3]}>
                         <DefendersPage />
+                    </ProtectedPageLayout>
+                } />
+                <Route path="/result-schedules" element={
+                    <ProtectedPageLayout roles={[3]}>
+                        <ResultSchedulesPage />
                     </ProtectedPageLayout>
                 } />
             </Routes>

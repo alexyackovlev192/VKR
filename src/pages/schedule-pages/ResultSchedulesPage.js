@@ -182,7 +182,7 @@ const ResultSchedulesPage = () => {
   return (
     <div className="px-5">
       <div className="text-center my-4">
-        <h3>Список членов комиссии</h3>
+        <h3>Результаты защит</h3>
       </div>
       <form className="justify-content-center text-center mb-3" onSubmit={handleFormSubmit}>
         <div className="row justify-content-center mb-3">
