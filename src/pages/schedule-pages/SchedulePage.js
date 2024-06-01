@@ -342,27 +342,25 @@ const SchedulePage = () => {
         )}
       </div>
       <div className="row">
-        {schedules.length > 0 ? (
-          <>
-          isTableView ? (
-            <TableView
-              uniqueDates={uniqueDates}
-              uniqueDirections={uniqueDirections}
-              filteredSchedules={filteredSchedules}
-              handleSelectedClick={handleSelectedClick}
-              activeCell={activeCell}
-              tableRef={tableRef}
-            />
-          ) : (
-            <CardView
-              schedules={schedules}
-              handleEditSchedule={handleEditSchedule}
-            />
-          )
-          </>
+      {schedules.length > 0 ? (
+        isTableView ? (
+          <TableView
+            uniqueDates={uniqueDates}
+            uniqueDirections={uniqueDirections}
+            filteredSchedules={filteredSchedules}
+            handleSelectedClick={handleSelectedClick}
+            activeCell={activeCell}
+            tableRef={tableRef}
+          />
         ) : (
-          <NoDataMessage />
-        )}  
+          <CardView
+            schedules={schedules}
+            handleEditSchedule={handleEditSchedule}
+          />
+        )
+      ) : (
+        <NoDataMessage />
+      )}
       </div>
       <UpdateSchedule
         showModal={showUpdateModal}

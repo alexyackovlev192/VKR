@@ -78,7 +78,7 @@ const MySchedulePage = () => {
                     {scheduleDetails.map((item, index) => (
                         <Card key={index} className="col-2 mx-2 my-4 text-center bg-light">
                             <Card.Body>
-                                <Card.Title>{new Date(item.date).toLocaleDateString('ru', { day: '2-digit', month: '2-digit' })}</Card.Title>
+                                <Card.Title>Защита №{item.id_DS} <br></br> {new Date(item.date).toLocaleDateString('ru', { day: '2-digit', month: '2-digit' })}</Card.Title>
                                 <Card.Text>
                                     <span>
                                         <p>ГЭК №{item.id_G}</p>
