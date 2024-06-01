@@ -7,6 +7,7 @@ import { utils, writeFile } from 'xlsx';
 
 import UpdateSchedule from '../../modal-windows/UpdateSchedule';
 import AddSchedule from '../../modal-windows/AddSchedule';
+import GekCompositionModal from '../../modal-windows/GekCompositionModal';
 import WarningWindow from '../../components/WarningWindow'; 
 import NoDataMessage from '../../components/NoDataMessage'; 
 
@@ -23,9 +24,11 @@ const SchedulePage = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showWarningWindow, setShowWarningWindow] = useState(false); 
+  const [showOpenModal, setShowOpenModal] = useState(false); 
 
   const [formData, setFormData] = useState(null);
   const [activeCell, setActiveCell] = useState(null);
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
 
   const [isTableView, setIsTableView] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
@@ -72,7 +75,8 @@ const SchedulePage = () => {
         'Authorization': `Bearer ${token}`
       }
     })
-    .then(response => setGeks(response.data))
+    .then(response => { 
+      setGeks(response.data)})
     .catch(error => console.error('Ошибка при загрузке данных:', error));
   }, []);
 
@@ -110,6 +114,8 @@ const SchedulePage = () => {
   const handleCloseModal = () => {
     setShowUpdateModal(false);
     setShowAddModal(false);
+    setShowOpenModal(false);
+    setSelectedSchedule(null);
     setFormData(null);
     setChanges(false);
   };
@@ -124,6 +130,11 @@ const SchedulePage = () => {
     setFormData(selectedItem);
     setShowUpdateModal(true);
     setChanges(false);
+  };
+
+  const handleOpenSchedule = (selectedItem) => {
+    setSelectedSchedule(selectedItem);
+    setShowOpenModal(true);
   };
 
   const handleAddSchedule = () => {
@@ -288,20 +299,16 @@ const SchedulePage = () => {
   }, [uniqueDates, uniqueDirections, directions, schedules]);
 
   const handleExportToExcel = useCallback(() => {
-    // Собираем наименования направлений из уникальных направлений
     const directionNames = uniqueDirections.map(direction => direction[1]);
   
-    // Формируем заголовки для столбцов
     const headers = [
-      { label: 'Дата', key: 'Дата' }, // Используем ключ "Дата" вместо "date"
+      { label: 'Дата', key: 'Дата' },
       ...directionNames.map(name => ({ label: name, key: name })),
     ];
   
-    // Формируем данные для таблицы
     const dataToExport = uniqueDates.map(date => {
-      const rowData = { Дата: date }; // Используем ключ "Дата" вместо "date"
+      const rowData = { Дата: date }; 
   
-      // Заполняем ячейки для направлений данными о защите
       directionNames.forEach(name => {
         const schedule = schedules.find(schedule => schedule.date === date && schedule.direction.Name_direction === name);
         rowData[name] = schedule ? `Время: ${schedule.time} | Аудитория: ${schedule.classroom} | ГЭК: ${schedule.id_G}` : '';
@@ -315,10 +322,10 @@ const SchedulePage = () => {
     });
   
     worksheet['!cols'] = [
-      { wch: 15 }, // Ширина первого столбца (Дата)
-      ...directionNames.map(() => ({ wch: 50 })) // Ширина остальных столбцов (направления)
+      { wch: 15 },
+      ...directionNames.map(() => ({ wch: 50 }))
     ];
-    worksheet['!rows'] = [{ hpt: 20 }]; // Высота строк
+    worksheet['!rows'] = [{ hpt: 20 }];
   
     const workbook = utils.book_new();
     utils.book_append_sheet(workbook, worksheet, 'Расписание');
@@ -333,7 +340,9 @@ const SchedulePage = () => {
       </div>
       <div>
         {schedules.length > 0 && isTableView && (
-          <Button variant="primary" className="mx-3" onClick={() => handleEditSchedule(activeCell)} disabled={!activeCell}>Редактировать</Button>
+          <>
+            <Button variant="primary" className="mx-3" onClick={() => handleEditSchedule(activeCell)} disabled={!activeCell}>Редактировать</Button>
+          </>
         )}
         <Button variant="primary" className="mx-3" onClick={handleAddSchedule}>Добавить</Button>
         <Button variant="primary" className="mx-3" onClick={toggleView}>{isTableView ? 'Карточки' : 'Таблица'}</Button>
@@ -349,6 +358,7 @@ const SchedulePage = () => {
             uniqueDirections={uniqueDirections}
             filteredSchedules={filteredSchedules}
             handleSelectedClick={handleSelectedClick}
+            handleOpenSchedule={handleOpenSchedule}
             activeCell={activeCell}
             tableRef={tableRef}
           />
@@ -384,11 +394,16 @@ const SchedulePage = () => {
         handleClose={handleCloseWarningWindow} 
         errorMessage={errorMessage} 
       />
+      <GekCompositionModal
+        showModal={showOpenModal}
+        handleCloseModal={handleCloseModal}
+        schedules={selectedSchedule ? [selectedSchedule] : []}
+      />
     </div>
   );
 };
 
-const TableView = ({ uniqueDates, uniqueDirections, filteredSchedules, handleSelectedClick, activeCell, tableRef }) => {
+const TableView = ({ uniqueDates, uniqueDirections, filteredSchedules, handleSelectedClick, activeCell, tableRef, handleOpenSchedule }) => {
   return (
     <>
       <div className="col-1 px-0 my-4">
@@ -419,12 +434,13 @@ const TableView = ({ uniqueDates, uniqueDirections, filteredSchedules, handleSel
             </tr>
           </thead>
           <tbody>
-            {filteredSchedules.map(({ date, schedules }, dateIndex) => (
+            {filteredSchedules.map(({ schedules }, dateIndex) => (
               <tr key={dateIndex}>
                 {schedules.map((sched, directionIndex) => {
                   const isActive = activeCell && sched && activeCell.date === sched.date && activeCell.Name_direction === sched.Name_direction;
                   return (
                     <td 
+                      onDoubleClick={() => handleOpenSchedule(activeCell)}
                       key={directionIndex}
                       className={`px-5 ${isActive ? 'table-info' : 'table-light'}`}
                       onClick={() => handleSelectedClick({ event: sched })}
