@@ -9,5 +9,8 @@ router.post('/create', [
     check('id_DS',"Id защиты не может быть пустым").notEmpty(),
     check('id_U', "Id члена комиссии не может быть пустым").notEmpty()
 ], authMiddleware, roleMiddleware([2, 4]), controller.create)
-
+router.get('/ByIdDSAndIdU', [
+    check('id_DS',"Id защиты не может быть пустым").notEmpty(),
+    check('id_U', "Id члена комиссии не может быть пустым").notEmpty()
+], authMiddleware, roleMiddleware([2,3,4]), controller.getPresenceByIdDSAndIdU)
 module.exports = router
