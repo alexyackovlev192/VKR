@@ -17,6 +17,7 @@ const ResultComissionMemberRouter = require('./routes/resultComissionMemberRoute
 const ResultComissionSecretaryRouter = require('./routes/resultComissionSecretaryRoutes')
 const UserRouter = require('./routes/UserRoutes')
 const emailRouter = require('./routes/emailRoutes');
+const DefensePresenceRouter = require('./routes/DefensePresenceRoutes');
 const PORT = process.env.PORT || 5000
 
 const app = express()
@@ -36,6 +37,7 @@ app.use("/roles", RolesRouter)
 app.use("/criteria", CriteriaRouter)
 app.use("/resultComissionMember", ResultComissionMemberRouter)
 app.use("/resultComissionSecretary", ResultComissionSecretaryRouter)
+app.use("/defensePresence", DefensePresenceRouter)
 app.use("/users", UserRouter)
 app.use("/mailer", emailRouter)
 
