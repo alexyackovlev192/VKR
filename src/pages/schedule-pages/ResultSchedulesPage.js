@@ -106,6 +106,7 @@ const ResultSchedulesPage = () => {
     } else if (!year && direction) {
       setErrorMessage('Пожалуйста, заполните поле "Год".');
     }
+    else if (idDS) {fetchResults();}
   };
 
   const handleExportToExcel = () => {
@@ -162,6 +163,22 @@ const ResultSchedulesPage = () => {
     return null;
   };
 
+  const handleYearChange = (e) => {
+    setYear(e.target.value);
+    setIdDS('');
+  };
+
+  const handleDirectionChange = (e) => {
+    setDirection(e.target.value);
+    setIdDS('');
+  };
+
+  const handleIdDSChange = (e) => {
+    setIdDS(e.target.value);
+    setDirection('');
+    setYear('');
+  };
+
   return (
     <div className="px-5">
       <div className="text-center my-4">
@@ -177,7 +194,7 @@ const ResultSchedulesPage = () => {
               id="year"
               name="year"
               value={year}
-              onChange={(e) => setYear(e.target.value)}
+              onChange={handleYearChange}
             />
           </div>
           <div className="col-3">
@@ -186,8 +203,8 @@ const ResultSchedulesPage = () => {
               className="form-control mx-2"
               id="direction"
               name="direction"
-              value={direction.Name_direction}
-              onChange={(e) => setDirection(e.target.value)}
+              value={direction}
+              onChange={handleDirectionChange}
             >
               <option value=""></option>
               {directions.map((dir, index) => (
@@ -203,7 +220,7 @@ const ResultSchedulesPage = () => {
               id="id_DS"
               name="id_DS"
               value={idDS}
-              onChange={(e) => setIdDS(e.target.value)}
+              onChange={handleIdDSChange}
             />
           </div>
         </div>
