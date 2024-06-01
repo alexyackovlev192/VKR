@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button, Card, ListGroup } from 'react-bootstrap';
 
 const ListDefendersForSchedulePage = () => {
   const [schedules, setschedules] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -61,13 +62,19 @@ const ListDefendersForSchedulePage = () => {
   }, []);
 
 
+  const handleEditClick = (ds) => {
+    localStorage.setItem('id_D', ds.id_D);
+    localStorage.setItem('Name_dir', ds.directs.Name_direction);
+    navigate(`/list-defenders-edit/${ds.id_DS}`);
+  }
+
   return (
     <div className="container-fluid text-center my-3">            
-      <div className="row my-3">
+      <div className="row text-center my-4">
         <Link to={`/defenders`} className="col-1">
             <Button variant="primary" className="">Назад</Button>
         </Link>
-        <h4 className="col-10">Составы защищающихся</h4>
+        <h3 className="col-10">Составы защищающихся</h3>
       </div>
       <div className="row justify-content-evenly">
         {schedules && schedules.map(data => (
@@ -88,9 +95,7 @@ const ListDefendersForSchedulePage = () => {
               </ListGroup>
             </Card.Body>
             <Card.Footer className="text-left bg-light">
-              <Link to={`/list-defenders-edit/${data.id_DS}`}>
-                <Button variant="primary" className="mx-3">Редактировать</Button>
-              </Link>
+              <Button variant="primary" className="mx-3" onClick={() => handleEditClick(data)}>Редактировать</Button>
             </Card.Footer>
           </Card>
         ))}

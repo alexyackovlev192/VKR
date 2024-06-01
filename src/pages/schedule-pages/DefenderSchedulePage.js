@@ -12,12 +12,24 @@ const DefenderSchedulePage = () => {
     const id_U = localStorage.getItem('id_U');
     const id_DSS = localStorage.getItem('id_DSS');
     const id_DS = localStorage.getItem('id_DS');
+
+    const recMag = localStorage.getItem('RecMag') === 'Да';
+    const recPub = localStorage.getItem('RecPub') === 'Да';
+    const result = localStorage.getItem('Result');
+
     const navigate = useNavigate();
 
-    console.log(id_DS);
     useEffect(() => {
         fetchData();
     }, [id_S]);
+
+    useEffect(() => {
+        setDefenderData(prevData => ({
+            ...prevData,
+            magRec: recMag,
+            publRec: recPub
+        }));
+    }, [recMag, recPub]);
 
     const fetchData = async () => {
         const token = localStorage.getItem('token');
@@ -64,7 +76,7 @@ const DefenderSchedulePage = () => {
                 }
             });
             navigate(`/my-schedule/${id_DS}`);
-            localStorage.removeItem('id_DSS');
+            localStorage.removeItem('DataDefender');
         } catch (error) {
             console.error('Error saving data:', error);
         }
@@ -72,6 +84,7 @@ const DefenderSchedulePage = () => {
 
     const handleBackButton = () => {
         navigate(`/my-schedule/${id_DS}`);
+        localStorage.removeItem('DataDefender');
     };
 
     const RatingCriteria = ({ criteria }) => {
@@ -121,33 +134,35 @@ const DefenderSchedulePage = () => {
                             <th>Красный диплом</th>
                             <th>Рекомендация в магистратуру</th>
                             <th>Рекомендация к публикации</th>
+                            <th>Оценка</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {defenderData && ( 
-                        <tr key={defenderData.id}>
-                            <td>1</td>
-                            <td>{defenderData.Fullname}</td>
-                            <td>{defenderData.Group}</td>
-                            <td>{defenderData.Topic}</td>
-                            <td>{defenderData.ScientificAdviser}</td>
-                            <td>{defenderData.Avg_Mark}</td>
-                            <td>{defenderData.Red_Diplom ? 'Да' : 'Нет'}</td>
-                            <td>
-                                <Form.Check
-                                    type="checkbox"
-                                    checked={defenderData.magRec}
-                                    onChange={(e) => handleRecChange('magRec', e.target.checked)}
-                                />
-                            </td>
-                            <td>
-                                <Form.Check
-                                    type="checkbox"
-                                    checked={defenderData.publRec}
-                                    onChange={(e) => handleRecChange('publRec', e.target.checked)}
-                                />
-                            </td>
-                        </tr>
+                        {defenderData && (
+                            <tr key={defenderData.id}>
+                                <td>1</td>
+                                <td>{defenderData.Fullname}</td>
+                                <td>{defenderData.Group}</td>
+                                <td>{defenderData.Topic}</td>
+                                <td>{defenderData.ScientificAdviser}</td>
+                                <td>{defenderData.Avg_Mark}</td>
+                                <td>{defenderData.Red_Diplom ? 'Да' : 'Нет'}</td>
+                                <td>
+                                    <Form.Check
+                                        type="checkbox"
+                                        checked={defenderData.magRec}
+                                        onChange={(e) => handleRecChange('magRec', e.target.checked)}
+                                    />
+                                </td>
+                                <td>
+                                    <Form.Check
+                                        type="checkbox"
+                                        checked={defenderData.publRec}
+                                        onChange={(e) => handleRecChange('publRec', e.target.checked)}
+                                    />
+                                </td>
+                                <td>{result > 0 ? result : ''}</td>
+                            </tr>
                         )}
                     </tbody>
                 </table>

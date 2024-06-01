@@ -5,6 +5,7 @@ import axios from 'axios';
 import UpdateSecretarie from '../modal-windows/UpdateSecretarie';
 import WarningWindow from '../components/WarningWindow';
 import SearchMem from '../components/SearchMember';
+import NoDataMessage from '../components/NoDataMessage'; 
 import { writeFile, utils } from 'xlsx';
 
 const SecretariesPage = () => {
@@ -212,7 +213,7 @@ const SecretariesPage = () => {
           </div>
         </>
       ) : (
-        <p>Данных нет</p>
+        <NoDataMessage />
       )}          
         <UpdateSecretarie
         secretaries={secretaries}

@@ -9,6 +9,9 @@ const EditListDefendersForSchedulePage = () => {
     const { id_DS } = useParams(); 
     const [defendersSchedule, setMembersGek] = useState([]);
     const [allDefendersSchedule, setAllMembersGek] = useState([]);
+    const id_D = Number(localStorage.getItem('id_D'));
+    
+    const Name_dir = localStorage.getItem('Name_dir');
     const navigate = useNavigate();
 
     const fetchAllDefendersData = async () => {
@@ -19,14 +22,14 @@ const EditListDefendersForSchedulePage = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            return response.data;
+            const filteredStudents = response.data.filter(student => student.id_D === id_D);
+            return filteredStudents;
         } catch (error) {
             console.error('Ошибка при загрузке данных:', error);
             return [];
         }
     };
 
-    
     const fetchDefendersData = async () => {
         const token = localStorage.getItem('token');
         try {
@@ -71,7 +74,6 @@ const EditListDefendersForSchedulePage = () => {
         setAllMembersGek(filteredAndSortAllDefenders);
     };
 
-
     useEffect(() => {
         fetchData();
     }, [id_DS]);
@@ -100,6 +102,10 @@ const EditListDefendersForSchedulePage = () => {
                 }
             });
             navigate('/list-defenders');
+
+            localStorage.removeItem('id_D');
+            localStorage.removeItem('Name_dir');
+
             console.log(gecCompositionResponse.data);
         } catch (error) {
             console.error('Ошибка:', error);
@@ -135,7 +141,7 @@ const EditListDefendersForSchedulePage = () => {
                 </Card>
 
                 <Card style={{ minWidth: '500px', width: '40%', height: '70vh', overflowY: 'auto' }} className="my-2 text-center bg-light">
-                    <Card.Header className="fs-4 bg-light">Список защищающихся</Card.Header>
+                    <Card.Header className="fs-4 bg-light">Список защищающихся направления {Name_dir}</Card.Header>
                     <Card.Body>
                         <ListGroup className="container">
                             {allDefendersSchedule.map((defender, index) => (

@@ -4,6 +4,7 @@ import axios from 'axios';
 import UpdateMember from '../modal-windows/UpdateMember';
 import WarningWindow from '../components/WarningWindow';
 import SearchMem from '../components/SearchMember';
+import NoDataMessage from '../components/NoDataMessage'; 
 import { writeFile, utils } from 'xlsx';
 import './style-pages/MembersPage.css';
 
@@ -188,7 +189,7 @@ const MembersPage = () => {
           </div>
         </>
       ) : (
-        <p>Данных нет</p>
+        <NoDataMessage />
       )}          
         <UpdateMember
         showModal={showUpdateModal}

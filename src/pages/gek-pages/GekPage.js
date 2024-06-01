@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import NoDataMessage from '../../components/NoDataMessage'; 
 import axios from 'axios';
 import { Button, Card, ListGroup } from 'react-bootstrap';
 
@@ -107,7 +108,7 @@ const GekPage = () => {
             </Card>
           ))
         ) : (
-          <p>Данных нет</p>
+          <NoDataMessage />
         )}
       </div>
     </div>

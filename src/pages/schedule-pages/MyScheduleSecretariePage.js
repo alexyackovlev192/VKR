@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Card } from 'react-bootstrap';
+import NoDataMessage from '../../components/NoDataMessage'; 
 import axios from 'axios';
 import {jwtDecode} from 'jwt-decode';
 
@@ -93,7 +94,7 @@ const MySchedulePage = () => {
                 </div> 
                 </>
                 ) : (
-                    <p>Данных нет</p>
+                    <NoDataMessage />
                 )}
         </div>
     );

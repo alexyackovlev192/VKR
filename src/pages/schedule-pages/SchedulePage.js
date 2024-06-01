@@ -8,6 +8,7 @@ import { utils, writeFile } from 'xlsx';
 import UpdateSchedule from '../../modal-windows/UpdateSchedule';
 import AddSchedule from '../../modal-windows/AddSchedule';
 import WarningWindow from '../../components/WarningWindow'; 
+import NoDataMessage from '../../components/NoDataMessage'; 
 
 import '../style-pages/SchedulePage.css';
 
@@ -341,7 +342,8 @@ const SchedulePage = () => {
         )}
       </div>
       <div className="row">
-        {
+        {schedules.length > 0 ? (
+          <>
           isTableView ? (
             <TableView
               uniqueDates={uniqueDates}
@@ -356,7 +358,11 @@ const SchedulePage = () => {
               schedules={schedules}
               handleEditSchedule={handleEditSchedule}
             />
-          )}
+          )
+          </>
+        ) : (
+          <NoDataMessage />
+        )}  
       </div>
       <UpdateSchedule
         showModal={showUpdateModal}

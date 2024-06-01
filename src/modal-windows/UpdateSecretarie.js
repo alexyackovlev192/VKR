@@ -30,9 +30,6 @@ const UpdateSecretarie = ({
         <Button variant="secondary" onClick={handleCloseModal}>
           Отмена
         </Button>
-        {/* <Button variant="danger" onClick={() => handleDeleteMember(formData)}>
-          Удалить
-        </Button> */}
       </Modal.Footer>
     </Modal>
   );

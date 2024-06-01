@@ -5,6 +5,7 @@ import { writeFile, utils } from 'xlsx';
 import UpdateUser from '../modal-windows/UpdateUser';
 import AddUser from '../modal-windows/AddUser';
 import SearchUser from '../components/SearchUser';
+import NoDataMessage from '../components/NoDataMessage'; 
 import './style-pages/UsersPage.css';
 import ImportUsersModal from '../modal-windows/ImportUsers';
 
@@ -287,9 +288,7 @@ const UsersPage = () => {
                 </tr>
               ))
             ) : (
-              <tr>
-                <td colSpan="6">Данные не найдены</td>
-              </tr>
+              <NoDataMessage />
             )}
           </tbody>
         </table>

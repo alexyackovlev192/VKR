@@ -8,6 +8,7 @@ import UpdateDefender from '../../modal-windows/UpdateDefender';
 import WarningWindow from '../../components/WarningWindow';
 import AddDefender from '../../modal-windows/AddDefender';
 import SearchStud from '../../components/SearchDefender';
+import NoDataMessage from '../../components/NoDataMessage'; 
 import ImportDefendersModal from '../../modal-windows/ImportDefenders';
 
 import '../style-pages/DefendersPage.css';
@@ -93,8 +94,8 @@ const DefendersPage = () => {
       if (sortColumn === 'Avg_Mark') {
         return sortOrder === 'asc' ? a[sortColumn] - b[sortColumn] : b[sortColumn] - a[sortColumn];
       } else if (sortColumn === 'Red_Diplom') {
-        let valA = a[sortColumn] ? 'Да' : 'Нет';
-        let valB = b[sortColumn] ? 'Да' : 'Нет';
+        let valA = a[sortColumn] ? 'Да' : null;
+        let valB = b[sortColumn] ? 'Да' : null;
         return sortOrder === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
       } else {
         return sortOrder === 'asc' ? a[sortColumn].localeCompare(b[sortColumn]) : b[sortColumn].localeCompare(a[sortColumn]);
@@ -261,7 +262,7 @@ const DefendersPage = () => {
       const scientificAdviserMatch = scientificAdviser ? defender.ScientificAdviser && defender.ScientificAdviser.toLowerCase().includes(scientificAdviser.toLowerCase()) : true;
       const nameDirectionMatch = name_direction ? defender.Name_direction && defender.Name_direction.toLowerCase().includes(name_direction.toLowerCase()) : true;
       const avgMarkMatch = avgMark ? defender.Avg_Mark === parseFloat(avgMark) : true;
-      const redDiplomMatch = redDiplom ? (defender.Red_Diplom ? 'Да' : 'Нет') === redDiplom : true;
+      const redDiplomMatch = redDiplom ? (defender.Red_Diplom ? 'Да' : null) === redDiplom : true;
       
       return fullnameMatch && groupMatch && topicMatch && scientificAdviserMatch && avgMarkMatch && redDiplomMatch && nameDirectionMatch;
     });
@@ -277,7 +278,7 @@ const DefendersPage = () => {
       defender.Topic,
       defender.ScientificAdviser,
       defender.Avg_Mark,
-      defender.Red_Diplom ? 'Да' : 'Нет',
+      defender.Red_Diplom ? 'Да' : null,
       defender.YearOfDefense,
       defender.Name_direction
     ]);
@@ -377,7 +378,7 @@ const DefendersPage = () => {
                     <td>{defender.Topic}</td>
                     <td>{defender.ScientificAdviser}</td>
                     <td>{defender.Avg_Mark}</td>
-                    <td>{defender.Red_Diplom ? 'Да' : 'Нет'}</td>
+                    <td>{defender.Red_Diplom ? 'Да' : null}</td>
                     <td>{defender.Name_direction}</td>
                   </tr>
                 ))}
@@ -386,7 +387,7 @@ const DefendersPage = () => {
           </div>
         </>
       ) : (
-        <p>Данных нет</p>
+        <NoDataMessage />
       )} 
       {showUpdateModal && (
         <UpdateDefender

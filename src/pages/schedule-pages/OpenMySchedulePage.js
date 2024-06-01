@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'react-bootstrap';
+import NoDataMessage from '../../components/NoDataMessage'; 
 import axios from 'axios';
 
 const OpenMySchedulePage = () => {
@@ -107,10 +108,18 @@ const OpenMySchedulePage = () => {
 
     const handleClickButton = (d) => {
         localStorage.setItem('id_DSS', d.id_DSS);
+        localStorage.setItem('RecMag', d.RecMagistracy);
+        localStorage.setItem('RecPub', d.RecPublication);
+        localStorage.setItem('Result', d.Result);
         navigate(`/defender-schedule/${d.id_S}`);
     };
 
     const handleBackButton = () => {
+        localStorage.removeItem('id_DS');
+        navigate(`/my-schedule`);
+    };
+
+    const handleSaveButton = () => {
         localStorage.removeItem('id_DS');
         navigate(`/my-schedule`);
     };
@@ -159,7 +168,7 @@ const OpenMySchedulePage = () => {
                                             <Button 
                                                 variant="primary" 
                                                 onClick={() => handleClickButton(defender)} 
-                                                disabled={defender.Result}
+                                                //disabled={defender.Result}
                                             >
                                                 {defender.Result ? 'Редактировать' : 'Начать'}
                                             </Button>
@@ -168,10 +177,11 @@ const OpenMySchedulePage = () => {
                                 ))}
                             </tbody>
                         </Table>
+                        <Button variant="primary" className="col-2 my-4" onClick={handleSaveButton}>Завершить защиту</Button>
                     </div>
                 </>
             ) : (
-                <p>Данных нет</p>
+                <NoDataMessage />
             )}    
         </div>
     );

@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Table } from 'react-bootstrap';
+import NoDataMessage from '../../components/NoDataMessage'; 
 import axios from 'axios';
 
 const OpenMyScheduleSecretariePage = () => {
@@ -172,7 +173,7 @@ const OpenMyScheduleSecretariePage = () => {
                     </div>
                 </>
             ) : (
-                <p>Данных нет</p>
+                <NoDataMessage />
             )}  
         </div>
     );

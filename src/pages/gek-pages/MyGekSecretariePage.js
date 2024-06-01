@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, ListGroup } from 'react-bootstrap';
 import axios from 'axios';
+import NoDataMessage from '../../components/NoDataMessage'; 
 import {jwtDecode} from 'jwt-decode'; 
 
 const MyGekPage = () => {
@@ -110,7 +111,7 @@ const MyGekPage = () => {
         </div>      
       </>
       ) : (
-        <p>Данных нет</p>
+        <NoDataMessage />
       )}  
     </div>
   );
