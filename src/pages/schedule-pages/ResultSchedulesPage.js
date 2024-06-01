@@ -68,18 +68,14 @@ const ResultSchedulesPage = () => {
 
   const fetchResults = () => {
     const token = localStorage.getItem('token');
-    
-    let url = 'http://localhost:5000/resultComissionSecretary/resultsByIdDOrYear?';
 
     const handleParametrs = () => {
-        if (false) return `id_DS=${false}`;
-        else if(year && direction) return `id_D=${direction}&Year=${year}`;
-        else if(year) return `Year=${year}&`;
+        if (idDS) return `http://localhost:5000/resultComissionSecretary/resultsByIdDS?id_DS=${idDS}`;
+        else if(year && direction) return `http://localhost:5000/resultComissionSecretary/resultsByIdDOrYear?id_D=${direction}&Year=${year}`;
+        else if(year) return `http://localhost:5000/resultComissionSecretary/resultsByIdDOrYear?Year=${year}`;
     }
-    
-    url += handleParametrs();
   
-    axios.get(url, {
+    axios.get(handleParametrs(), {
       headers: {
         'Authorization': `Bearer ${token}`
       }
