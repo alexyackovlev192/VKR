@@ -75,20 +75,19 @@ class resultComissionSecretaryController {
     }
     async getResultsByIdDOrYear(req, res) {
         try {
-            const errors = validationResult(req)
+            const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                return res.status(400).json({message:"Ошибка при получении результатов защит по id_D или Year", errors})
+                return res.status(400).json({ message: "Ошибка при получении результатов защит по id_D и Year или по Year", errors });
             }
             const { id_D, Year } = req.query;
-            
+    
             console.log('id_D:', id_D);
             console.log('Year:', Year);
-
-
-            if (!id_D && !Year) {
-                return res.status(400).json({ message: "Необходимо указать хотя бы один из параметров: id_D, Year" });
+    
+            if (!Year) {
+                return res.status(400).json({ message: "Необходимо указать параметр: Year" });
             }
-
+    
             // Формируем критерии поиска
             const searchCriteria = {};
             if (id_D) searchCriteria.id_D = id_D;
@@ -99,16 +98,16 @@ class resultComissionSecretaryController {
                     [Op.between]: [yearStart, yearEnd]
                 };
             }
-
+    
             // Находим записи в таблице Defense_Schedule
             const defenseSchedules = await DefenseSchedule.findAll({
                 where: searchCriteria
             });
-
+    
             if (!defenseSchedules.length) {
                 return res.status(404).json({ message: 'Записи с указанными id_D или Year не найдены' });
             }
-
+    
             // Получаем направления и id_G для найденных защит
             const directionIds = defenseSchedules.map(ds => ds.id_D);
             const directions = await Direction.findAll({
@@ -116,18 +115,18 @@ class resultComissionSecretaryController {
                     id_D: directionIds
                 }
             });
-
+    
             const defenseScheduleIds = defenseSchedules.map(ds => ds.id_DS);
             const defenseScheduleStudents = await DefenseScheduleStudent.findAll({
                 where: {
                     id_DS: defenseScheduleIds
                 }
             });
-
+    
             if (!defenseScheduleStudents.length) {
                 return res.status(404).json({ message: 'Студенты для указанных защит не найдены' });
             }
-
+    
             // Находим результаты защиты студентов
             const studentResults = await Promise.all(defenseScheduleStudents.map(async (dss) => {
                 const result = await ResultComissionSecretary.findOne({
@@ -135,18 +134,18 @@ class resultComissionSecretaryController {
                         id_DSS: dss.id_DSS
                     }
                 });
-
+    
                 if (!result) return null;
-
+    
                 const student = await Student.findOne({
                     where: {
                         id_S: dss.id_S
                     }
                 });
-
+    
                 const defenseSchedule = defenseSchedules.find(ds => ds.id_DS === dss.id_DS);
                 const direction = directions.find(dir => dir.id_D === defenseSchedule.id_D);
-
+    
                 return {
                     id_DS: dss.id_DS,
                     studentName: student ? student.Fullname : 'Не найдено',
@@ -163,12 +162,12 @@ class resultComissionSecretaryController {
                     numberProtocol: result.NumberProtocol
                 };
             }));
-
+    
             // Фильтруем результаты без null (если result не найден)
             const validResults = studentResults.filter(result => result !== null);
-
+    
             return res.status(200).json(validResults);
-
+    
         } catch (error) {
             console.error(error);
             return res.status(500).json({ message: 'Ошибка при получении результата защиты по Id_D или Year', error });
