@@ -232,5 +232,84 @@ class resultComissionSecretaryController {
             res.status(400).json({ message: 'Ошибка обновления результата защиты студента, выставленного секретарем ГЭК' });
         }
     }
+    async getResultsByIdDS(req, res) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ message: "Ошибка при получении результатов защит по id_DS", errors });
+            }
+            const { id_DS } = req.query;
+   
+            // Находим записи в таблице Defense_Schedule
+            const defenseSchedule = await DefenseSchedule.findOne({
+                where: { id_DS: id_DS }
+            });
+    
+            if (!defenseSchedule) {
+                return res.status(404).json({ message: 'Данная защита не найдена' });
+            }
+    
+            // Получаем направления и id_G для найденных защит
+            const directionId = defenseSchedule.id_D;
+            const direction = await Direction.findOne({
+                where: {
+                    id_D: directionId
+                }
+            });
+
+            const defenseScheduleStudents = await DefenseScheduleStudent.findAll({
+                where: {
+                    id_DS: defenseSchedule.id_DS
+                }
+            });
+    
+            if (!defenseScheduleStudents.length) {
+                return res.status(404).json({ message: 'Студенты для указанной защиты не найдены' });
+            }
+    
+            // Находим результаты защиты студентов
+            const studentResults = await Promise.all(defenseScheduleStudents.map(async (dss) => {
+                const result = await ResultComissionSecretary.findOne({
+                    where: {
+                        id_DSS: dss.id_DSS
+                    }
+                });
+    
+                if (!result) return null;
+    
+                const student = await Student.findOne({
+                    where: {
+                        id_S: dss.id_S
+                    }
+                });
+    
+    
+                return {
+                    id_DS: dss.id_DS,
+                    studentName: student ? student.Fullname : 'Не найдено',
+                    Group: student.Group,
+                    Topic: student.Topic,
+                    ScientificAdviser: student.ScientificAdviser,
+                    Red_Diplom: student.Red_Diplom,
+                    Year: student.YearOfDefense,
+                    Name_direction: direction ? direction.Name_direction : 'Не найдено',
+                    gec: defenseSchedule.id_G,
+                    result: result.Result,
+                    recMagistracy: result.RecMagistracy,
+                    recPublication: result.RecPublication,
+                    numberProtocol: result.NumberProtocol
+                };
+            }));
+    
+            // Фильтруем результаты без null (если result не найден)
+            const validResults = studentResults.filter(result => result !== null);
+    
+            return res.status(200).json(validResults);
+    
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: 'Ошибка при получении результатов защиты по Id_DS', error });
+        }
+    }
 }
 module.exports = new resultComissionSecretaryController()

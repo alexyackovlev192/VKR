@@ -16,6 +16,9 @@ router.get('/resultsByIdDOrYear', [
     check('id_D').optional().notEmpty().withMessage('Id направления не может быть пустым'),
     check('Year').optional().notEmpty().withMessage('Год защиты не может быть пустым'),
 ], authMiddleware, roleMiddleware([3]), controller.getResultsByIdDOrYear)
+router.get('/resultsByIdDS', [
+    check('id_DS', "Id защиты не может быть пустым").notEmpty()
+], authMiddleware, roleMiddleware([3]), controller.getResultsByIdDS)
 router.get('/:id', authMiddleware, roleMiddleware([4]), controller.getResultsByIdDSS)
 router.put('/:id', [
     check('id_U', "Id секретаря ГЭК не может быть пустым").notEmpty(),
