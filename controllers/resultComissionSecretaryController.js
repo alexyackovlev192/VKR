@@ -173,5 +173,64 @@ class resultComissionSecretaryController {
             return res.status(500).json({ message: 'Ошибка при получении результата защиты по Id_D или Year', error });
         }
     }
+    async updateResultSecretaryGEC(req, res) {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ message: "Ошибка при обновлении результата защиты студента секретарем ГЭК", errors });
+            }
+    
+            const { id } = req.params;
+            const { id_U, Result, RecMagistracy, RecPublication, NumberProtocol, id_S, Red_Diplom } = req.body;
+    
+            // Проверка существования записи о защите студента
+            const defenseStudent = await DefenseScheduleStudent.findOne({ where: { id_DSS: id } });
+            if (!defenseStudent) {
+                return res.status(404).json({ message: "Защита данного студента не найдена" });
+            }
+    
+            // Проверка существования секретаря ГЭК
+            const SecretaryOfGec = await User.findOne({ where: { id_U: id_U } });
+            if (!SecretaryOfGec) {
+                return res.status(404).json({ message: "Секретарь ГЭК не найден" });
+            }
+    
+            let resultUpdateSuccess = true;
+            let studentUpdateSuccess = true;
+    
+            // Обновление основных полей результата защиты, если они предоставлены
+            if (Result !== undefined || RecMagistracy !== undefined || RecPublication !== undefined || NumberProtocol !== undefined) {
+                const [updatedResultRowsCount] = await ResultComissionSecretary.update(
+                    { Result, RecMagistracy, RecPublication, NumberProtocol },
+                    { where: { id_DSS: id, id_U: id_U } }
+                );
+    
+                resultUpdateSuccess = updatedResultRowsCount > 0;
+            }
+    
+            // Обновление красного диплома, если id_S и Red_Diplom предоставлены
+            if (id_S && Red_Diplom !== undefined) {
+                const [updatedRowsCount] = await Student.update(
+                    { Red_Diplom: Red_Diplom },
+                    { where: { id_S: id_S } }
+                );
+    
+                studentUpdateSuccess = updatedRowsCount > 0;
+            }
+    
+            if (!resultUpdateSuccess && !studentUpdateSuccess) {
+                return res.status(404).json({ message: "Результат защиты и студент не найдены" });
+            } else if (!resultUpdateSuccess) {
+                return res.status(404).json({ message: "Результат защиты для студента, выставленный секретарем ГЭК, не найден" });
+            } else if (!studentUpdateSuccess) {
+                return res.status(404).json({ message: `Студент с id ${id_S} не найден` });
+            }
+    
+            return res.json({ message: "Результат защиты для студента, выставленный секретарем ГЭК, обновлен" });
+        } catch (e) {
+            console.log(e);
+            res.status(400).json({ message: 'Ошибка обновления результата защиты студента, выставленного секретарем ГЭК' });
+        }
+    }
 }
 module.exports = new resultComissionSecretaryController()

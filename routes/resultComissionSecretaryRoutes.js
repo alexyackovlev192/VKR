@@ -17,7 +17,12 @@ router.get('/resultsByIdDOrYear', [
     check('Year').optional().notEmpty().withMessage('Год защиты не может быть пустым'),
 ], authMiddleware, roleMiddleware([3]), controller.getResultsByIdDOrYear)
 router.get('/:id', authMiddleware, roleMiddleware([4]), controller.getResultsByIdDSS)
-
+router.put('/:id', [
+    check('id_U', "Id секретаря ГЭК не может быть пустым").notEmpty(),
+    check('Result').optional().notEmpty().withMessage("Результат защиты не может быть пустым"),
+    check('NumberProtocol').optional().notEmpty().withMessage("Номер протокола защиты не может быть пустым"),
+    check('id_S').optional().notEmpty().withMessage('Id студента не может быть пустым')
+], authMiddleware, roleMiddleware([4]), controller.updateResultSecretaryGEC)
 
 
 module.exports = router
