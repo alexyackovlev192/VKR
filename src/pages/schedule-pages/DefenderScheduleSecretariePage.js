@@ -18,6 +18,7 @@ const DefenderScheduleSecretariePage = () => {
         NumberProtocol: localStorage.getItem('NumberProtocol') || ''
     });
     const [changedFields, setChangedFields] = useState({});
+    const [changedRedDiplom, setChangedRedDiplom] = useState(false);
     const id_U = localStorage.getItem('id_U');
     const id_DSS = localStorage.getItem('id_DSS');
     const id_DS = localStorage.getItem('id_DS');
@@ -39,6 +40,15 @@ const DefenderScheduleSecretariePage = () => {
             }));
         }
     }, [formData, redDiplom]);
+
+    useEffect(() => {
+        if (changedRedDiplom) {
+            setChangedFields((prevFields) => ({
+                ...prevFields,
+                Red_Diplom: true
+            }));
+        }
+    }, [changedRedDiplom]);
 
     const fetchData = async () => {
         const token = localStorage.getItem('token');
@@ -80,33 +90,41 @@ const DefenderScheduleSecretariePage = () => {
         }));
         if (field === 'Red_Diplom') {
             setRedDiplom(value);
-            setChangedFields((prevFields) => ({
-                ...prevFields,
-                [field]: true
-            }));
+            setChangedRedDiplom(true); 
         }
-    }, [setDefenderData, setRedDiplom, setChangedFields]); 
+        setChangedFields((prevFields) => ({
+            ...prevFields,
+            [field]: true
+        }));
+    }, [setDefenderData, setRedDiplom, setChangedFields, setChangedRedDiplom]);
 
     const handleSave = async () => {
         const token = localStorage.getItem('token');
-        const dataToSave = {
+    
+        // Initialize the dataToSave object
+        let dataToSave = {
             id_DSS: id_DSS,
             id_U: id_U,
             id_S: id_S,
             Result: formData.Result,
             RecMagistracy: formData.RecMag ? 'Да' : null,
             RecPublication: formData.RecPub ? 'Да' : null,
-            NumberProtocol: formData.NumberProtocol,
-            Red_Diplom: redDiplom ? 'Да' : null
+            NumberProtocol: formData.NumberProtocol
         };
+    
+        // Add Red_Diplom to dataToSave only if it has changed
+        if (changedRedDiplom) {
+            dataToSave.Red_Diplom = redDiplom ? 'Да' : null;
+        }
+    
         const dataToEdit = {
             id_U: id_U,
             id_S: id_S
         };
     
-        // Добавляем изменённые поля в тело запроса
+        // Construct dataToEdit object with changed fields
         Object.keys(changedFields).forEach(field => {
-            if (changedFields[field]) { 
+            if (changedFields[field]) {
                 if (field === 'RecMag') {
                     dataToEdit['RecMagistracy'] = formData[field] ? 'Да' : null;
                 } else if (field === 'RecPub') {
@@ -116,9 +134,7 @@ const DefenderScheduleSecretariePage = () => {
                 }
             }
         });
-
-        console.log(dataToEdit);
-        console.log(dataToSave);
+    
         try {
             if (result && parseInt(result) > 0) {
                 await axios.put(`http://localhost:5000/resultComissionSecretary/${id_DSS}`, dataToEdit, {
