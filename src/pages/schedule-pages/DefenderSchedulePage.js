@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
@@ -42,7 +43,7 @@ const DefenderSchedulePage = () => {
                 }
             });
             setDefenderData(studentResponse.data);
-            setRedDiplom(studentResponse.data.Red_Diplom === 'Да');  // Установка состояния красного диплома
+            setRedDiplom(studentResponse.data.Red_Diplom === 'Да');  
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -88,7 +89,6 @@ const DefenderSchedulePage = () => {
             Red_Diplom: redDiplom ? 'Да' : null
         };
     
-        console.log(dataToSave);
         try {
             if (result && parseInt(result) > 0) {
                 await axios.put(`http://localhost:5000/resultComissionMember/${id_DSS}`, dataToEdit, {
@@ -105,7 +105,6 @@ const DefenderSchedulePage = () => {
             }
             navigate(`/my-schedule/${id_DS}`);
             localStorage.removeItem('edit');
-            localStorage.removeItem('DataDefender');
         } catch (error) {
             console.error('Error saving data:', error);
         }
@@ -113,7 +112,6 @@ const DefenderSchedulePage = () => {
 
     const handleBackButton = () => {
         navigate(`/my-schedule/${id_DS}`);
-        localStorage.removeItem('DataDefender');
     };
 
     const RatingCriteria = ({ criteria }) => {

@@ -107,12 +107,25 @@ const OpenMyScheduleSecretariePage = () => {
 
     const handleClickButton = (d) => {
         localStorage.setItem('id_DSS', d.id_DSS);
+        localStorage.setItem('RecMag', d.RecMagistracy);
+        localStorage.setItem('RecPub', d.RecPublication);
+        localStorage.setItem('Result', d.Result);
+        localStorage.setItem('NumberProtocol', d.NumberProtocol ? d.NumberProtocol : '');
         navigate(`/defender-schedule-sec/${d.id_S}`);
+    };
+
+    const handleSaveButton = () => {
+        localStorage.removeItem('id_DS');
+        navigate(`/my-schedule-sec`);
     };
 
     const handleBackButton = () => {
         localStorage.removeItem('id_DS');
         navigate(`/my-schedule-sec`);
+    };
+
+    const areAllRatingsFilled = () => {
+        return filteredDefenders.every(defender => defender.Result !== null && defender.Result !== undefined);
     };
 
     return (
@@ -161,15 +174,22 @@ const OpenMyScheduleSecretariePage = () => {
                                             <Button 
                                                 variant="primary" 
                                                 onClick={() => handleClickButton(defender)} 
-                                                disabled={defender.RecMagistracy && defender.RecPublication && defender.Result}
                                             >
-                                                {defender.RecMagistracy && defender.RecPublication && defender.Result ? 'Проведена' : 'Начать'}
+                                                {defender.Result ? 'Редактировать' : 'Начать'}
                                             </Button>
                                         </td>
                                     </tr>
                                 ))}
                             </tbody>
                         </Table>
+                        <Button 
+                            variant="primary" 
+                            className="col-2 my-4" 
+                            onClick={handleSaveButton} 
+                            disabled={!areAllRatingsFilled()}
+                        >
+                            Сохранить результаты
+                        </Button>
                     </div>
                 </>
             ) : (

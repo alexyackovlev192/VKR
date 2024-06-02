@@ -114,11 +114,6 @@ const OpenMySchedulePage = () => {
         navigate(`/defender-schedule/${d.id_S}`);
     };
 
-    const handleBackButton = () => {
-        localStorage.removeItem('id_DS');
-        navigate(`/my-schedule`);
-    };
-
     const handleSaveButton = () => {
         localStorage.removeItem('id_DS');
         navigate(`/my-schedule`);
@@ -169,7 +164,6 @@ const OpenMySchedulePage = () => {
                                             <Button 
                                                 variant="primary" 
                                                 onClick={() => handleClickButton(defender)} 
-                                                //disabled={defender.Result}
                                             >
                                                 {defender.Result ? 'Редактировать' : 'Начать'}
                                             </Button>
