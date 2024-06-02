@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal, Button, ListGroup, Form } from 'react-bootstrap';
-import { jwtDecode } from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 import Template from '../components/TemplateEmail.txt';
+import WarningWindow from '../components/WarningWindow';
 
 const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
   const [geks, setGeks] = useState([]);
@@ -11,6 +12,8 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
   const [subject, setSubject] = useState('');
   const [text, setText] = useState('');
   const [user, setUser] = useState('');
+  const [showWarningWindow, setShowWarningWindow] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -98,7 +101,6 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
       }
     };
 
-
     const fetchAllGeks = async () => {
       try {
         const results = await Promise.all(schedules.map(sched => fetchGeksForSchedule(sched)));
@@ -152,11 +154,17 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
   };
 
   const handleSendNotifications = async () => {
+    if (!subject || !text) {
+      setErrorMessage('Не все поля заполнены');
+      setShowWarningWindow(true);
+      return;
+    }
+  
     const token = localStorage.getItem('token');
     const to = emails.join(', ');
-
+  
     console.log('Emails to send:', to);
-
+  
     try {
       await axios.post(`http://localhost:5000/mailer/send`, {
         to,
@@ -167,74 +175,82 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
           'Authorization': `Bearer ${token}`
         }
       });
-      alert('Уведомления отправлены успешно');
+      setErrorMessage('Уведомления успешно отправлены');
+      setShowWarningWindow(true);
       setCurrentPage('info');
+      setSubject('');
     } catch (error) {
       console.error('Ошибка при отправке уведомлений:', error);
-      alert('Ошибка при отправке уведомлений');
+      setErrorMessage('Ошибка при отправке уведомлений');
+      setShowWarningWindow(true);
     }
   };
 
+  const handleCloseWarningWindow = () => {
+    setShowWarningWindow(false);
+  };
+
   return (
-    <Modal show={showModal} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>{currentPage === 'info' ? 'Информация о защите' : 'Отправить уведомления'}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {currentPage === 'info' ? (
-          schedules.map((sched, index) => (
-            <div key={index}>
-              <h5>Направление</h5>
-              <ListGroup>
-                <ListGroup.Item>{sched.Name_direction}</ListGroup.Item>
-              </ListGroup>
-              <h5 className="mt-3">Время</h5>
-              <ListGroup>
-                <ListGroup.Item>{sched.time}</ListGroup.Item>
-              </ListGroup>
-              <h5 className="mt-3">Аудитория</h5>
-              <ListGroup>
-                <ListGroup.Item>{sched.classroom}</ListGroup.Item>
-              </ListGroup>
-              <h5 className="mt-3">Дата</h5>
-              <ListGroup>
-                <ListGroup.Item>{new Date(sched.date).toLocaleDateString('ru-GB')}</ListGroup.Item>
-              </ListGroup>
-              {geks.length > 0 && geks.map((gec, index) => (
-                <div key={index}>
-                  <h5 className="mt-3">Состав ГЭК №{schedules[index].id_G}</h5>
-                  {gec.members.map((member, idx) => (
-                    <ListGroup key={idx}>
-                      <ListGroup.Item variant={member.presence ? "success" : "danger"}>
-                        {member.Fullname}
+    <>
+      <Modal show={showModal} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>{currentPage === 'info' ? 'Информация о защите' : 'Отправить уведомления'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {currentPage === 'info' ? (
+            schedules.map((sched, index) => (
+              <div key={index}>
+                <h5>Направление</h5>
+                <ListGroup>
+                  <ListGroup.Item>{sched.Name_direction}</ListGroup.Item>
+                </ListGroup>
+                <h5 className="mt-3">Дата</h5>
+                <ListGroup>
+                  <ListGroup.Item>{new Date(sched.date).toLocaleDateString('ru-GB')}</ListGroup.Item>
+                </ListGroup>
+                <h5 className="mt-3">Время</h5>
+                <ListGroup>
+                  <ListGroup.Item>{sched.time}</ListGroup.Item>
+                </ListGroup>
+                <h5 className="mt-3">Аудитория</h5>
+                <ListGroup>
+                  <ListGroup.Item>{sched.classroom}</ListGroup.Item>
+                </ListGroup>
+                {geks.length > 0 && geks.map((gec, index) => (
+                  <div key={index}>
+                    <h5 className="mt-3">Состав ГЭК №{schedules[index].id_G}</h5>
+                    {gec.members.map((member, idx) => (
+                      <ListGroup key={idx}>
+                        <ListGroup.Item className="my-1" variant={member.presence ? "success" : "danger"}>
+                          {member.Fullname}
+                        </ListGroup.Item>
+                      </ListGroup>
+                    ))}
+                    <h5 className="mt-3">Секретарь</h5>
+                    <ListGroup>
+                      <ListGroup.Item variant={gec.secretary.presence ? "success" : "danger"}>
+                        {gec.secretary.Fullname}
                       </ListGroup.Item>
                     </ListGroup>
-                  ))}
-                  <h5 className="mt-3">Секретарь</h5>
-                  <ListGroup>
-                    <ListGroup.Item variant={gec.secretary.presence ? "success" : "danger"}>
-                      {gec.secretary.Fullname}
-                    </ListGroup.Item>
-                  </ListGroup>
-                </div>
-              ))}
-            </div>
-          ))
-        ) : (
-          <Form>
-            <Form.Group controlId="formTextarea">
-              <Form.Label>Текст сообщения</Form.Label>
-              <Form.Control as="textarea" rows={12} value={text} onChange={(e) => setText(e.target.value)} />
-            </Form.Group>
-            <Form.Group controlId="formInput1" className="mt-3">
-              <Form.Label>Тема сообщения</Form.Label>
-              <Form.Control type="text" value={subject} onChange={(e) => setSubject(e.target.value)} />
-            </Form.Group>
-          </Form>
-        )}
-      </Modal.Body>
-      <Modal.Footer>
-        {currentPage === 'info' ? (
+                  </div>
+                ))}
+              </div>
+            ))
+          ) : (
+            <Form>
+              <Form.Group controlId="formTextarea">
+                <Form.Label>Текст сообщения</Form.Label>
+                <Form.Control as="textarea" rows={12} value={text} onChange={(e) => setText(e.target.value)} />
+              </Form.Group>
+              <Form.Group controlId="formInput1" className="mt-3">
+                <Form.Label>Тема сообщения</Form.Label>
+                <Form.Control type="text" value={subject} onChange={(e) => setSubject(e.target.value)} />
+              </Form.Group>
+            </Form>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          {currentPage === 'info' ? (
           <>
             <Button variant="primary" onClick={() => setCurrentPage('notifications')}>
               Отправить уведомления
@@ -243,7 +259,7 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
               Закрыть
             </Button>
           </>
-        ) : (
+          ) : (
           <>
             <Button variant="primary" onClick={handleSendNotifications}>
               Отправить
@@ -252,9 +268,15 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
               Назад
             </Button>
           </>
-        )}
-      </Modal.Footer>
-    </Modal>
+          )}
+        </Modal.Footer>
+      </Modal>
+      <WarningWindow 
+        show={showWarningWindow} 
+        handleClose={handleCloseWarningWindow} 
+        errorMessage={errorMessage}
+      />
+    </>
   );
 };
 
