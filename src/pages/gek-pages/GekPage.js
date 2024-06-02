@@ -69,6 +69,24 @@ const GekPage = () => {
     fetchGeks();
   }, []);
 
+  const handleEndClick = async (data) => {
+    const token = localStorage.getItem('token');
+    const status = "Завершила работу";
+
+    try {
+      await axios.put(`http://localhost:5000/gecs/EndWork/${data.id_G}`, { Status: status }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      // Обновление списка ГЭК после успешного завершения работы
+      setGeks(prevGeks => prevGeks.filter(gek => gek.id_G !== data.id_G));
+    } catch (error) {
+      console.error('Ошибка при завершении ГЭК:', error);
+    }
+  }
+
   return (
     <div className="container-fluid px-5">
       <div className="text-center my-4">
@@ -101,9 +119,12 @@ const GekPage = () => {
                 </ListGroup>
               </Card.Body>
               <Card.Footer className="text-left bg-light">
-                <Link to={`/edit-gek/${gekData.id_G}`}>
-                  <Button variant="primary" className="mx-3">Редактировать</Button>
-                </Link>
+                <div className="">
+                  <Link to={`/edit-gek/${gekData.id_G}`}>
+                    <Button variant="primary" className="mx-3 my-1">Редактировать</Button>
+                  </Link>
+                  <Button variant="danger" className="mx-3 my-1" onClick={() => handleEndClick(gekData)}>Завершить работу</Button>
+                </div>
               </Card.Footer>
             </Card>
           ))

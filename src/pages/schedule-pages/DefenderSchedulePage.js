@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
@@ -8,13 +7,13 @@ const DefenderSchedulePage = () => {
     const { id_S } = useParams();
     const [defenderData, setDefenderData] = useState(null);
     const [ratings, setRatings] = useState({});
+    const [recMag, setRecMag] = useState(localStorage.getItem('RecMag') === 'Да');
+    const [recPub, setRecPub] = useState(localStorage.getItem('RecPub') === 'Да');
+    const [redDiplom, setRedDiplom] = useState(false);
 
     const id_U = localStorage.getItem('id_U');
     const id_DSS = localStorage.getItem('id_DSS');
     const id_DS = localStorage.getItem('id_DS');
-
-    const recMag = localStorage.getItem('RecMag') === 'Да';
-    const recPub = localStorage.getItem('RecPub') === 'Да';
     const result = localStorage.getItem('Result');
 
     const navigate = useNavigate();
@@ -24,12 +23,15 @@ const DefenderSchedulePage = () => {
     }, [id_S]);
 
     useEffect(() => {
-        setDefenderData(prevData => ({
-            ...prevData,
-            magRec: recMag,
-            publRec: recPub
-        }));
-    }, [recMag, recPub]);
+        if (defenderData) {
+            setDefenderData(prevData => ({
+                ...prevData,
+                magRec: recMag ? 'Да' : null,
+                publRec: recPub ? 'Да' : null,
+                Red_Diplom: redDiplom ? 'Да' : null
+            }));
+        }
+    }, [recMag, recPub, redDiplom]);
 
     const fetchData = async () => {
         const token = localStorage.getItem('token');
@@ -40,6 +42,7 @@ const DefenderSchedulePage = () => {
                 }
             });
             setDefenderData(studentResponse.data);
+            setRedDiplom(studentResponse.data.Red_Diplom === 'Да');  // Установка состояния красного диплома
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -48,8 +51,15 @@ const DefenderSchedulePage = () => {
     const handleRecChange = useCallback((field, value) => {
         setDefenderData(prevState => ({
             ...prevState,
-            [field]: value
+            [field]: value ? 'Да' : null
         }));
+        if (field === 'magRec') {
+            setRecMag(value);
+        } else if (field === 'publRec') {
+            setRecPub(value);
+        } else if (field === 'Red_Diplom') {
+            setRedDiplom(value);
+        }
     }, []);
 
     const handleRatingChange = useCallback((criteria, value) => {
@@ -65,17 +75,36 @@ const DefenderSchedulePage = () => {
             id_DSS: id_DSS,
             id_U: id_U,
             scores: Object.values(ratings),
-            RecMagistracy: defenderData.magRec ? 'Да' : null,
-            RecPublication: defenderData.publRec ? 'Да' : null
+            RecMagistracy: recMag ? 'Да' : null,
+            RecPublication: recPub ? 'Да' : null,
+            Red_Diplom: redDiplom ? 'Да' : null
         };
-
+    
+        const dataToEdit = {
+            id_U: id_U,
+            scores: Object.values(ratings),
+            RecMagistracy: recMag ? 'Да' : null,
+            RecPublication: recPub ? 'Да' : null,
+            Red_Diplom: redDiplom ? 'Да' : null
+        };
+    
+        console.log(dataToSave);
         try {
-            await axios.post(`http://localhost:5000/resultComissionMember/create`, dataToSave, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            if (result && parseInt(result) > 0) {
+                await axios.put(`http://localhost:5000/resultComissionMember/${id_DSS}`, dataToEdit, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+            } else {
+                await axios.post(`http://localhost:5000/resultComissionMember/create`, dataToSave, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+            }
             navigate(`/my-schedule/${id_DS}`);
+            localStorage.removeItem('edit');
             localStorage.removeItem('DataDefender');
         } catch (error) {
             console.error('Error saving data:', error);
@@ -146,19 +175,25 @@ const DefenderSchedulePage = () => {
                                 <td>{defenderData.Topic}</td>
                                 <td>{defenderData.ScientificAdviser}</td>
                                 <td>{defenderData.Avg_Mark}</td>
-                                <td>{defenderData.Red_Diplom ? 'Да' : 'Нет'}</td>
-                                <td>
+                                <td className={redDiplom ? "table-success" : "table-danger"}>
                                     <Form.Check
                                         type="checkbox"
-                                        checked={defenderData.magRec}
-                                        onChange={(e) => handleRecChange('magRec', e.target.checked)}
+                                        checked={redDiplom}
+                                        onChange={() => handleRecChange('Red_Diplom', !redDiplom)}
                                     />
                                 </td>
                                 <td>
                                     <Form.Check
                                         type="checkbox"
-                                        checked={defenderData.publRec}
-                                        onChange={(e) => handleRecChange('publRec', e.target.checked)}
+                                        checked={recMag}
+                                        onChange={() => handleRecChange('magRec', !recMag)}
+                                    />
+                                </td>
+                                <td>
+                                    <Form.Check
+                                        type="checkbox"
+                                        checked={recPub}
+                                        onChange={() => handleRecChange('publRec', !recPub)}
                                     />
                                 </td>
                                 <td>{result > 0 ? result : ''}</td>
@@ -173,7 +208,7 @@ const DefenderSchedulePage = () => {
                     <RatingCriteria criteria="Возможность развития" />
                 </div>
 
-                <Button onClick={handleSave} className="mt-3" variant="primary">Сохранить результаты</Button>
+                <Button onClick={handleSave} className="mt-3" variant="primary">Завершить защиту</Button>
             </div>
         </div>
     );

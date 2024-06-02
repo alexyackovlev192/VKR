@@ -124,13 +124,14 @@ const OpenMySchedulePage = () => {
         navigate(`/my-schedule`);
     };
 
+    const areAllRatingsFilled = () => {
+        return filteredDefenders.every(defender => defender.Result !== null && defender.Result !== undefined);
+    };
+
     return (
         <div className="container-fluid text-center px-5">
             <div className="row my-4">
-                <div className="col-1">
-                    <Button variant="primary" onClick={handleBackButton}>Назад</Button>
-                </div>
-                <h3 className="col-10">Защита №{id_DS}</h3>
+                <h3>Защита №{id_DS}</h3>
             </div>
             {filteredDefenders.length > 0 ? (
                 <>
@@ -177,7 +178,14 @@ const OpenMySchedulePage = () => {
                                 ))}
                             </tbody>
                         </Table>
-                        <Button variant="primary" className="col-2 my-4" onClick={handleSaveButton}>Завершить защиту</Button>
+                        <Button 
+                            variant="primary" 
+                            className="col-2 my-4" 
+                            onClick={handleSaveButton} 
+                            disabled={!areAllRatingsFilled()}
+                        >
+                            Сохранить результаты
+                        </Button>
                     </div>
                 </>
             ) : (

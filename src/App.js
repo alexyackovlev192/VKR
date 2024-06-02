@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 
 import MembersPage from './pages/MembersPage';
 import SecretariesPage from './pages/SecretariesPage';
@@ -133,6 +133,7 @@ const App = () => {
                         <ResultSchedulesPage />
                     </ProtectedPageLayout>
                 } />
+                <Route path="*" element={<Navigate to="/auth" />} />
             </Routes>
         </Router>
     );
