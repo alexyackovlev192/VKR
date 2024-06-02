@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Modal, Button, ListGroup, Form } from 'react-bootstrap';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import Template from '../components/TemplateEmail.txt';
 
 const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
@@ -28,13 +28,30 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
             'Authorization': `Bearer ${token}`
           }
         });
+    
         const members = await Promise.all(compResponse.data.map(async (comp) => {
           const memberResponse = await axios.get(`http://localhost:5000/users/${comp.id_U}`, {
             headers: {
-              'Authorization': `Bearer ${token}` 
+              'Authorization': `Bearer ${token}`
             }
           });
-          return memberResponse.data;
+    
+          let presenceResponse;
+          try {
+            presenceResponse = await axios.get(`http://localhost:5000/defensePresence/ByIdDSAndIdU?id_DS=${sched.id_DS}&id_U=${comp.id_U}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+          } catch (error) {
+            if (error.response && error.response.status === 404) {
+              console.warn(`Запись присутствия не найдена для пользователя ${comp.id_U} на защите ${sched.id_DS}`);
+              presenceResponse = { data: null };
+            } else {
+              throw error;
+            }
+          }
+          return { ...memberResponse.data, presence: presenceResponse.data };
         }));
     
         const idSecResponse = await axios.get(`http://localhost:5000/gecs/SecretaryId/${sched.id_G}`, {
@@ -43,12 +60,28 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
           }
         });
     
+        let presenceSecResponse;
+        try {
+          presenceSecResponse = await axios.get(`http://localhost:5000/defensePresence/ByIdDSAndIdU?id_DS=${sched.id_DS}&id_U=${idSecResponse.data.id_U}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+        } catch (error) {
+          if (error.response && error.response.status === 404) {
+            console.warn(`Запись присутствия не найдена для пользователя ${idSecResponse.data.id_U} на защите ${sched.id_DS}`);
+            presenceSecResponse = { data: null };
+          } else {
+            throw error;
+          }
+        }
+    
         const secretarieResponse = await axios.get(`http://localhost:5000/users/${idSecResponse.data.id_U}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         });
-
+    
         const userResponse = await axios.get(`http://localhost:5000/users/${userId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -57,26 +90,30 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
         setUser(userResponse.data);
         return {
           members,
-          secretary: secretarieResponse.data
+          secretary: { ...secretarieResponse.data, presence: presenceSecResponse.data }
         };
       } catch (error) {
         console.error('Ошибка при загрузке данных ГЭК:', error);
-        return { members: [], secretary: {} }; 
+        return { members: [], secretary: {} };
       }
     };
 
+
     const fetchAllGeks = async () => {
-      const results = await Promise.all(schedules.map(sched => fetchGeksForSchedule(sched)));
-      setGeks(results);
-      
-      const emails = results.reduce((acc, gec) => {
-        const memberEmails = gec.members.map(member => member.Mail);
-        return [...acc, ...memberEmails, gec.secretary.Mail];
-      }, []);
-      
-      setEmails(emails);
+      try {
+        const results = await Promise.all(schedules.map(sched => fetchGeksForSchedule(sched)));
+        setGeks(results);
+        const emails = results.reduce((acc, gec) => {
+          const memberEmails = gec.members.map(member => member.Mail);
+          return [...acc, ...memberEmails, gec.secretary.Mail];
+        }, []);
+
+        setEmails(emails);
+      } catch (error) {
+        console.error('Ошибка при загрузке всех ГЭК:', error);
+      }
     };
-  
+
     if (schedules.length > 0) {
       fetchAllGeks();
     }
@@ -87,13 +124,14 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
         let templateText = await response.text();
 
         if (schedules.length > 0) {
-          const schedule = schedules[0]; 
+          const schedule = schedules[0];
           templateText = templateText
             .replace('Name_direction', schedule.Name_direction)
-            .replace('id_DS', schedule.id_D)
+            .replace('_id_DS', schedule.id_DS)
             .replace('date', `${new Date(schedule.date).toLocaleDateString('ru-GB')} в ${schedule.time}`)
             .replace('classroom', schedule.classroom)
             .replace('id_G', schedule.id_G)
+            .replace('_id_DS', schedule.id_DS)
             .replace('Name', user.Fullname)
             .replace('Post', user.Post);
         }
@@ -109,16 +147,16 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
 
   const handleClose = () => {
     setCurrentPage('info');
-    setSubject('');  // Очистка поля "Тема сообщения"
+    setSubject('');
     handleCloseModal();
   };
 
   const handleSendNotifications = async () => {
     const token = localStorage.getItem('token');
     const to = emails.join(', ');
-    
+
     console.log('Emails to send:', to);
-  
+
     try {
       await axios.post(`http://localhost:5000/mailer/send`, {
         to,
@@ -167,12 +205,16 @@ const GeksCompositionModal = ({ showModal, handleCloseModal, schedules }) => {
                   <h5 className="mt-3">Состав ГЭК №{schedules[index].id_G}</h5>
                   {gec.members.map((member, idx) => (
                     <ListGroup key={idx}>
-                      <ListGroup.Item>{member.Fullname}</ListGroup.Item>
+                      <ListGroup.Item variant={member.presence ? "success" : "danger"}>
+                        {member.Fullname}
+                      </ListGroup.Item>
                     </ListGroup>
                   ))}
                   <h5 className="mt-3">Секретарь</h5>
                   <ListGroup>
-                    <ListGroup.Item>{gec.secretary.Fullname}</ListGroup.Item>
+                    <ListGroup.Item variant={gec.secretary.presence ? "success" : "danger"}>
+                      {gec.secretary.Fullname}
+                    </ListGroup.Item>
                   </ListGroup>
                 </div>
               ))}

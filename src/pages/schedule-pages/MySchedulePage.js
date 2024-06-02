@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button, Card } from 'react-bootstrap';
-import NoDataMessage from '../../components/NoDataMessage'; 
 import axios from 'axios';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
+import AlertWindow from '../../components/AlertWindow';
 
 import '../style-pages/MySchedulePage.css';
 
 const MySchedulePage = () => {
     const [scheduleDetails, setScheduleDetails] = useState([]);
+    const [showAlertModal, setShowAlertModal] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const params = new URLSearchParams(location.search);
+    const alertParam = params.get('alert');
+    const alertId = params.get('id_DS');
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -58,6 +64,7 @@ const MySchedulePage = () => {
                 console.error('Error loading schedules:', error);
             }
         };
+        alertParam && handleOpenAlert();
         fetchSchedules();
     }, []);
 
@@ -66,8 +73,17 @@ const MySchedulePage = () => {
         localStorage.setItem('id_DS', i.id_DS);
     }
 
+    const handleOpenAlert = () => {
+        setShowAlertModal(true);
+    }
+
+    const handleCloseAlert = () => {
+        setShowAlertModal(false);
+    }
+
     return (
         <div className="container-fluid px-5">
+            <AlertWindow showAlert={showAlertModal} handleCloseAlert={handleCloseAlert} alertId={alertId} /> 
             <div className="text-center my-4">
                 <h3>Защиты члена комиссии</h3>
             </div>
@@ -93,9 +109,10 @@ const MySchedulePage = () => {
                 </div>
             </>
             ) : (
-                <NoDataMessage />
+                <p>Данных нет</p>
             )}    
         </div>
+        
     );
 };
 

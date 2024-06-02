@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
-import {jwtDecode} from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 import './style-components/Login.css';
 
 function getFirstPageForRole(role) {
@@ -31,8 +31,18 @@ const LoginPage = () => {
 
       localStorage.setItem('token', token);
 
+      // Получаем параметры запроса из localStorage
+      const redirectParams = localStorage.getItem('redirectParams');
+      localStorage.removeItem('redirectParams'); // Удаляем их, чтобы они больше не использовались
+
       const firstPage = getFirstPageForRole(decoded.roles);
-      navigate(firstPage);
+
+      // Проверяем наличие параметров запроса и добавляем их к перенаправлению, если они есть
+      if (redirectParams) {
+        navigate(`${firstPage}${redirectParams}`);
+      } else {
+        navigate(firstPage);
+      }
     } catch (error) {
       console.error('Ошибка при авторизации:', error);
     }
