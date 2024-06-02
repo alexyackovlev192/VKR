@@ -8,15 +8,16 @@ const DefenderScheduleSecretariePage = () => {
     const { id_S } = useParams();
     const [defenderData, setDefenderData] = useState(null);
     const [redDiplom, setRedDiplom] = useState(false);
+    const result = localStorage.getItem('Result') || '';
 
     const [scoresData, setScoresData] = useState({});
     const [formData, setFormData] = useState({
-        Result: localStorage.getItem('Result') || '',
+        Result: result,
         RecMag: localStorage.getItem('RecMag') === 'Да',
         RecPub: localStorage.getItem('RecPub') === 'Да',
         NumberProtocol: localStorage.getItem('NumberProtocol') || ''
     });
-
+    const [changedFields, setChangedFields] = useState({});
     const id_U = localStorage.getItem('id_U');
     const id_DSS = localStorage.getItem('id_DSS');
     const id_DS = localStorage.getItem('id_DS');
@@ -66,8 +67,12 @@ const DefenderScheduleSecretariePage = () => {
             ...prevFormData,
             [name]: type === 'checkbox' ? checked : value
         }));
+        setChangedFields((prevFields) => ({
+            ...prevFields,
+            [name]: true
+        }));
     };
-
+    
     const handleRecChange = useCallback((field, value) => {
         setDefenderData(prevState => ({
             ...prevState,
@@ -75,8 +80,12 @@ const DefenderScheduleSecretariePage = () => {
         }));
         if (field === 'Red_Diplom') {
             setRedDiplom(value);
+            setChangedFields((prevFields) => ({
+                ...prevFields,
+                [field]: true
+            }));
         }
-    }, []);
+    }, [setDefenderData, setRedDiplom, setChangedFields]); 
 
     const handleSave = async () => {
         const token = localStorage.getItem('token');
@@ -87,21 +96,31 @@ const DefenderScheduleSecretariePage = () => {
             Result: formData.Result,
             RecMagistracy: formData.RecMag ? 'Да' : null,
             RecPublication: formData.RecPub ? 'Да' : null,
-            NumberProtocol: formData.NumberProtocol
+            NumberProtocol: formData.NumberProtocol,
+            Red_Diplom: redDiplom ? 'Да' : null
         };
-
         const dataToEdit = {
             id_U: id_U,
-            id_S: id_S,
-            Result: formData.Result,
-            RecMagistracy: formData.RecMag ? 'Да' : null,
-            RecPublication: formData.RecPub ? 'Да' : null,
-            NumberProtocol: formData.NumberProtocol
+            id_S: id_S
         };
-        console.log(dataToEdit);
+    
+        // Добавляем изменённые поля в тело запроса
+        Object.keys(changedFields).forEach(field => {
+            if (changedFields[field]) { 
+                if (field === 'RecMag') {
+                    dataToEdit['RecMagistracy'] = formData[field] ? 'Да' : null;
+                } else if (field === 'RecPub') {
+                    dataToEdit['RecPublication'] = formData[field] ? 'Да' : null;
+                } else {
+                    dataToEdit[field] = formData[field] || defenderData[field];
+                }
+            }
+        });
 
+        console.log(dataToEdit);
+        console.log(dataToSave);
         try {
-            if (formData.Result && parseInt(formData.Result) > 0) {
+            if (result && parseInt(result) > 0) {
                 await axios.put(`http://localhost:5000/resultComissionSecretary/${id_DSS}`, dataToEdit, {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -112,7 +131,7 @@ const DefenderScheduleSecretariePage = () => {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
-                });
+                })
             }
             navigate(`/my-schedule-sec/${id_DS}`);
             localStorage.removeItem('edit');
@@ -180,7 +199,7 @@ const DefenderScheduleSecretariePage = () => {
                                         <option value="5">5</option>
                                     </Form.Select>
                                 </td>
-                                <td>
+                                <td className={formData.RecMag ? "table-success" : "table-danger"}>
                                     <Form.Check
                                         type="checkbox"
                                         name="RecMag"
@@ -188,7 +207,7 @@ const DefenderScheduleSecretariePage = () => {
                                         onChange={handleInputChange}
                                     />
                                 </td>
-                                <td>
+                                <td className={formData.RecPub ? "table-success" : "table-danger"}>
                                     <Form.Check
                                         type="checkbox"
                                         name="RecPub"

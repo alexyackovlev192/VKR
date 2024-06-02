@@ -173,21 +173,15 @@ const DefenderSchedulePage = () => {
                                 <td>{defenderData.Topic}</td>
                                 <td>{defenderData.ScientificAdviser}</td>
                                 <td>{defenderData.Avg_Mark}</td>
-                                <td className={redDiplom ? "table-success" : "table-danger"}>
-                                    <Form.Check
-                                        type="checkbox"
-                                        checked={redDiplom}
-                                        onChange={() => handleRecChange('Red_Diplom', !redDiplom)}
-                                    />
-                                </td>
-                                <td>
+                                <td >{redDiplom}</td>
+                                <td className={recMag ? "table-success" : "table-danger"}>
                                     <Form.Check
                                         type="checkbox"
                                         checked={recMag}
                                         onChange={() => handleRecChange('magRec', !recMag)}
                                     />
                                 </td>
-                                <td>
+                                <td className={recPub ? "table-success" : "table-danger"}>
                                     <Form.Check
                                         type="checkbox"
                                         checked={recPub}

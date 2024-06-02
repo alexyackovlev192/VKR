@@ -131,10 +131,7 @@ const OpenMyScheduleSecretariePage = () => {
     return (
         <div className="container-fluid text-center px-5">
             <div className="row my-4">
-                <div className="col-1">
-                    <Button variant="primary" onClick={handleBackButton}>Назад</Button>
-                </div>
-                <h3 className="col-10">Защита №{id_DS}</h3>
+                <h3>Защита №{id_DS}</h3>
             </div>
             {filteredDefenders.length > 0 ? (
                 <>
