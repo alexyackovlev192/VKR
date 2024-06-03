@@ -63,17 +63,16 @@ const ImportUsersModal = ({ showModal, handleCloseModal, handleFileUpload }) => 
       <Modal.Body>
         <Form>
           <Form.Group controlId="formFile">
-            <Form.Label>Выберите файл</Form.Label>
             <Form.Control type="file" onChange={handleFileChange} />
           </Form.Group>
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleCloseModal}>
-          Закрыть
-        </Button>
         <Button variant="primary" onClick={handleImport}>
           Загрузить
+        </Button>
+        <Button variant="secondary" onClick={handleCloseModal}>
+          Закрыть
         </Button>
       </Modal.Footer>
     </Modal>

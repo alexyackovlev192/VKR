@@ -25,7 +25,7 @@ const AddUser = ({
 
       <Modal.Footer>
         <Button variant="primary" onClick={onSave}>
-          Сохранить изменения
+          Сохранить
         </Button>
         <Button variant="secondary" onClick={handleCloseModal}>
           Отмена

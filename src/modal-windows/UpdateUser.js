@@ -12,7 +12,7 @@ const UpdateUser = ({
   return (
     <Modal show={showModal} onHide={handleCloseModal}>
       <Modal.Header closeButton>
-        <Modal.Title>Редактирование ролей пользователя</Modal.Title>
+        <Modal.Title>Изменение списка ролей для {formData.Login}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
