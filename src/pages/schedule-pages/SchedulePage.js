@@ -350,7 +350,7 @@ const SchedulePage = () => {
           <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>Экспорт в Excel</Button>
         )}
       </div>
-      <div className="row">
+      <div className="row mx-5">
       {schedules.length > 0 ? (
         isTableView ? (
           <TableView
@@ -425,42 +425,44 @@ const TableView = ({ uniqueDates, uniqueDirections, filteredSchedules, handleSel
         </table>
       </div>
       <div className="col-11 px-0 my-4" style={{ overflowX: 'auto' }}>
-        <table className="table table-bordered table-light table-hover text-center" ref={tableRef}>
-          <thead className="table-dark">
-            <tr>
-              {uniqueDirections.map((direction, index) => (
-                <th className="px-5 py-3" key={index}>{direction[1]}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredSchedules.map(({ schedules }, dateIndex) => (
-              <tr key={dateIndex}>
-                {schedules.map((sched, directionIndex) => {
-                  const isActive = activeCell && sched && activeCell.date === sched.date && activeCell.Name_direction === sched.Name_direction;
-                  return (
-                    <td 
-                      onDoubleClick={() => handleOpenSchedule(activeCell)}
-                      key={directionIndex}
-                      className={`px-5 ${isActive ? 'table-info' : 'table-light'}`}
-                      onClick={() => handleSelectedClick({ event: sched })}
-                      style={{ height: '180px', verticalAlign: 'middle' }}
-                    >
-                      {sched ? (
-                        <span>
-                          <h5>Защита №{sched.id_DS}</h5>
-                          <p>ГЭК №{sched.id_G}</p>
-                          <p>Время: {sched.time}</p>
-                          <p>Аудитория: {sched.classroom}</p>
-                        </span>
-                      ) : ""}
-                    </td>
-                  );
-                })}
+        <div style={{ minWidth: '800px' }}> {/* Установите минимальную ширину, которая ограничивает ширину таблицы */}
+          <table className="table table-bordered table-light table-hover text-center" ref={tableRef}>
+            <thead className="table-dark">
+              <tr>
+                {uniqueDirections.map((direction, index) => (
+                  <th className="px-5 py-3" key={index}>{direction[1]}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredSchedules.map(({ schedules }, dateIndex) => (
+                <tr key={dateIndex}>
+                  {schedules.map((sched, directionIndex) => {
+                    const isActive = activeCell && sched && activeCell.date === sched.date && activeCell.Name_direction === sched.Name_direction;
+                    return (
+                      <td 
+                        onDoubleClick={() => handleOpenSchedule(activeCell)}
+                        key={directionIndex}
+                        className={`px-1 ${isActive ? 'table-info' : 'table-light'}`}
+                        onClick={() => handleSelectedClick({ event: sched })}
+                        style={{ height: '180px', verticalAlign: 'middle' }}
+                      >
+                        {sched ? (
+                          <span>
+                            <h5>Защита №{sched.id_DS}</h5>
+                            <p>ГЭК №{sched.id_G}</p>
+                            <p>Время: {sched.time}</p>
+                            <p>Аудитория: {sched.classroom}</p>
+                          </span>
+                        ) : ""}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </>
   );

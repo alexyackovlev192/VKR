@@ -10,7 +10,6 @@ const DefenderSchedulePage = () => {
     const [ratings, setRatings] = useState({});
     const [recMag, setRecMag] = useState(localStorage.getItem('RecMag') === 'Да');
     const [recPub, setRecPub] = useState(localStorage.getItem('RecPub') === 'Да');
-    const [redDiplom, setRedDiplom] = useState(false);
 
     const id_U = localStorage.getItem('id_U');
     const id_DSS = localStorage.getItem('id_DSS');
@@ -28,11 +27,10 @@ const DefenderSchedulePage = () => {
             setDefenderData(prevData => ({
                 ...prevData,
                 magRec: recMag ? 'Да' : null,
-                publRec: recPub ? 'Да' : null,
-                Red_Diplom: redDiplom ? 'Да' : null
+                publRec: recPub ? 'Да' : null
             }));
         }
-    }, [recMag, recPub, redDiplom]);
+    }, [recMag, recPub]);
 
     const fetchData = async () => {
         const token = localStorage.getItem('token');
@@ -42,8 +40,7 @@ const DefenderSchedulePage = () => {
                     'Authorization': `Bearer ${token}`
                 }
             });
-            setDefenderData(studentResponse.data);
-            setRedDiplom(studentResponse.data.Red_Diplom === 'Да');  
+            setDefenderData(studentResponse.data);  
         } catch (error) {
             console.error('Error fetching data:', error);
         }
@@ -58,8 +55,6 @@ const DefenderSchedulePage = () => {
             setRecMag(value);
         } else if (field === 'publRec') {
             setRecPub(value);
-        } else if (field === 'Red_Diplom') {
-            setRedDiplom(value);
         }
     }, []);
 
@@ -77,16 +72,14 @@ const DefenderSchedulePage = () => {
             id_U: id_U,
             scores: Object.values(ratings),
             RecMagistracy: recMag ? 'Да' : null,
-            RecPublication: recPub ? 'Да' : null,
-            Red_Diplom: redDiplom ? 'Да' : null
+            RecPublication: recPub ? 'Да' : null
         };
     
         const dataToEdit = {
             id_U: id_U,
             scores: Object.values(ratings),
             RecMagistracy: recMag ? 'Да' : null,
-            RecPublication: recPub ? 'Да' : null,
-            Red_Diplom: redDiplom ? 'Да' : null
+            RecPublication: recPub ? 'Да' : null
         };
     
         try {
@@ -173,7 +166,7 @@ const DefenderSchedulePage = () => {
                                 <td>{defenderData.Topic}</td>
                                 <td>{defenderData.ScientificAdviser}</td>
                                 <td>{defenderData.Avg_Mark}</td>
-                                <td >{redDiplom}</td>
+                                <td>{defenderData.Red_diplom ? 'Да' : 'Нет'}</td>
                                 <td className={recMag ? "table-success" : "table-danger"}>
                                     <Form.Check
                                         type="checkbox"

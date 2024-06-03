@@ -255,13 +255,13 @@ const DefenderScheduleSecretariePage = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {scoresData && (
-                                <tr key={scoresData.id}>
-                                    <td>{scoresData.averageResult}</td>
-                                    <td>{scoresData.RecMagistracy}</td>
-                                    <td>{scoresData.RecPublication}</td>
-                                </tr>
-                            )}
+                        {scoresData && (
+                        <tr key={scoresData.id}>
+                            <td>{parseFloat(scoresData.averageResult).toFixed(2)}</td> {/* Округление до 2 десятичных знаков */}
+                            <td>{scoresData.RecMagistracy}</td>
+                            <td>{scoresData.RecPublication}</td>
+                        </tr>
+                        )}
                         </tbody>
                     </table>
                 </div>  
