@@ -53,7 +53,7 @@ const LoginPage = () => {
       <div className="col-md-3 rounded-4">
         <Form className="forma bg-light rounded-4 shadow-lg">
           <Form.Group controlId="formBasicUsername" className="px-3 py-2 fs-5">
-            <Form.Label>Username</Form.Label>
+            <Form.Label>Логин</Form.Label>
             <Form.Control
               type="text"
               placeholder="Enter username"
@@ -62,7 +62,7 @@ const LoginPage = () => {
             />
           </Form.Group>
           <Form.Group controlId="formBasicPassword" className="px-3 my-2 fs-5">
-            <Form.Label>Password</Form.Label>
+            <Form.Label>Пароль</Form.Label>
             <Form.Control
               type="password"
               placeholder="Enter password"
