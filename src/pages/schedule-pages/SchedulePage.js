@@ -347,7 +347,7 @@ const SchedulePage = () => {
         <Button variant="primary" className="mx-3" onClick={handleAddSchedule}>Добавить</Button>
         <Button variant="primary" className="mx-3" onClick={toggleView}>{isTableView ? 'Карточки' : 'Таблица'}</Button>
         {schedules.length > 0 && (
-          <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>Экспорт в Excel</Button>
+          <Button variant="secondary" className="mx-3" onClick={handleExportToExcel}>Скачать расписание</Button>
         )}
       </div>
       <div className="row mx-5">

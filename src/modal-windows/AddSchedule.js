@@ -27,7 +27,7 @@ const AddSchedule = ({
 
       <Modal.Footer>
         <Button variant="primary" onClick={() => handleSaveChanges(formData)}>
-          Сохранить изменения
+          Сохранить
         </Button>
         <Button variant="secondary" onClick={handleCloseModal}>
           Отмена

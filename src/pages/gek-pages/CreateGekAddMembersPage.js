@@ -115,7 +115,7 @@ const CreateGekAddMemberPage = () => {
       </div>
       <div className="row justify-content-evenly">
         <Card style={{ minWidth: '500px', width: '40%', height: '70vh', overflowY: 'auto' }} className="my-2 text-center bg-light">
-          <Card.Header className="fs-4 bg-light">Новая ГЭК</Card.Header>
+          <Card.Header className="fs-4 bg-light">Состав новой ГЭК</Card.Header>
           <Card.Body> 
             <h5 className="my-2">Состав</h5>
             <ListGroup className="container text-center">

@@ -10,8 +10,8 @@ const navigationItems = {
     { href: "/logout", text: "Выход" }
   ],
   2: [
-    { href: "/my-schedule", text: "Защиты члена комиссии" },
     { href: "/my-gek", text: "ГЭК члена комиссии" },
+    { href: "/my-schedule", text: "Защиты члена комиссии" },
     { href: "/logout", text: "Выход" }
   ],
   3: [
@@ -24,8 +24,8 @@ const navigationItems = {
     { href: "/logout", text: "Выход" }
   ],
   4: [
-    { href: "/my-schedule-sec", text: "Защиты секретаря" },
     { href: "/my-gek-sec", text: "ГЭК секретаря" },
+    { href: "/my-schedule-sec", text: "Защиты секретаря" },
     { href: "/logout", text: "Выход" }
   ]
 };
@@ -65,8 +65,8 @@ const Navigation = () => {
   });
 
   const sortedNavigationItems = [
-    ...allUserItems.filter(item => item.href === "/my-schedule"),
     ...allUserItems.filter(item => item.href === "/my-gek"),
+    ...allUserItems.filter(item => item.href === "/my-schedule"),
     ...allUserItems.filter(item => item.href !== "/logout" && item.href !== "/my-schedule" && item.href !== "/my-gek"),
     ...allUserItems.filter(item => item.href === "/logout")
   ];

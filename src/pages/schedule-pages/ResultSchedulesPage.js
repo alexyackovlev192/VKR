@@ -234,12 +234,15 @@ const ResultSchedulesPage = () => {
                 Вывести
             </Button>
             {results.length > 0 &&
-            <Button variant="primary" onClick={handleSelectAll} className="mx-3">
-                Вывести все
-            </Button>}
-            <Button variant="secondary" type="button" className="mx-3" onClick={handleExportToExcel}>
-                Скачать таблицу
-            </Button>
+              <>
+                <Button variant="primary" onClick={handleSelectAll} className="mx-3">
+                    Вывести все
+                </Button>
+                <Button variant="secondary" type="button" className="mx-3" onClick={handleExportToExcel}>
+                    Скачать таблицу
+                </Button>
+              </>
+            }
         </div>
       </form>
       {results.length > 0 &&

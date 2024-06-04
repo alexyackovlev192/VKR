@@ -339,7 +339,7 @@ const DefendersPage = () => {
       {sortedDefenders.length > 0 && (
         <>
           <Link to={`/list-defenders`} className="mx-3 ">
-            <Button variant="primary" className="">Составы защищающихся</Button>
+            <Button variant="primary" className="">Составы</Button>
           </Link>
           <Button variant="secondary" className="mx-3" onClick={handleExport}>
             Скачать таблицу

@@ -8,9 +8,9 @@ import './style-components/Login.css';
 function getFirstPageForRole(role) {
   const rolePages = {
     1: "/users",
-    2: "/my-schedule",
+    2: "/my-gek",
     3: "/members",
-    4: "/my-schedule-sec"
+    4: "/my-gek-sec"
   };
   return rolePages[role[0]] || "/auth";
 }
